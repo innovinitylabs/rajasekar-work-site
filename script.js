@@ -1,6 +1,5 @@
 const root = document.documentElement;
 const themeToggle = document.querySelector(".theme-toggle");
-const themeToggleLabel = document.querySelector(".theme-toggle-label");
 const revealElements = [...document.querySelectorAll(".reveal")];
 
 const setTheme = (theme) => {
@@ -16,10 +15,6 @@ const setTheme = (theme) => {
     "aria-label",
     isDark ? "Switch to light mode" : "Switch to dark mode"
   );
-
-  if (themeToggleLabel) {
-    themeToggleLabel.textContent = isDark ? "Light" : "Dark";
-  }
 };
 
 if (themeToggle) {
