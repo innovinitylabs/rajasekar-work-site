@@ -34,12 +34,57 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   color: var(--text);
   background: var(--bg);
   line-height: 1.65;
+}
+
+html.theme-intro body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  background: #111313;
+  opacity: 0.3;
+}
+
+html.theme-ready.theme-intro body::before {
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+html.theme-ready body,
+html.theme-ready .site-nav a,
+html.theme-ready .theme-toggle,
+html.theme-ready .theme-toggle-track,
+html.theme-ready .theme-toggle-thumb,
+html.theme-ready .brand,
+html.theme-ready .button,
+html.theme-ready .proof-grid,
+html.theme-ready .proof-card,
+html.theme-ready .experience-card,
+html.theme-ready .project-card,
+html.theme-ready .skill-group,
+html.theme-ready .education-card,
+html.theme-ready .contact-card,
+html.theme-ready .tag-list li,
+html.theme-ready .proof-value,
+html.theme-ready .proof-text,
+html.theme-ready .experience-header p,
+html.theme-ready .timeline,
+html.theme-ready .project-top a,
+html.theme-ready .contact-value,
+html.theme-ready .education-meta,
+html.theme-ready .education-card p {
+  transition:
+    background-color 0.9s ease,
+    color 0.9s ease,
+    border-color 0.9s ease;
 }
 
 a {

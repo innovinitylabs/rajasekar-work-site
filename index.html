@@ -12,12 +12,12 @@
       document.documentElement.classList.add("js");
       (function () {
         const storedTheme = localStorage.getItem("theme");
-        const systemPrefersDark =
-          window.matchMedia &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const resolvedTheme =
-          storedTheme || (systemPrefersDark ? "dark" : "light");
+        const resolvedTheme = storedTheme || "light";
         document.documentElement.dataset.theme = resolvedTheme;
+
+        if (resolvedTheme === "light") {
+          document.documentElement.classList.add("theme-intro");
+        }
       })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />

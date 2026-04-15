@@ -24,8 +24,34 @@ if (themeToggle) {
     const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
     localStorage.setItem("theme", nextTheme);
+    root.classList.remove("theme-intro");
+    root.classList.add("theme-ready");
   });
 }
+
+window.addEventListener(
+  "load",
+  () => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      root.classList.remove("theme-intro");
+      root.classList.add("theme-ready");
+      return;
+    }
+
+    window.setTimeout(() => {
+      root.classList.add("theme-ready");
+
+      if (root.classList.contains("theme-intro")) {
+        window.setTimeout(() => root.classList.remove("theme-intro"), 950);
+      }
+    }, 120);
+  },
+  { once: true }
+);
 
 const revealIfInView = (element) => {
   const rect = element.getBoundingClientRect();
