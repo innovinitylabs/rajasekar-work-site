@@ -1,32 +1,36 @@
 const root = document.documentElement;
-const themeToggle = document.querySelector(".theme-toggle");
+const themeToggles = [...document.querySelectorAll(".theme-toggle")];
 const revealElements = [...document.querySelectorAll(".reveal")];
 
 const setTheme = (theme) => {
   root.dataset.theme = theme;
 
-  if (!themeToggle) {
+  if (!themeToggles.length) {
     return;
   }
 
   const isDark = theme === "dark";
-  themeToggle.setAttribute("aria-pressed", String(isDark));
-  themeToggle.setAttribute(
-    "aria-label",
-    isDark ? "Switch to light mode" : "Switch to dark mode"
-  );
+  themeToggles.forEach((themeToggle) => {
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute(
+      "aria-label",
+      isDark ? "Switch to light mode" : "Switch to dark mode"
+    );
+  });
 };
 
-if (themeToggle) {
+if (themeToggles.length) {
   setTheme(root.dataset.theme || "light");
 
-  themeToggle.addEventListener("click", () => {
-    const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    localStorage.setItem("theme", nextTheme);
-    root.classList.remove("theme-intro");
-    root.classList.add("theme-ready");
-  });
+  themeToggles.forEach((themeToggle) =>
+    themeToggle.addEventListener("click", () => {
+      const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+      setTheme(nextTheme);
+      localStorage.setItem("theme", nextTheme);
+      root.classList.remove("theme-intro");
+      root.classList.add("theme-ready");
+    })
+  );
 }
 
 window.addEventListener(
