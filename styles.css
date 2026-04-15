@@ -326,22 +326,17 @@ img {
 .proof-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
+  gap: 1.75rem;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
 
 .proof-card {
-  padding: 1rem 0.95rem 1rem 0;
+  padding: 1.15rem 0;
   background: transparent;
   border: 0;
-  border-right: 1px solid var(--line);
   border-radius: 0;
   box-shadow: none;
-}
-
-.proof-card:last-child {
-  border-right: 0;
 }
 
 .proof-value {
@@ -431,6 +426,10 @@ img {
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 0.75rem;
+}
+
+.project-links-bottom {
+  margin-top: 0.9rem;
 }
 
 .project-top a {
@@ -578,7 +577,6 @@ img {
 
   .proof-card {
     padding: 0.9rem 0;
-    border-right: 0;
     border-bottom: 1px solid var(--line);
   }
 
