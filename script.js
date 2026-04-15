@@ -1,4 +1,36 @@
+const root = document.documentElement;
+const themeToggle = document.querySelector(".theme-toggle");
+const themeToggleLabel = document.querySelector(".theme-toggle-label");
 const revealElements = [...document.querySelectorAll(".reveal")];
+
+const setTheme = (theme) => {
+  root.dataset.theme = theme;
+
+  if (!themeToggle) {
+    return;
+  }
+
+  const isDark = theme === "dark";
+  themeToggle.setAttribute("aria-pressed", String(isDark));
+  themeToggle.setAttribute(
+    "aria-label",
+    isDark ? "Switch to light mode" : "Switch to dark mode"
+  );
+
+  if (themeToggleLabel) {
+    themeToggleLabel.textContent = isDark ? "Light" : "Dark";
+  }
+};
+
+if (themeToggle) {
+  setTheme(root.dataset.theme || "light");
+
+  themeToggle.addEventListener("click", () => {
+    const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    localStorage.setItem("theme", nextTheme);
+  });
+}
 
 const revealIfInView = (element) => {
   const rect = element.getBoundingClientRect();
