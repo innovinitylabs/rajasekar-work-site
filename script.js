@@ -77,8 +77,10 @@ const buildResumePdf = (JsPDF, data) => {
     y += gap;
   };
 
-  const sectionHeading = (label) => {
-    ensureSpace(26);
+  const sectionHeading = (label, reserve = 62) => {
+    // Reserve room for the heading plus its first lines so a heading never
+    // lands alone at the bottom of a page (no orphan headings).
+    ensureSpace(reserve);
     y += 6;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
@@ -160,6 +162,20 @@ const buildResumePdf = (JsPDF, data) => {
       .join("   |   ");
     writeLines(links, { size: 8.6, color: ACCENT, gap: 6 });
   });
+
+  // Awards
+  if (Array.isArray(data.awards) && data.awards.length) {
+    sectionHeading("Awards");
+    data.awards.forEach((award) => {
+      writeLines(`${award.title} - ${award.org}`, {
+        size: 10.5,
+        style: "bold",
+        color: INK,
+        gap: 1,
+      });
+      writeLines(award.description, { size: 9.3, color: MUTE, gap: 6 });
+    });
+  }
 
   // Skills
   sectionHeading("Skills");

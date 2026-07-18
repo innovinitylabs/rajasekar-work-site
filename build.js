@@ -176,6 +176,25 @@ const webFooterLinks = () => {
   ].join("\n");
 };
 
+const webAwards = () =>
+  data.awards
+    .map((award) =>
+      [
+        `<article class="experience-card">`,
+        `  <div class="experience-header">`,
+        `    <div>`,
+        `      <h3>${escapeHtml(award.title)}</h3>`,
+        `      <p>${escapeHtml(award.org)}</p>`,
+        `    </div>`,
+        `  </div>`,
+        `  <ul>`,
+        `    <li>${escapeHtml(award.description)}</li>`,
+        `  </ul>`,
+        `</article>`,
+      ].join("\n")
+    )
+    .join("\n\n");
+
 /* ------------------------------ print markup ------------------------------ */
 
 const printContact = () => {
@@ -226,6 +245,18 @@ const printProjects = () =>
     })
     .join("\n\n");
 
+const printAwards = () =>
+  data.awards
+    .map((award) =>
+      [
+        `<div class="project">`,
+        `  <h3>${escapeHtml(award.title)} - ${escapeHtml(award.org)}</h3>`,
+        `  <p>${escapeHtml(award.description)}</p>`,
+        `</div>`,
+      ].join("\n")
+    )
+    .join("\n\n");
+
 const printSkills = () =>
   data.skills
     .map(
@@ -258,6 +289,7 @@ indexHtml = replaceRegion(indexHtml, "eyebrow", escapeHtml(data.title), 0);
 indexHtml = replaceRegion(indexHtml, "summary", escapeHtml(data.summary), 16);
 indexHtml = replaceRegion(indexHtml, "experience", webExperience(), 14);
 indexHtml = replaceRegion(indexHtml, "projects", webProjects(), 14);
+indexHtml = replaceRegion(indexHtml, "awards", webAwards(), 14);
 indexHtml = replaceRegion(indexHtml, "skills", webSkills(), 14);
 indexHtml = replaceRegion(indexHtml, "education", webEducation(), 14);
 indexHtml = replaceRegion(indexHtml, "contact", webContact(), 14);
@@ -270,6 +302,7 @@ sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(data.summary), 10);
 sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);
 sourceHtml = replaceRegion(sourceHtml, "projects", printProjects(), 8);
+sourceHtml = replaceRegion(sourceHtml, "awards", printAwards(), 8);
 sourceHtml = replaceRegion(sourceHtml, "skills", printSkills(), 10);
 sourceHtml = replaceRegion(sourceHtml, "education", printEducation(), 10);
 sourceHtml = replaceRegion(sourceHtml, "footer", printFooter(), 10);
