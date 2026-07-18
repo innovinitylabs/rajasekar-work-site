@@ -1,0 +1,114 @@
+{
+  "name": "Rajasekar C",
+  "title": "Data Engineer | Product Engineer | Founder",
+  "summary": "Data and backend engineer with 5+ years building high-volume production systems. Deep in SQL, Python, PostgreSQL, and ETL, with a proven track record in data engineering and backend engineering at scale (~50M records/day). Now focused on independent product development, shipping software end to end.",
+  "contact": {
+    "phone": { "label": "+91 7904348791", "url": "tel:+917904348791" },
+    "email": { "label": "rajasekarc1142@gmail.com", "url": "mailto:rajasekarc1142@gmail.com" },
+    "linkedin": { "label": "linkedin.com/in/rajasekar-c", "url": "https://linkedin.com/in/rajasekar-c" },
+    "github": { "label": "github.com/innovinitylabs", "url": "https://github.com/innovinitylabs" }
+  },
+  "links": {
+    "portfolio": { "label": "rajasekar.work", "url": "https://rajasekar.work" },
+    "creative": { "label": "valipokkann.in", "url": "https://valipokkann.in" }
+  },
+  "experience": [
+    {
+      "org": "Independent Product Engineer & Founder",
+      "role": "Building and shipping software products",
+      "period": "Jun 2025 - Present",
+      "bullets": [
+        "Design and build software products end to end, owning system architecture, backend, and deployment",
+        "Build backend services and REST APIs on PostgreSQL and Redis, adding caching and automated background jobs for reliability",
+        "Containerize and ship services with Docker, managing source, releases, and CI-style workflows through Git and GitHub",
+        "Automate data indexing, metadata handling, and operational tasks to cut manual effort and keep systems consistent",
+        "Use AI-assisted development (Cursor, Claude, Codex) to accelerate build-test-iterate cycles and ship product improvements continuously"
+      ]
+    },
+    {
+      "org": "Digit Insurance",
+      "role": "Data Engineer",
+      "period": "Nov 2023 - Jun 2025",
+      "bullets": [
+        "Built a Flask and Pandas tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, winning the company \"Tech Titan\" award",
+        "Designed and operated ETL pipelines processing ~50M records/day, keeping downstream reporting accurate and on time",
+        "Automated MoEngage customer notifications with real-time stored procedures for policy-renewal detection, removing redundant alerts",
+        "Versioned PostgreSQL schemas by extracting DDL into Git, making deployments traceable, reviewable, and reproducible",
+        "Implemented PII classification and secure credential storage to keep data handling compliant",
+        "Delivered ETL pipelines and schemas for the Bima Satrak regulatory reporting service",
+        "Resolved 4000+ production issues, cutting the open backlog from ~600 to under 70",
+        "Automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas, replacing manual runs"
+      ]
+    },
+    {
+      "org": "Appzwork",
+      "role": "Software Engineer",
+      "period": "Jan 2020 - Nov 2023",
+      "bullets": [
+        "Built Oracle SQL and PL/SQL solutions, including queries, stored procedures, and reports, for banking and insurance clients",
+        "Provided production support for live banking and insurance systems, owning incident response and root-cause analysis",
+        "Optimized database performance by tuning slow queries and stored procedures under high-usage workloads",
+        "Managed deployments and database maintenance and recovery across client production environments"
+      ]
+    },
+    {
+      "org": "Construction Business",
+      "role": "Founder / Civil Engineer",
+      "period": "2013 - 2019",
+      "bullets": [
+        "Founded and ran a construction business delivering residential and commercial projects end to end",
+        "Managed vendors, clients, budgets, and schedules across concurrent projects",
+        "Led site teams and daily operations, owning quality and on-time delivery"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Valipokkann",
+      "description": "A custom-built art and writing site that replaces an off-the-shelf CMS, handling dynamic content, media management, and page rendering for galleries and long-form work.",
+      "links": [
+        { "label": "Live site", "url": "https://valipokkann.in" },
+        { "label": "GitHub", "url": "https://github.com/innovinitylabs/valipokkann_in" }
+      ]
+    },
+    {
+      "name": "Hard Copy",
+      "description": "A native iPad note-taking app built for fast, structured capture and document organization, with a data model designed for quick entry and retrieval.",
+      "links": [
+        { "label": "GitHub", "url": "https://github.com/innovinitylabs/free-notes" }
+      ]
+    },
+    {
+      "name": "Onchain Rugs",
+      "description": "An on-chain generative art system that solves deterministic asset generation, on-chain metadata, and event indexing so every minted asset stays verifiable and reproducible.",
+      "links": [
+        { "label": "Live site", "url": "https://onchainrugs.xyz" },
+        { "label": "GitHub", "url": "https://github.com/innovinitylabs/onchain-rug" }
+      ]
+    },
+    {
+      "name": "Madraschecks",
+      "description": "A browser-based procedural generator that recreates Madras check textiles from seeded algorithms, so each pattern is unique yet historically accurate, paired with a research site on the textile's history.",
+      "links": [
+        { "label": "Live site", "url": "http://www.madraschecks.com" },
+        { "label": "Generator", "url": "https://madras-generator.madraschecks.com/" },
+        { "label": "GitHub", "url": "https://github.com/innovinitylabs/checks-of-time-beta" }
+      ]
+    }
+  ],
+  "skills": [
+    { "group": "Languages", "items": ["SQL", "PL/SQL", "Python", "Shell"] },
+    { "group": "Databases", "items": ["PostgreSQL", "Oracle", "Redis", "DB2"] },
+    { "group": "Backend", "items": ["Flask", "REST API", "Stored Procedures", "Database Design", "Performance Optimisation"] },
+    { "group": "Data Engineering", "items": ["ETL", "Data Modelling", "Data Warehousing", "Pandas", "Automation"] },
+    { "group": "Cloud & Big Data", "items": ["PySpark", "ClickHouse", "Databricks (Learning)"] },
+    { "group": "DevOps", "items": ["Docker", "Git", "Linux", "GitHub Workflows"] },
+    { "group": "AI Development", "items": ["Cursor", "Claude", "Codex", "OpenClaw"] },
+    { "group": "Developer Tools", "items": ["Xcode", "Selenium", "MoEngage"] }
+  ],
+  "education": [
+    { "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" },
+    { "level": "HSC", "meta": "87.4%", "place": "Infant Jesus MHSS" },
+    { "level": "SSLC", "meta": "86.5%", "place": "St. Mary's Matriculation" }
+  ]
+}

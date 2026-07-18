@@ -64,15 +64,14 @@
         <section class="hero">
           <div class="container hero-grid">
             <div class="hero-copy">
-              <p class="eyebrow">Independent Product Engineer | Data Engineer | Founder</p>
+              <p class="eyebrow"><!-- build:eyebrow -->
+Data Engineer | Product Engineer | Founder
+<!-- /build:eyebrow --></p>
               <h1>Rajasekar C</h1>
               <p class="hero-summary">
-                Engineer with 5+ years across data engineering, backend
-                engineering, and product engineering. Strong in SQL and
-                Python, with hands-on experience designing ETL pipelines and
-                operating high-volume production systems (~50M records/day).
-                Currently building independent products end to end as a
-                founder.
+                <!-- build:summary -->
+                Data and backend engineer with 5+ years building high-volume production systems. Deep in SQL, Python, PostgreSQL, and ETL, with a proven track record in data engineering and backend engineering at scale (~50M records/day). Now focused on independent product development, shipping software end to end.
+              <!-- /build:summary -->
               </p>
               <div class="hero-actions">
                 <a class="button button-primary" href="#projects">View Projects</a>
@@ -124,21 +123,21 @@
             </div>
 
             <div class="experience-list">
+              <!-- build:experience -->
               <article class="experience-card">
                 <div class="experience-header">
                   <div>
                     <h3>Independent Product Engineer &amp; Founder</h3>
-                    <p>Self-directed product development</p>
+                    <p>Building and shipping software products</p>
                   </div>
                   <span class="timeline">Jun 2025 - Present</span>
                 </div>
                 <ul>
-                  <li>Founded and ship multiple independent products, owning system architecture, backend, frontend, and deployment end to end</li>
-                  <li>Designed backend systems on PostgreSQL and Redis with REST APIs, caching layers, and automated background workflows</li>
-                  <li>Built and deployed containerized services with Docker, managing releases and version control workflows through GitHub</li>
-                  <li>Developed on-chain infrastructure and generative asset systems, including indexing pipelines and metadata architecture</li>
-                  <li>Integrated AI-assisted engineering workflows with Cursor, Codex, and Claude to compress build-test-iterate cycles on production code</li>
-                  <li>Iterated rapidly on live products, shipping architecture and feature changes continuously based on real usage</li>
+                <li>Design and build software products end to end, owning system architecture, backend, and deployment</li>
+                <li>Build backend services and REST APIs on PostgreSQL and Redis, adding caching and automated background jobs for reliability</li>
+                <li>Containerize and ship services with Docker, managing source, releases, and CI-style workflows through Git and GitHub</li>
+                <li>Automate data indexing, metadata handling, and operational tasks to cut manual effort and keep systems consistent</li>
+                <li>Use AI-assisted development (Cursor, Claude, Codex) to accelerate build-test-iterate cycles and ship product improvements continuously</li>
                 </ul>
               </article>
 
@@ -151,30 +150,14 @@
                   <span class="timeline">Nov 2023 - Jun 2025</span>
                 </div>
                 <ul>
-                  <li>
-                    Built a Flask and Pandas tool that cut Vahan issue
-                    resolution from ~30 minutes to under 1 minute; awarded
-                    "Tech Titan"
-                  </li>
-                  <li>Designed and operated ETL pipelines processing ~50M records per day</li>
-                  <li>
-                    Developed real-time stored procedures for policy renewal
-                    detection, automating MoEngage notifications and
-                    eliminating redundant alerts
-                  </li>
-                  <li>
-                    Automated Postgres schema versioning by extracting DDL and
-                    syncing it to Git, making deployments traceable and
-                    reproducible
-                  </li>
-                  <li>
-                    Implemented PII classification and secure credential
-                    storage workflows to meet compliance requirements
-                  </li>
-                  <li>Built ETL pipelines and database schemas for the Bima Satrak regulatory reporting service</li>
-                  <li>Resolved 4000+ production issues, driving the open backlog down from ~600 to under 70</li>
-                  <li>Built Pandas-based Excel-to-database ingestion tools that removed manual data loading from operational workflows</li>
-                  <li>Automated credit update processes with SQL stored procedures, replacing repetitive manual query runs</li>
+                <li>Built a Flask and Pandas tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, winning the company &quot;Tech Titan&quot; award</li>
+                <li>Designed and operated ETL pipelines processing ~50M records/day, keeping downstream reporting accurate and on time</li>
+                <li>Automated MoEngage customer notifications with real-time stored procedures for policy-renewal detection, removing redundant alerts</li>
+                <li>Versioned PostgreSQL schemas by extracting DDL into Git, making deployments traceable, reviewable, and reproducible</li>
+                <li>Implemented PII classification and secure credential storage to keep data handling compliant</li>
+                <li>Delivered ETL pipelines and schemas for the Bima Satrak regulatory reporting service</li>
+                <li>Resolved 4000+ production issues, cutting the open backlog from ~600 to under 70</li>
+                <li>Automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas, replacing manual runs</li>
                 </ul>
               </article>
 
@@ -187,10 +170,10 @@
                   <span class="timeline">Jan 2020 - Nov 2023</span>
                 </div>
                 <ul>
-                  <li>Developed Oracle SQL and PL/SQL solutions, including complex queries, stored procedures, and reporting workflows, for banking and insurance clients</li>
-                  <li>Provided production support for live banking and insurance systems, handling incident triage, root-cause analysis, and deployments</li>
-                  <li>Improved database performance by tuning slow queries and optimizing stored procedures in high-usage workloads</li>
-                  <li>Supported database maintenance and recovery operations for client production environments</li>
+                <li>Built Oracle SQL and PL/SQL solutions, including queries, stored procedures, and reports, for banking and insurance clients</li>
+                <li>Provided production support for live banking and insurance systems, owning incident response and root-cause analysis</li>
+                <li>Optimized database performance by tuning slow queries and stored procedures under high-usage workloads</li>
+                <li>Managed deployments and database maintenance and recovery across client production environments</li>
                 </ul>
               </article>
 
@@ -203,11 +186,12 @@
                   <span class="timeline">2013 - 2019</span>
                 </div>
                 <ul>
-                  <li>Founded and ran a construction business, managing residential and commercial projects from planning to handover</li>
-                  <li>Managed vendors, clients, budgets, and schedules across concurrent projects</li>
-                  <li>Led site teams and daily operations, owning quality control and on-time delivery</li>
+                <li>Founded and ran a construction business delivering residential and commercial projects end to end</li>
+                <li>Managed vendors, clients, budgets, and schedules across concurrent projects</li>
+                <li>Led site teams and daily operations, owning quality and on-time delivery</li>
                 </ul>
               </article>
+            <!-- /build:experience -->
             </div>
           </div>
         </section>
@@ -219,78 +203,17 @@
             </div>
 
             <div class="projects-grid">
+              <!-- build:projects -->
               <article class="project-card">
                 <div class="project-top">
                   <h3>Valipokkann</h3>
                 </div>
                 <ul>
-                  <li>Personal art and writing site built as a custom web application instead of an off-the-shelf CMS. Handles dynamic content management, media organization, and page rendering for galleries and written work.</li>
+                  <li>A custom-built art and writing site that replaces an off-the-shelf CMS, handling dynamic content, media management, and page rendering for galleries and long-form work.</li>
                 </ul>
                 <div class="project-links project-links-bottom">
-                  <a
-                    href="https://valipokkann.in"
-                    target="_blank"
-                    rel="noreferrer"
-                    >Live site</a
-                  >
-                  <a
-                    href="https://github.com/innovinitylabs/valipokkann_in"
-                    target="_blank"
-                    rel="noreferrer"
-                    >GitHub</a
-                  >
-                </div>
-              </article>
-
-              <article class="project-card">
-                <div class="project-top">
-                  <h3>Onchain Rugs</h3>
-                </div>
-                <ul>
-                  <li>Generative art project deployed on-chain. Solves deterministic asset generation, on-chain metadata architecture, and event indexing so minted assets can be generated, served, and tracked reliably at scale.</li>
-                </ul>
-                <div class="project-links project-links-bottom">
-                  <a
-                    href="https://onchainrugs.xyz"
-                    target="_blank"
-                    rel="noreferrer"
-                    >Live site</a
-                  >
-                  <a
-                    href="https://github.com/innovinitylabs/onchain-rug"
-                    target="_blank"
-                    rel="noreferrer"
-                    >GitHub</a
-                  >
-                </div>
-              </article>
-
-              <article class="project-card">
-                <div class="project-top">
-                  <h3>Madraschecks</h3>
-                </div>
-                <ul>
-                  <li>Procedural generator that recreates Madras check textile patterns in the browser. Encodes pattern structure as seeded algorithms so each output is unique yet historically grounded, paired with a research site documenting the textile's history.</li>
-                </ul>
-                <div class="project-links project-links-bottom">
-                  <a
-                    href="http://www.madraschecks.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    >Live site</a
-                  >
-                  <a
-                    href="https://madras-generator.madraschecks.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    >Generator</a
-                  >
-                  <a
-                    href="https://github.com/innovinitylabs/checks-of-time-beta"
-                    target="_blank"
-                    rel="noreferrer"
-                    >GitHub</a
-                  >
+                <a href="https://valipokkann.in" target="_blank" rel="noreferrer">Live site</a>
+                <a href="https://github.com/innovinitylabs/valipokkann_in" target="_blank" rel="noreferrer">GitHub</a>
                 </div>
               </article>
 
@@ -299,17 +222,40 @@
                   <h3>Hard Copy</h3>
                 </div>
                 <ul>
-                  <li>Native iPad note-taking application. Addresses structured note capture and document organization, with a data model and interface designed for fast entry and retrieval.</li>
+                  <li>A native iPad note-taking app built for fast, structured capture and document organization, with a data model designed for quick entry and retrieval.</li>
                 </ul>
                 <div class="project-links project-links-bottom">
-                  <a
-                    href="https://github.com/innovinitylabs/free-notes"
-                    target="_blank"
-                    rel="noreferrer"
-                    >GitHub</a
-                  >
+                <a href="https://github.com/innovinitylabs/free-notes" target="_blank" rel="noreferrer">GitHub</a>
                 </div>
               </article>
+
+              <article class="project-card">
+                <div class="project-top">
+                  <h3>Onchain Rugs</h3>
+                </div>
+                <ul>
+                  <li>An on-chain generative art system that solves deterministic asset generation, on-chain metadata, and event indexing so every minted asset stays verifiable and reproducible.</li>
+                </ul>
+                <div class="project-links project-links-bottom">
+                <a href="https://onchainrugs.xyz" target="_blank" rel="noreferrer">Live site</a>
+                <a href="https://github.com/innovinitylabs/onchain-rug" target="_blank" rel="noreferrer">GitHub</a>
+                </div>
+              </article>
+
+              <article class="project-card">
+                <div class="project-top">
+                  <h3>Madraschecks</h3>
+                </div>
+                <ul>
+                  <li>A browser-based procedural generator that recreates Madras check textiles from seeded algorithms, so each pattern is unique yet historically accurate, paired with a research site on the textile's history.</li>
+                </ul>
+                <div class="project-links project-links-bottom">
+                <a href="http://www.madraschecks.com" target="_blank" rel="noreferrer">Live site</a>
+                <a href="https://madras-generator.madraschecks.com/" target="_blank" rel="noreferrer">Generator</a>
+                <a href="https://github.com/innovinitylabs/checks-of-time-beta" target="_blank" rel="noreferrer">GitHub</a>
+                </div>
+              </article>
+            <!-- /build:projects -->
             </div>
           </div>
         </section>
@@ -321,75 +267,87 @@
             </div>
 
             <div class="skills-grid">
+              <!-- build:skills -->
               <article class="skill-group">
                 <h3>Languages</h3>
                 <ul class="tag-list">
-                  <li>SQL</li>
-                  <li>PL/SQL</li>
-                  <li>Python</li>
-                  <li>Shell</li>
+                <li>SQL</li>
+                <li>PL/SQL</li>
+                <li>Python</li>
+                <li>Shell</li>
                 </ul>
               </article>
 
               <article class="skill-group">
                 <h3>Databases</h3>
                 <ul class="tag-list">
-                  <li>PostgreSQL</li>
-                  <li>Oracle</li>
-                  <li>Redis</li>
-                  <li>ClickHouse</li>
-                  <li>DB2</li>
+                <li>PostgreSQL</li>
+                <li>Oracle</li>
+                <li>Redis</li>
+                <li>DB2</li>
                 </ul>
               </article>
 
               <article class="skill-group">
                 <h3>Backend</h3>
                 <ul class="tag-list">
-                  <li>Flask</li>
-                  <li>REST API integration</li>
-                  <li>Stored Procedures</li>
-                  <li>Performance Optimisation</li>
+                <li>Flask</li>
+                <li>REST API</li>
+                <li>Stored Procedures</li>
+                <li>Database Design</li>
+                <li>Performance Optimisation</li>
                 </ul>
               </article>
 
               <article class="skill-group">
                 <h3>Data Engineering</h3>
                 <ul class="tag-list">
-                  <li>ETL Pipelines</li>
-                  <li>Data Modelling</li>
-                  <li>Pandas</li>
-                  <li>PySpark</li>
+                <li>ETL</li>
+                <li>Data Modelling</li>
+                <li>Data Warehousing</li>
+                <li>Pandas</li>
+                <li>Automation</li>
+                </ul>
+              </article>
+
+              <article class="skill-group">
+                <h3>Cloud &amp; Big Data</h3>
+                <ul class="tag-list">
+                <li>PySpark</li>
+                <li>ClickHouse</li>
+                <li>Databricks (Learning)</li>
                 </ul>
               </article>
 
               <article class="skill-group">
                 <h3>DevOps</h3>
                 <ul class="tag-list">
-                  <li>Docker</li>
-                  <li>Git</li>
-                  <li>GitHub Workflows</li>
-                  <li>Linux</li>
+                <li>Docker</li>
+                <li>Git</li>
+                <li>Linux</li>
+                <li>GitHub Workflows</li>
                 </ul>
               </article>
 
               <article class="skill-group">
-                <h3>AI Development Workflow</h3>
+                <h3>AI Development</h3>
                 <ul class="tag-list">
-                  <li>Cursor</li>
-                  <li>Claude</li>
-                  <li>Codex</li>
-                  <li>OpenClaw</li>
+                <li>Cursor</li>
+                <li>Claude</li>
+                <li>Codex</li>
+                <li>OpenClaw</li>
                 </ul>
               </article>
 
               <article class="skill-group">
                 <h3>Developer Tools</h3>
                 <ul class="tag-list">
-                  <li>Xcode</li>
-                  <li>Selenium</li>
-                  <li>MoEngage</li>
+                <li>Xcode</li>
+                <li>Selenium</li>
+                <li>MoEngage</li>
                 </ul>
               </article>
+            <!-- /build:skills -->
             </div>
           </div>
         </section>
@@ -401,6 +359,7 @@
             </div>
 
             <div class="education-list">
+              <!-- build:education -->
               <article class="education-card">
                 <div class="education-top">
                   <h3>B.E.</h3>
@@ -424,6 +383,7 @@
                 </div>
                 <p>St. Mary's Matriculation</p>
               </article>
+            <!-- /build:education -->
             </div>
           </div>
         </section>
@@ -435,50 +395,24 @@
             </div>
 
             <div class="contact-grid">
-              <a
-                class="contact-card"
-                href="https://rajasekar.work"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span class="contact-label">Professional Site</span>
-                <span class="contact-value">rajasekar.work</span>
-              </a>
-              <a
-                class="contact-card"
-                href="https://github.com/innovinitylabs"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span class="contact-label">GitHub</span>
-                <span class="contact-value">github.com/innovinitylabs</span>
-              </a>
-              <a
-                class="contact-card"
-                href="https://linkedin.com/in/rajasekar-c"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span class="contact-label">LinkedIn</span>
-                <span class="contact-value">linkedin.com/in/rajasekar-c</span>
+              <!-- build:contact -->
+              <a class="contact-card" href="tel:+917904348791">
+                <span class="contact-label">Phone</span>
+                <span class="contact-value">+91 7904348791</span>
               </a>
               <a class="contact-card" href="mailto:rajasekarc1142@gmail.com">
                 <span class="contact-label">Email</span>
                 <span class="contact-value">rajasekarc1142@gmail.com</span>
               </a>
-              <a class="contact-card" href="tel:+917904348791">
-                <span class="contact-label">Phone</span>
-                <span class="contact-value">+91 7904348791</span>
+              <a class="contact-card" href="https://linkedin.com/in/rajasekar-c" target="_blank" rel="noreferrer">
+                <span class="contact-label">LinkedIn</span>
+                <span class="contact-value">linkedin.com/in/rajasekar-c</span>
               </a>
-              <a
-                class="contact-card"
-                href="https://valipokkann.in"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span class="contact-label">Creative Work</span>
-                <span class="contact-value">valipokkann.in</span>
+              <a class="contact-card" href="https://github.com/innovinitylabs" target="_blank" rel="noreferrer">
+                <span class="contact-label">GitHub</span>
+                <span class="contact-value">github.com/innovinitylabs</span>
               </a>
+            <!-- /build:contact -->
             </div>
           </div>
         </section>
@@ -493,6 +427,10 @@
             <a href="#skills">Skills</a>
             <a href="#education">Education</a>
             <a href="#contact">Contact</a>
+            <!-- build:footer-links -->
+            <a href="https://rajasekar.work" target="_blank" rel="noreferrer">Portfolio</a>
+            <a href="https://valipokkann.in" target="_blank" rel="noreferrer">Creative</a>
+          <!-- /build:footer-links -->
           </nav>
           <button
             class="theme-toggle footer-theme-toggle"
