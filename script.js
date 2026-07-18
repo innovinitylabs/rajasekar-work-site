@@ -1,6 +1,53 @@
 const root = document.documentElement;
 const themeToggles = [...document.querySelectorAll(".theme-toggle")];
 const revealElements = [...document.querySelectorAll(".reveal")];
+const downloadResumeButton = document.getElementById("download-resume");
+
+// Generates the PDF at runtime from resume-source.html via the browser's
+// print-to-PDF flow, so the download always matches the latest resume content.
+// The print document title becomes the default filename: rajasekarc-resume.pdf.
+const RESUME_SOURCE_URL = "resume-source.html";
+const RESUME_FILENAME = "rajasekarc-resume";
+
+let resumePrintFrame = null;
+
+const printResume = () => {
+  if (resumePrintFrame) {
+    resumePrintFrame.remove();
+  }
+
+  resumePrintFrame = document.createElement("iframe");
+  resumePrintFrame.style.position = "fixed";
+  resumePrintFrame.style.right = "0";
+  resumePrintFrame.style.bottom = "0";
+  resumePrintFrame.style.width = "0";
+  resumePrintFrame.style.height = "0";
+  resumePrintFrame.style.border = "0";
+  resumePrintFrame.setAttribute("aria-hidden", "true");
+  resumePrintFrame.src = RESUME_SOURCE_URL;
+
+  resumePrintFrame.addEventListener("load", () => {
+    const frameWindow = resumePrintFrame.contentWindow;
+
+    if (!frameWindow) {
+      window.open(RESUME_SOURCE_URL, "_blank");
+      return;
+    }
+
+    frameWindow.document.title = RESUME_FILENAME;
+    frameWindow.focus();
+    frameWindow.print();
+  });
+
+  document.body.appendChild(resumePrintFrame);
+};
+
+if (downloadResumeButton) {
+  downloadResumeButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    printResume();
+  });
+}
 
 const setTheme = (theme) => {
   root.dataset.theme = theme;
