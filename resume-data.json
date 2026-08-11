@@ -109,7 +109,7 @@
     { "group": "Backend", "items": ["Flask", "REST API", "Stored Procedures", "Database Design", "Performance Optimisation"] },
     { "group": "Data Engineering", "items": ["ETL", "Data Modelling", "Data Warehousing", "Pandas", "Automation"] },
     { "group": "DevOps", "items": ["Docker", "Git", "Linux", "GitHub Workflows"] },
-    { "group": "Cloud & Big Data", "items": ["PySpark", "ClickHouse", "Databricks (Learning)"] },
+    { "group": "Cloud & Big Data", "items": ["PySpark", "ClickHouse", "Databricks"] },
     { "group": "Developer Tools", "items": ["Xcode", "Selenium", "MoEngage"] },
     { "group": "AI Development", "items": ["Cursor", "Claude", "Codex"] }
   ],
