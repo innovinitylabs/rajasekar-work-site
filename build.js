@@ -90,33 +90,6 @@ const webExperience = () =>
     })
     .join("\n\n");
 
-const webProjects = () =>
-  data.projects
-    .map((project) => {
-      const links = project.links
-        .map(
-          (link) =>
-            `  <a href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(
-              link.label
-            )}</a>`
-        )
-        .join("\n");
-      return [
-        `<article class="project-card">`,
-        `  <div class="project-top">`,
-        `    <h3>${escapeHtml(project.name)}</h3>`,
-        `  </div>`,
-        `  <ul>`,
-        `    <li>${escapeHtml(project.description)}</li>`,
-        `  </ul>`,
-        `  <div class="project-links project-links-bottom">`,
-        links,
-        `  </div>`,
-        `</article>`,
-      ].join("\n");
-    })
-    .join("\n\n");
-
 const webSkills = () =>
   data.skills
     .map((group) => {
@@ -230,21 +203,6 @@ const printExperience = () =>
     })
     .join("\n\n");
 
-const printProjects = () =>
-  data.projects
-    .map((project) => {
-      const links = project.links
-        .map((link) => `${link.label}: ${displayUrl(link.url)}`)
-        .join(" | ");
-      return [
-        `<div class="project">`,
-        `  <h3>${escapeHtml(project.name)}</h3>`,
-        `  <p>${escapeHtml(project.description)} ${escapeHtml(links)}</p>`,
-        `</div>`,
-      ].join("\n");
-    })
-    .join("\n\n");
-
 const printAwards = () =>
   data.awards
     .map((award) =>
@@ -288,7 +246,6 @@ let indexHtml = fs.readFileSync(INDEX_PATH, "utf8");
 indexHtml = replaceRegion(indexHtml, "eyebrow", escapeHtml(data.title), 0);
 indexHtml = replaceRegion(indexHtml, "summary", escapeHtml(data.summary), 16);
 indexHtml = replaceRegion(indexHtml, "experience", webExperience(), 14);
-indexHtml = replaceRegion(indexHtml, "projects", webProjects(), 14);
 indexHtml = replaceRegion(indexHtml, "awards", webAwards(), 14);
 indexHtml = replaceRegion(indexHtml, "skills", webSkills(), 14);
 indexHtml = replaceRegion(indexHtml, "education", webEducation(), 14);
@@ -301,7 +258,6 @@ sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(data.title), 0);
 sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(data.summary), 10);
 sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);
-sourceHtml = replaceRegion(sourceHtml, "projects", printProjects(), 8);
 sourceHtml = replaceRegion(sourceHtml, "awards", printAwards(), 8);
 sourceHtml = replaceRegion(sourceHtml, "skills", printSkills(), 10);
 sourceHtml = replaceRegion(sourceHtml, "education", printEducation(), 10);

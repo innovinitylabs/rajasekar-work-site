@@ -151,18 +151,6 @@ const buildResumePdf = (JsPDF, data) => {
     y += 6;
   });
 
-  // Projects
-  sectionHeading("Projects");
-  data.projects.forEach((project) => {
-    ensureSpace(28);
-    writeLines(project.name, { size: 10.5, style: "bold", color: INK, gap: 1 });
-    writeLines(project.description, { size: 9.3, color: MUTE, gap: 1 });
-    const links = project.links
-      .map((link) => `${link.label}: ${stripUrl(link.url)}`)
-      .join("   |   ");
-    writeLines(links, { size: 8.6, color: ACCENT, gap: 6 });
-  });
-
   // Awards
   if (Array.isArray(data.awards) && data.awards.length) {
     sectionHeading("Awards");

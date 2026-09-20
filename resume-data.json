@@ -42,40 +42,6 @@
       ]
     }
   ],
-  "projects": [
-    {
-      "name": "Valipokkann",
-      "description": "A full-stack publishing platform built on a custom CMS, with dynamic content management, media handling, and page rendering across a self-designed architecture.",
-      "links": [
-        { "label": "Live site", "url": "https://valipokkann.in" },
-        { "label": "GitHub", "url": "https://github.com/innovinitylabs/valipokkann_in" }
-      ]
-    },
-    {
-      "name": "Hard Copy",
-      "description": "A native iPad note-taking app built for fast, structured capture and document organization, with a data model designed for quick entry and retrieval.",
-      "links": [
-        { "label": "GitHub", "url": "https://github.com/innovinitylabs/free-notes" }
-      ]
-    },
-    {
-      "name": "Onchain Rugs",
-      "description": "An on-chain generative art system that solves deterministic asset generation, on-chain metadata, and event indexing so every minted asset stays verifiable and reproducible.",
-      "links": [
-        { "label": "Live site", "url": "https://onchainrugs.xyz" },
-        { "label": "GitHub", "url": "https://github.com/innovinitylabs/onchain-rug" }
-      ]
-    },
-    {
-      "name": "Madraschecks",
-      "description": "A browser-based procedural generator that recreates Madras check textiles from seeded algorithms, so each pattern is unique yet historically accurate, paired with a research site on the textile's history.",
-      "links": [
-        { "label": "Live site", "url": "http://www.madraschecks.com" },
-        { "label": "Generator", "url": "https://madras-generator.madraschecks.com/" },
-        { "label": "GitHub", "url": "https://github.com/innovinitylabs/checks-of-time-beta" }
-      ]
-    }
-  ],
   "awards": [
     {
       "title": "Tech Titan Award",
