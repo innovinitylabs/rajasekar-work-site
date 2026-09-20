@@ -8,7 +8,6 @@ const downloadResumeButton = document.getElementById("download-resume");
 // text APIs, which produce selectable, ATS-parseable text (not a rasterized
 // image) and download immediately with no print dialog.
 const RESUME_DATA_URL = "resume-data.json";
-const RESUME_FILENAME = "rajasekarc-resume.pdf";
 const JSPDF_CDN_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
 
@@ -217,6 +216,15 @@ const buildResumePdf = (JsPDF, data) => {
   return doc;
 };
 
+const resumeDownloadFilename = () => {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const stamp =
+    `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}` +
+    `${pad(now.getHours())}${pad(now.getMinutes())}`;
+  return `rajasekar-resume-${stamp}.pdf`;
+};
+
 const downloadResume = async () => {
   const response = await fetch(RESUME_DATA_URL, { cache: "no-store" });
   if (!response.ok) {
@@ -225,7 +233,7 @@ const downloadResume = async () => {
   const data = await response.json();
   const JsPDF = await loadJsPdf();
   const doc = buildResumePdf(JsPDF, data);
-  doc.save(RESUME_FILENAME);
+  doc.save(resumeDownloadFilename());
 };
 
 if (downloadResumeButton) {
