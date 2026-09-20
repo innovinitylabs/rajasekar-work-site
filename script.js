@@ -117,6 +117,35 @@ const buildResumePdf = (JsPDF, data) => {
   // Summary
   writeLines(data.summary, { size: 9.8, color: MUTE, gap: 2 });
 
+  // Skills
+  sectionHeading("Skills");
+  data.skills.forEach((group) => {
+    const label = `${group.group}: `;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.4);
+    const labelWidth = doc.getTextWidth(label);
+    doc.setFont("helvetica", "normal");
+    const valueLines = doc.splitTextToSize(
+      group.items.join(", "),
+      contentWidth - labelWidth
+    );
+    const lineHeight = 9.4 * 1.34;
+    ensureSpace(lineHeight);
+    setColor(INK);
+    doc.setFont("helvetica", "bold");
+    doc.text(label, margin, y);
+    doc.setFont("helvetica", "normal");
+    setColor(MUTE);
+    valueLines.forEach((line, index) => {
+      if (index > 0) {
+        ensureSpace(lineHeight);
+      }
+      doc.text(line, margin + (index === 0 ? labelWidth : 0), y);
+      y += lineHeight;
+    });
+    y += 2;
+  });
+
   // Experience
   sectionHeading("Experience");
   data.experience.forEach((role) => {
@@ -163,35 +192,6 @@ const buildResumePdf = (JsPDF, data) => {
       writeLines(award.description, { size: 9.3, color: MUTE, gap: 6 });
     });
   }
-
-  // Skills
-  sectionHeading("Skills");
-  data.skills.forEach((group) => {
-    const label = `${group.group}: `;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.4);
-    const labelWidth = doc.getTextWidth(label);
-    doc.setFont("helvetica", "normal");
-    const valueLines = doc.splitTextToSize(
-      group.items.join(", "),
-      contentWidth - labelWidth
-    );
-    const lineHeight = 9.4 * 1.34;
-    ensureSpace(lineHeight);
-    setColor(INK);
-    doc.setFont("helvetica", "bold");
-    doc.text(label, margin, y);
-    doc.setFont("helvetica", "normal");
-    setColor(MUTE);
-    valueLines.forEach((line, index) => {
-      if (index > 0) {
-        ensureSpace(lineHeight);
-      }
-      doc.text(line, margin + (index === 0 ? labelWidth : 0), y);
-      y += lineHeight;
-    });
-    y += 2;
-  });
 
   // Education
   sectionHeading("Education");
