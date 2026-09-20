@@ -1,5 +1,11 @@
 {
   "scripts": {
-    "build": "node build.js"
+    "build": "node build.js",
+    "test": "node --test",
+    "verify": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "jspdf": "^4.2.1",
+    "pdf-parse": "^2.4.5"
   }
 }

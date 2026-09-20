@@ -1,7 +1,7 @@
 {
   "name": "Rajasekar C",
   "title": "Data Engineer",
-  "summary": "Data Engineer with 5+ years building high-volume production data systems, ETL pipelines, and SQL-backed reporting platforms. Experienced in Python, SQL, PL/SQL, PostgreSQL, and Oracle, designing data pipelines and schemas that support batch processing of approximately 50 million records daily, with a focus on data ingestion, data modelling, data quality, and production reliability.",
+  "summary": "Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day.",
   "contact": {
     "phone": { "label": "+91 7904348791", "url": "tel:+917904348791" },
     "email": { "label": "rajasekarc1142@gmail.com", "url": "mailto:rajasekarc1142@gmail.com" },
@@ -10,24 +10,32 @@
     "portfolio": { "label": "rajasekar.work", "url": "https://rajasekar.work" },
     "creative": { "label": "valipokkann.in", "url": "https://valipokkann.in" }
   },
-  "links": {
-    "portfolio": { "label": "rajasekar.work", "url": "https://rajasekar.work" },
-    "creative": { "label": "valipokkann.in", "url": "https://valipokkann.in" }
-  },
+  "proof": [
+    {
+      "value": "50M records/day",
+      "text": "Designed and operated production ETL pipelines at scale."
+    },
+    {
+      "value": "30 min to under 1 min",
+      "text": "Built Flask and Pandas automation recognized with the Tech Titan Award."
+    },
+    {
+      "value": "4000+ issues resolved",
+      "text": "Reduced the open production-data backlog from approximately 600 to under 70."
+    }
+  ],
   "experience": [
     {
       "org": "Digit Insurance",
       "role": "Data Engineer",
       "period": "Nov 2023 - Jun 2025",
       "bullets": [
-        "Built a Flask and Pandas data automation tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, earning the company \"Tech Titan\" award",
-        "Designed and operated ETL data pipelines processing ~50M records/day for batch processing and downstream reporting",
-        "Automated MoEngage customer notifications through real-time SQL stored procedures for policy-renewal detection, eliminating redundant alerts",
-        "Owned PostgreSQL schema design and DDL versioning in Git, making data model deployments traceable, reviewable, and reproducible",
-        "Implemented PII classification and secure credential storage to strengthen data quality and compliant data handling",
-        "Delivered ETL pipelines, data ingestion flows, and schemas for the Bima Satrak regulatory reporting service",
-        "Resolved 4000+ production data issues, cutting the open backlog from ~600 to under 70",
-        "Automated recurring credit-update and Excel-to-database data ingestion with SQL and Pandas, replacing manual runs"
+        "Designed and operated ETL data pipelines processing approximately 50M records per day for high-volume batch data processing and downstream reporting",
+        "Built a Flask and Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under 1 minute, earning the Tech Titan Award",
+        "Resolved 4000+ production data issues and reduced the open backlog from approximately 600 to under 70",
+        "Owned PostgreSQL schema design and DDL versioning in Git; implemented PII classification and secure credential storage for data quality and compliant handling",
+        "Automated MoEngage customer notification workflows with SQL stored procedures for policy-renewal detection, eliminating redundant alerts",
+        "Delivered ETL, data-ingestion, and schema work for Bima Satrak regulatory reporting; automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas"
       ]
     },
     {
@@ -35,28 +43,21 @@
       "role": "Software Engineer",
       "period": "Jan 2020 - Nov 2023",
       "bullets": [
-        "Built and maintained Oracle SQL and PL/SQL data solutions, including stored procedures and production reports, for banking and insurance systems",
-        "Owned incident response for live production databases, diagnosing root causes and deploying fixes across client data environments",
-        "Tuned slow SQL queries and stored procedures to improve database performance under high-usage production workloads",
-        "Managed database deployments, maintenance, and recovery for production data systems across client environments"
+        "Built and maintained Oracle SQL and PL/SQL solutions, stored procedures, and production reports for banking and insurance data systems",
+        "Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments",
+        "Optimized SQL queries and stored procedures to improve database performance under high-usage production workloads",
+        "Managed production database deployments, maintenance, and recovery across client environments"
       ]
     }
   ],
-  "awards": [
-    {
-      "title": "Tech Titan Award",
-      "org": "Digit Insurance",
-      "description": "Recognized for building a Flask + Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under one minute."
-    }
-  ],
   "skills": [
-    { "group": "Languages", "items": ["SQL", "PL/SQL", "Python", "Shell"] },
-    { "group": "Databases", "items": ["PostgreSQL", "Oracle", "Redis", "DB2"] },
+    { "group": "Languages", "items": ["Python", "SQL", "PL/SQL", "Shell"] },
     { "group": "Data Engineering", "items": ["ETL", "ELT", "Data Pipelines", "Data Ingestion", "Data Modelling", "Data Warehousing", "Batch Processing", "Pandas", "PySpark"] },
-    { "group": "Backend", "items": ["Flask", "REST API", "Stored Procedures", "Database Design", "Performance Optimisation"] },
-    { "group": "Cloud & Big Data", "items": ["Databricks", "ClickHouse"] },
+    { "group": "Databases", "items": ["PostgreSQL", "Oracle", "DB2", "Redis"] },
+    { "group": "Backend", "items": ["Flask", "REST APIs", "Stored Procedures", "Database Design", "Query Optimization"] },
+    { "group": "Data Platforms", "items": ["Databricks", "ClickHouse"] },
     { "group": "DevOps", "items": ["Docker", "Git", "Linux", "GitHub Workflows"] },
-    { "group": "Tools", "items": ["Selenium", "MoEngage"] }
+    { "group": "Other", "items": ["Selenium", "MoEngage"] }
   ],
   "education": [
     { "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" }

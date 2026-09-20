@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Rajasekar C is an independent product engineer and data engineer building products, backend systems, data platforms, and automation with SQL, Python, PostgreSQL, and Redis."
-    />
+    <!-- build:meta-description -->
+    <meta name="description" content="Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day." />
+  <!-- /build:meta-description -->
+    <!-- build:page-title -->
     <title>Rajasekar C | Data Engineer</title>
+  <!-- /build:page-title -->
     <script>
       document.documentElement.classList.add("js");
       (function () {
@@ -27,18 +28,20 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
+    <script src="resume-pdf.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
     <div class="site-frame">
       <header class="site-header">
         <div class="container header-inner">
-          <a class="brand" href="#top">Rajasekar C</a>
+          <a class="brand" href="#top"><!-- build:brand-name -->
+Rajasekar C
+<!-- /build:brand-name --></a>
           <div class="header-actions">
             <nav class="site-nav" aria-label="Primary">
               <a href="#proof">Proof</a>
               <a href="#experience">Experience</a>
-              <a href="#awards">Awards</a>
               <a href="#skills">Skills</a>
               <a href="#education">Education</a>
               <a href="#contact">Contact</a>
@@ -67,27 +70,20 @@
               <p class="eyebrow"><!-- build:eyebrow -->
 Data Engineer
 <!-- /build:eyebrow --></p>
-              <h1>Rajasekar C</h1>
+              <h1><!-- build:name -->
+Rajasekar C
+<!-- /build:name --></h1>
               <p class="hero-summary">
                 <!-- build:summary -->
-                Data Engineer with 5+ years building high-volume production data systems, ETL pipelines, and SQL-backed reporting platforms. Experienced in Python, SQL, PL/SQL, PostgreSQL, and Oracle, designing data pipelines and schemas that support batch processing of approximately 50 million records daily, with a focus on data ingestion, data modelling, data quality, and production reliability.
+                Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day.
               <!-- /build:summary -->
               </p>
               <div class="hero-actions">
+                <!-- build:hero-actions -->
                 <a class="button button-primary" href="#experience">View Experience</a>
-                <a
-                  class="button button-secondary"
-                  href="https://github.com/innovinitylabs"
-                  target="_blank"
-                  rel="noreferrer"
-                  >GitHub</a
-                >
-                <a
-                  class="button button-secondary"
-                  href="resume-source.html"
-                  id="download-resume"
-                  >Download Resume</a
-                >
+                <a class="button button-secondary" href="https://github.com/innovinitylabs/" target="_blank" rel="noreferrer">GitHub</a>
+                <a class="button button-secondary" href="resume-source.html" id="download-resume">Download Resume</a>
+              <!-- /build:hero-actions -->
               </div>
             </div>
           </div>
@@ -100,18 +96,22 @@ Data Engineer
               <h2>Key results</h2>
             </div>
             <div class="proof-grid">
+              <!-- build:proof -->
               <article class="proof-card">
                 <span class="proof-value">50M records/day</span>
-                <p class="proof-text">Built and maintained production pipelines at scale.</p>
+                <p class="proof-text">Designed and operated production ETL pipelines at scale.</p>
               </article>
+
               <article class="proof-card">
                 <span class="proof-value">30 min to under 1 min</span>
-                <p class="proof-text">Built internal tooling that cut issue resolution time dramatically.</p>
+                <p class="proof-text">Built Flask and Pandas automation recognized with the Tech Titan Award.</p>
               </article>
+
               <article class="proof-card">
                 <span class="proof-value">4000+ issues resolved</span>
-                <p class="proof-text">Resolved production issues and helped reduce backlog significantly.</p>
+                <p class="proof-text">Reduced the open production-data backlog from approximately 600 to under 70.</p>
               </article>
+            <!-- /build:proof -->
             </div>
           </div>
         </section>
@@ -133,14 +133,12 @@ Data Engineer
                   <span class="timeline">Nov 2023 - Jun 2025</span>
                 </div>
                 <ul>
-                <li>Built a Flask and Pandas data automation tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, earning the company &quot;Tech Titan&quot; award</li>
-                <li>Designed and operated ETL data pipelines processing ~50M records/day for batch processing and downstream reporting</li>
-                <li>Automated MoEngage customer notifications through real-time SQL stored procedures for policy-renewal detection, eliminating redundant alerts</li>
-                <li>Owned PostgreSQL schema design and DDL versioning in Git, making data model deployments traceable, reviewable, and reproducible</li>
-                <li>Implemented PII classification and secure credential storage to strengthen data quality and compliant data handling</li>
-                <li>Delivered ETL pipelines, data ingestion flows, and schemas for the Bima Satrak regulatory reporting service</li>
-                <li>Resolved 4000+ production data issues, cutting the open backlog from ~600 to under 70</li>
-                <li>Automated recurring credit-update and Excel-to-database data ingestion with SQL and Pandas, replacing manual runs</li>
+                <li>Designed and operated ETL data pipelines processing approximately 50M records per day for high-volume batch data processing and downstream reporting</li>
+                <li>Built a Flask and Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under 1 minute, earning the Tech Titan Award</li>
+                <li>Resolved 4000+ production data issues and reduced the open backlog from approximately 600 to under 70</li>
+                <li>Owned PostgreSQL schema design and DDL versioning in Git; implemented PII classification and secure credential storage for data quality and compliant handling</li>
+                <li>Automated MoEngage customer notification workflows with SQL stored procedures for policy-renewal detection, eliminating redundant alerts</li>
+                <li>Delivered ETL, data-ingestion, and schema work for Bima Satrak regulatory reporting; automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas</li>
                 </ul>
               </article>
 
@@ -153,37 +151,13 @@ Data Engineer
                   <span class="timeline">Jan 2020 - Nov 2023</span>
                 </div>
                 <ul>
-                <li>Built and maintained Oracle SQL and PL/SQL data solutions, including stored procedures and production reports, for banking and insurance systems</li>
-                <li>Owned incident response for live production databases, diagnosing root causes and deploying fixes across client data environments</li>
-                <li>Tuned slow SQL queries and stored procedures to improve database performance under high-usage production workloads</li>
-                <li>Managed database deployments, maintenance, and recovery for production data systems across client environments</li>
+                <li>Built and maintained Oracle SQL and PL/SQL solutions, stored procedures, and production reports for banking and insurance data systems</li>
+                <li>Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments</li>
+                <li>Optimized SQL queries and stored procedures to improve database performance under high-usage production workloads</li>
+                <li>Managed production database deployments, maintenance, and recovery across client environments</li>
                 </ul>
               </article>
             <!-- /build:experience -->
-            </div>
-          </div>
-        </section>
-
-        <section class="section reveal" id="awards">
-          <div class="container">
-            <div class="section-heading">
-              <h2>Awards</h2>
-            </div>
-
-            <div class="experience-list">
-              <!-- build:awards -->
-              <article class="experience-card">
-                <div class="experience-header">
-                  <div>
-                    <h3>Tech Titan Award</h3>
-                    <p>Digit Insurance</p>
-                  </div>
-                </div>
-                <ul>
-                  <li>Recognized for building a Flask + Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under one minute.</li>
-                </ul>
-              </article>
-            <!-- /build:awards -->
             </div>
           </div>
         </section>
@@ -199,20 +173,10 @@ Data Engineer
               <article class="skill-group">
                 <h3>Languages</h3>
                 <ul class="tag-list">
+                <li>Python</li>
                 <li>SQL</li>
                 <li>PL/SQL</li>
-                <li>Python</li>
                 <li>Shell</li>
-                </ul>
-              </article>
-
-              <article class="skill-group">
-                <h3>Databases</h3>
-                <ul class="tag-list">
-                <li>PostgreSQL</li>
-                <li>Oracle</li>
-                <li>Redis</li>
-                <li>DB2</li>
                 </ul>
               </article>
 
@@ -232,18 +196,28 @@ Data Engineer
               </article>
 
               <article class="skill-group">
-                <h3>Backend</h3>
+                <h3>Databases</h3>
                 <ul class="tag-list">
-                <li>Flask</li>
-                <li>REST API</li>
-                <li>Stored Procedures</li>
-                <li>Database Design</li>
-                <li>Performance Optimisation</li>
+                <li>PostgreSQL</li>
+                <li>Oracle</li>
+                <li>DB2</li>
+                <li>Redis</li>
                 </ul>
               </article>
 
               <article class="skill-group">
-                <h3>Cloud &amp; Big Data</h3>
+                <h3>Backend</h3>
+                <ul class="tag-list">
+                <li>Flask</li>
+                <li>REST APIs</li>
+                <li>Stored Procedures</li>
+                <li>Database Design</li>
+                <li>Query Optimization</li>
+                </ul>
+              </article>
+
+              <article class="skill-group">
+                <h3>Data Platforms</h3>
                 <ul class="tag-list">
                 <li>Databricks</li>
                 <li>ClickHouse</li>
@@ -261,7 +235,7 @@ Data Engineer
               </article>
 
               <article class="skill-group">
-                <h3>Tools</h3>
+                <h3>Other</h3>
                 <ul class="tag-list">
                 <li>Selenium</li>
                 <li>MoEngage</li>
@@ -327,7 +301,6 @@ Data Engineer
           <nav class="footer-nav" aria-label="Footer">
             <a href="#proof">Proof</a>
             <a href="#experience">Experience</a>
-            <a href="#awards">Awards</a>
             <a href="#skills">Skills</a>
             <a href="#education">Education</a>
             <a href="#contact">Contact</a>

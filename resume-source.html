@@ -2,17 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- build:page-title -->
     <title>Rajasekar C Resume</title>
+  <!-- /build:page-title -->
     <style>
       @page {
-        margin: 0.6in;
+        size: A4;
+        margin: 0.42in 0.48in;
       }
 
       body {
         margin: 0;
         color: #101828;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-        line-height: 1.45;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+        line-height: 1.3;
       }
 
       h1,
@@ -24,141 +28,156 @@
       }
 
       .page {
-        max-width: 760px;
+        max-width: none;
       }
 
       .header {
-        border-bottom: 1px solid #d0d5dd;
-        padding-bottom: 14px;
-        margin-bottom: 18px;
+        border-bottom: 0.6pt solid #d0d5dd;
+        padding-bottom: 7pt;
       }
 
       .header h1 {
-        font-size: 28px;
+        font-size: 22pt;
         letter-spacing: -0.03em;
       }
 
       .title {
         color: #2457c5;
         font-weight: 700;
-        margin-top: 4px;
+        font-size: 11pt;
+        margin-top: 2pt;
       }
 
       .summary {
-        margin-top: 10px;
         color: #475467;
-        font-size: 13px;
+        font-size: 9.7pt;
+        line-height: 1.35;
       }
 
       .contact {
-        margin-top: 10px;
-        font-size: 12px;
+        margin-top: 4pt;
+        font-size: 8.8pt;
         color: #344054;
+        line-height: 1.25;
+      }
+
+      .contact-line {
+        display: block;
+      }
+
+      .contact-line + .contact-line {
+        margin-top: 1.5pt;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
       }
 
       section {
-        margin-top: 18px;
+        margin-top: 8pt;
       }
 
       section h2 {
-        font-size: 13px;
+        font-size: 10.5pt;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: #2457c5;
-        margin-bottom: 10px;
+        margin-bottom: 4pt;
+        padding-bottom: 2pt;
+        border-bottom: 0.5pt solid #d0d5dd;
       }
 
-      .bullets,
+      .bullets {
+        padding-left: 14pt;
+      }
+
       .skills {
-        padding-left: 18px;
+        padding: 0;
+        list-style: none;
       }
 
-      .bullets li,
+      .bullets li {
+        margin: 1.8pt 0;
+        font-size: 9.5pt;
+        line-height: 1.28;
+        color: #344054;
+      }
+
       .skills li {
-        margin: 4px 0;
-        font-size: 12.5px;
+        margin: 2pt 0;
+        font-size: 9pt;
+        line-height: 1.24;
         color: #344054;
       }
 
       .role {
-        margin-bottom: 14px;
+        margin-bottom: 8pt;
       }
 
       .role-header {
-        display: table;
-        width: 100%;
-        margin-bottom: 6px;
-      }
-
-      .role-title,
-      .role-time {
-        display: table-cell;
-        vertical-align: top;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12pt;
+        margin-bottom: 3pt;
       }
 
       .role-title h3 {
-        font-size: 14px;
+        font-size: 10.5pt;
       }
 
       .role-title p {
-        font-size: 12px;
+        font-size: 9.2pt;
         color: #475467;
-        margin-top: 2px;
+        margin-top: 1.5pt;
       }
 
       .role-time {
-        width: 140px;
-        text-align: right;
-        font-size: 12px;
-        color: #2457c5;
+        white-space: nowrap;
+        font-size: 9.2pt;
+        color: #475467;
         font-weight: 700;
-      }
-
-      .project {
-        margin-bottom: 12px;
-      }
-
-      .project h3 {
-        font-size: 13px;
-      }
-
-      .project p {
-        margin-top: 4px;
-        font-size: 12.5px;
-        color: #344054;
       }
     </style>
   </head>
   <body>
     <div class="page">
       <header class="header">
-        <h1>Rajasekar C</h1>
+        <h1><!-- build:name -->
+Rajasekar C
+<!-- /build:name --></h1>
         <p class="title"><!-- build:title -->
 Data Engineer
 <!-- /build:title --></p>
-        <p class="summary">
-          <!-- build:summary -->
-          Data Engineer with 5+ years building high-volume production data systems, ETL pipelines, and SQL-backed reporting platforms. Experienced in Python, SQL, PL/SQL, PostgreSQL, and Oracle, designing data pipelines and schemas that support batch processing of approximately 50 million records daily, with a focus on data ingestion, data modelling, data quality, and production reliability.
-        <!-- /build:summary -->
-        </p>
         <p class="contact">
           <!-- build:contact -->
-          +91 7904348791 | Email: rajasekarc1142@gmail.com | LinkedIn: linkedin.com/in/rajasekar-c | GitHub: github.com/innovinitylabs
+          <span class="contact-line"><a href="tel:+917904348791">+91 7904348791</a> | <a href="mailto:rajasekarc1142@gmail.com">rajasekarc1142@gmail.com</a> | <a href="https://linkedin.com/in/rajasekar-c">LinkedIn: linkedin.com/in/rajasekar-c</a></span>
+          <span class="contact-line"><a href="https://github.com/innovinitylabs/">GitHub: github.com/innovinitylabs</a> | <a href="https://rajasekar.work">Portfolio: rajasekar.work</a></span>
         <!-- /build:contact -->
         </p>
       </header>
 
       <section>
+        <h2>Summary</h2>
+        <p class="summary">
+          <!-- build:summary -->
+          Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day.
+        <!-- /build:summary -->
+        </p>
+      </section>
+
+      <section>
         <h2>Skills</h2>
         <ul class="skills">
           <!-- build:skills -->
-          <li>Languages: SQL, PL/SQL, Python, Shell</li>
-          <li>Databases: PostgreSQL, Oracle, Redis, DB2</li>
-          <li>Data Engineering: ETL, ELT, Data Pipelines, Data Ingestion, Data Modelling, Data Warehousing, Batch Processing, Pandas, PySpark</li>
-          <li>Backend: Flask, REST API, Stored Procedures, Database Design, Performance Optimisation</li>
-          <li>Cloud &amp; Big Data: Databricks, ClickHouse</li>
-          <li>DevOps: Docker, Git, Linux, GitHub Workflows</li>
-          <li>Tools: Selenium, MoEngage</li>
+          <li><strong>Languages:</strong> Python, SQL, PL/SQL, Shell</li>
+          <li><strong>Data Engineering:</strong> ETL, ELT, Data Pipelines, Data Ingestion, Data Modelling, Data Warehousing, Batch Processing, Pandas, PySpark</li>
+          <li><strong>Databases:</strong> PostgreSQL, Oracle, DB2, Redis</li>
+          <li><strong>Backend:</strong> Flask, REST APIs, Stored Procedures, Database Design, Query Optimization</li>
+          <li><strong>Data Platforms:</strong> Databricks, ClickHouse</li>
+          <li><strong>DevOps:</strong> Docker, Git, Linux, GitHub Workflows</li>
+          <li><strong>Other:</strong> Selenium, MoEngage</li>
         <!-- /build:skills -->
         </ul>
       </section>
@@ -175,14 +194,12 @@ Data Engineer
             <div class="role-time">Nov 2023 - Jun 2025</div>
           </div>
           <ul class="bullets">
-          <li>Built a Flask and Pandas data automation tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, earning the company &quot;Tech Titan&quot; award</li>
-          <li>Designed and operated ETL data pipelines processing ~50M records/day for batch processing and downstream reporting</li>
-          <li>Automated MoEngage customer notifications through real-time SQL stored procedures for policy-renewal detection, eliminating redundant alerts</li>
-          <li>Owned PostgreSQL schema design and DDL versioning in Git, making data model deployments traceable, reviewable, and reproducible</li>
-          <li>Implemented PII classification and secure credential storage to strengthen data quality and compliant data handling</li>
-          <li>Delivered ETL pipelines, data ingestion flows, and schemas for the Bima Satrak regulatory reporting service</li>
-          <li>Resolved 4000+ production data issues, cutting the open backlog from ~600 to under 70</li>
-          <li>Automated recurring credit-update and Excel-to-database data ingestion with SQL and Pandas, replacing manual runs</li>
+          <li>Designed and operated ETL data pipelines processing approximately 50M records per day for high-volume batch data processing and downstream reporting</li>
+          <li>Built a Flask and Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under 1 minute, earning the Tech Titan Award</li>
+          <li>Resolved 4000+ production data issues and reduced the open backlog from approximately 600 to under 70</li>
+          <li>Owned PostgreSQL schema design and DDL versioning in Git; implemented PII classification and secure credential storage for data quality and compliant handling</li>
+          <li>Automated MoEngage customer notification workflows with SQL stored procedures for policy-renewal detection, eliminating redundant alerts</li>
+          <li>Delivered ETL, data-ingestion, and schema work for Bima Satrak regulatory reporting; automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas</li>
           </ul>
         </div>
 
@@ -195,23 +212,13 @@ Data Engineer
             <div class="role-time">Jan 2020 - Nov 2023</div>
           </div>
           <ul class="bullets">
-          <li>Built and maintained Oracle SQL and PL/SQL data solutions, including stored procedures and production reports, for banking and insurance systems</li>
-          <li>Owned incident response for live production databases, diagnosing root causes and deploying fixes across client data environments</li>
-          <li>Tuned slow SQL queries and stored procedures to improve database performance under high-usage production workloads</li>
-          <li>Managed database deployments, maintenance, and recovery for production data systems across client environments</li>
+          <li>Built and maintained Oracle SQL and PL/SQL solutions, stored procedures, and production reports for banking and insurance data systems</li>
+          <li>Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments</li>
+          <li>Optimized SQL queries and stored procedures to improve database performance under high-usage production workloads</li>
+          <li>Managed production database deployments, maintenance, and recovery across client environments</li>
           </ul>
         </div>
       <!-- /build:experience -->
-      </section>
-
-      <section>
-        <h2>Awards</h2>
-        <!-- build:awards -->
-        <div class="project">
-          <h3>Tech Titan Award - Digit Insurance</h3>
-          <p>Recognized for building a Flask + Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under one minute.</p>
-        </div>
-      <!-- /build:awards -->
       </section>
 
       <section>
@@ -221,12 +228,6 @@ Data Engineer
           <li>B.E. - RMK Engineering College - CGPA: 7.17</li>
         <!-- /build:education -->
         </ul>
-      </section>
-
-      <section>
-        <p class="contact"><!-- build:footer -->
-          Portfolio: rajasekar.work | Creative: valipokkann.in
-        <!-- /build:footer --></p>
       </section>
     </div>
   </body>

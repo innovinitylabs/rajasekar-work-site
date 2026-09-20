@@ -31,13 +31,6 @@ const escapeHtml = (value) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
-const displayUrl = (url) =>
-  String(url)
-    .replace(/^https?:\/\//, "")
-    .replace(/^mailto:/, "")
-    .replace(/^tel:/, "")
-    .replace(/\/$/, "");
-
 const indent = (block, spaces) => {
   const pad = " ".repeat(spaces);
   return block
@@ -89,6 +82,28 @@ const webExperience = () =>
       ].join("\n");
     })
     .join("\n\n");
+
+const webProof = () =>
+  data.proof
+    .map(
+      (proof) =>
+        [
+          `<article class="proof-card">`,
+          `  <span class="proof-value">${escapeHtml(proof.value)}</span>`,
+          `  <p class="proof-text">${escapeHtml(proof.text)}</p>`,
+          `</article>`,
+        ].join("\n")
+    )
+    .join("\n\n");
+
+const webHeroActions = () =>
+  [
+    `<a class="button button-primary" href="#experience">View Experience</a>`,
+    `<a class="button button-secondary" href="${escapeHtml(
+      data.contact.github.url
+    )}" target="_blank" rel="noreferrer">GitHub</a>`,
+    `<a class="button button-secondary" href="resume-source.html" id="download-resume">Download Resume</a>`,
+  ].join("\n");
 
 const webSkills = () =>
   data.skills
@@ -142,42 +157,35 @@ const webContact = () => {
 };
 
 const webFooterLinks = () => {
-  const l = data.links;
+  const c = data.contact;
   return [
-    `<a href="${escapeHtml(l.portfolio.url)}" target="_blank" rel="noreferrer">Portfolio</a>`,
-    `<a href="${escapeHtml(l.creative.url)}" target="_blank" rel="noreferrer">Creative</a>`,
+    `<a href="${escapeHtml(c.portfolio.url)}" target="_blank" rel="noreferrer">Portfolio</a>`,
+    `<a href="${escapeHtml(c.creative.url)}" target="_blank" rel="noreferrer">Creative</a>`,
   ].join("\n");
 };
-
-const webAwards = () =>
-  data.awards
-    .map((award) =>
-      [
-        `<article class="experience-card">`,
-        `  <div class="experience-header">`,
-        `    <div>`,
-        `      <h3>${escapeHtml(award.title)}</h3>`,
-        `      <p>${escapeHtml(award.org)}</p>`,
-        `    </div>`,
-        `  </div>`,
-        `  <ul>`,
-        `    <li>${escapeHtml(award.description)}</li>`,
-        `  </ul>`,
-        `</article>`,
-      ].join("\n")
-    )
-    .join("\n\n");
 
 /* ------------------------------ print markup ------------------------------ */
 
 const printContact = () => {
   const c = data.contact;
-  return [
-    escapeHtml(c.phone.label),
-    `Email: ${escapeHtml(displayUrl(c.email.url))}`,
-    `LinkedIn: ${escapeHtml(c.linkedin.label)}`,
-    `GitHub: ${escapeHtml(c.github.label)}`,
+  const link = (item, prefix = "") =>
+    `<a href="${escapeHtml(item.url)}">${prefix}${escapeHtml(
+      item.label
+    )}</a>`;
+  const primary = [
+    link(c.phone),
+    link(c.email),
+    link(c.linkedin, "LinkedIn: "),
   ].join(" | ");
+  const secondary = [
+    link(c.github, "GitHub: "),
+    link(c.portfolio, "Portfolio: "),
+  ].join(" | ");
+
+  return [
+    `<span class="contact-line">${primary}</span>`,
+    `<span class="contact-line">${secondary}</span>`,
+  ].join("\n");
 };
 
 const printExperience = () =>
@@ -203,23 +211,13 @@ const printExperience = () =>
     })
     .join("\n\n");
 
-const printAwards = () =>
-  data.awards
-    .map((award) =>
-      [
-        `<div class="project">`,
-        `  <h3>${escapeHtml(award.title)} - ${escapeHtml(award.org)}</h3>`,
-        `  <p>${escapeHtml(award.description)}</p>`,
-        `</div>`,
-      ].join("\n")
-    )
-    .join("\n\n");
-
 const printSkills = () =>
   data.skills
     .map(
       (group) =>
-        `<li>${escapeHtml(group.group)}: ${escapeHtml(group.items.join(", "))}</li>`
+        `<li><strong>${escapeHtml(group.group)}:</strong> ${escapeHtml(
+          group.items.join(", ")
+        )}</li>`
     )
     .join("\n");
 
@@ -233,20 +231,28 @@ const printEducation = () =>
     )
     .join("\n");
 
-const printFooter = () => {
-  const l = data.links;
-  return `Portfolio: ${escapeHtml(displayUrl(l.portfolio.url))} | Creative: ${escapeHtml(
-    displayUrl(l.creative.url)
-  )}`;
-};
-
 /* -------------------------------- assembly -------------------------------- */
 
 let indexHtml = fs.readFileSync(INDEX_PATH, "utf8");
+indexHtml = replaceRegion(
+  indexHtml,
+  "meta-description",
+  `<meta name="description" content="${escapeHtml(data.summary)}" />`,
+  4
+);
+indexHtml = replaceRegion(
+  indexHtml,
+  "page-title",
+  `<title>${escapeHtml(data.name)} | ${escapeHtml(data.title)}</title>`,
+  4
+);
+indexHtml = replaceRegion(indexHtml, "brand-name", escapeHtml(data.name), 0);
+indexHtml = replaceRegion(indexHtml, "name", escapeHtml(data.name), 0);
 indexHtml = replaceRegion(indexHtml, "eyebrow", escapeHtml(data.title), 0);
 indexHtml = replaceRegion(indexHtml, "summary", escapeHtml(data.summary), 16);
+indexHtml = replaceRegion(indexHtml, "hero-actions", webHeroActions(), 16);
+indexHtml = replaceRegion(indexHtml, "proof", webProof(), 14);
 indexHtml = replaceRegion(indexHtml, "experience", webExperience(), 14);
-indexHtml = replaceRegion(indexHtml, "awards", webAwards(), 14);
 indexHtml = replaceRegion(indexHtml, "skills", webSkills(), 14);
 indexHtml = replaceRegion(indexHtml, "education", webEducation(), 14);
 indexHtml = replaceRegion(indexHtml, "contact", webContact(), 14);
@@ -254,14 +260,19 @@ indexHtml = replaceRegion(indexHtml, "footer-links", webFooterLinks(), 12);
 fs.writeFileSync(INDEX_PATH, indexHtml);
 
 let sourceHtml = fs.readFileSync(SOURCE_PATH, "utf8");
+sourceHtml = replaceRegion(
+  sourceHtml,
+  "page-title",
+  `<title>${escapeHtml(data.name)} Resume</title>`,
+  4
+);
+sourceHtml = replaceRegion(sourceHtml, "name", escapeHtml(data.name), 0);
 sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(data.title), 0);
 sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(data.summary), 10);
 sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);
-sourceHtml = replaceRegion(sourceHtml, "awards", printAwards(), 8);
 sourceHtml = replaceRegion(sourceHtml, "skills", printSkills(), 10);
 sourceHtml = replaceRegion(sourceHtml, "education", printEducation(), 10);
-sourceHtml = replaceRegion(sourceHtml, "footer", printFooter(), 10);
 fs.writeFileSync(SOURCE_PATH, sourceHtml);
 
 console.log("Built index.html and resume-source.html from resume-data.json");

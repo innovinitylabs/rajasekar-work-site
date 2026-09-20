@@ -3,17 +3,9 @@ const themeToggles = [...document.querySelectorAll(".theme-toggle")];
 const revealElements = [...document.querySelectorAll(".reveal")];
 const downloadResumeButton = document.getElementById("download-resume");
 
-// Real PDF download, generated on the client from resume-data.json (the single
-// source of truth) so the file always reflects the latest resume. Uses jsPDF's
-// text APIs, which produce selectable, ATS-parseable text (not a rasterized
-// image) and download immediately with no print dialog.
 const RESUME_DATA_URL = "resume-data.json";
 const JSPDF_CDN_URL =
-  "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-
-const ACCENT = [36, 87, 197];
-const INK = [16, 24, 40];
-const MUTE = [71, 84, 103];
+  "https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js";
 
 let jsPdfLoader = null;
 
@@ -38,202 +30,20 @@ const loadJsPdf = () => {
   return jsPdfLoader;
 };
 
-const stripUrl = (url) =>
-  String(url)
-    .replace(/^https?:\/\//, "")
-    .replace(/^mailto:/, "")
-    .replace(/^tel:/, "")
-    .replace(/\/$/, "");
-
-const buildResumePdf = (JsPDF, data) => {
-  const doc = new JsPDF({ unit: "pt", format: "a4" });
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 44;
-  const contentWidth = pageWidth - margin * 2;
-  let y = margin;
-
-  const ensureSpace = (needed) => {
-    if (y + needed > pageHeight - margin) {
-      doc.addPage();
-      y = margin;
-    }
-  };
-
-  const setColor = ([r, g, b]) => doc.setTextColor(r, g, b);
-
-  const writeLines = (text, { size, style = "normal", color = INK, gap = 2, indent = 0 }) => {
-    doc.setFont("helvetica", style);
-    doc.setFontSize(size);
-    setColor(color);
-    const lines = doc.splitTextToSize(text, contentWidth - indent);
-    const lineHeight = size * 1.32;
-    lines.forEach((line) => {
-      ensureSpace(lineHeight);
-      doc.text(line, margin + indent, y);
-      y += lineHeight;
-    });
-    y += gap;
-  };
-
-  const sectionHeading = (label, reserve = 62) => {
-    // Reserve room for the heading plus its first lines so a heading never
-    // lands alone at the bottom of a page (no orphan headings).
-    ensureSpace(reserve);
-    y += 6;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    setColor(ACCENT);
-    doc.text(label.toUpperCase(), margin, y);
-    y += 6;
-    doc.setDrawColor(208, 213, 221);
-    doc.setLineWidth(0.6);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 12;
-  };
-
-  // Header
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(21);
-  setColor(INK);
-  doc.text(data.name, margin, y);
-  y += 20;
-  writeLines(data.title, { size: 11, style: "bold", color: ACCENT, gap: 3 });
-
-  const c = data.contact;
-  const contactLine = [
-    c.phone.label,
-    stripUrl(c.email.url),
-    c.linkedin.label,
-    c.github.label,
-  ].join("   |   ");
-  writeLines(contactLine, { size: 9, color: MUTE, gap: 4 });
-
-  doc.setDrawColor(208, 213, 221);
-  doc.setLineWidth(0.8);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 12;
-
-  // Summary
-  writeLines(data.summary, { size: 9.8, color: MUTE, gap: 2 });
-
-  // Skills
-  sectionHeading("Skills");
-  data.skills.forEach((group) => {
-    const label = `${group.group}: `;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9.4);
-    const labelWidth = doc.getTextWidth(label);
-    doc.setFont("helvetica", "normal");
-    const valueLines = doc.splitTextToSize(
-      group.items.join(", "),
-      contentWidth - labelWidth
-    );
-    const lineHeight = 9.4 * 1.34;
-    ensureSpace(lineHeight);
-    setColor(INK);
-    doc.setFont("helvetica", "bold");
-    doc.text(label, margin, y);
-    doc.setFont("helvetica", "normal");
-    setColor(MUTE);
-    valueLines.forEach((line, index) => {
-      if (index > 0) {
-        ensureSpace(lineHeight);
-      }
-      doc.text(line, margin + (index === 0 ? labelWidth : 0), y);
-      y += lineHeight;
-    });
-    y += 2;
-  });
-
-  // Experience
-  sectionHeading("Experience");
-  data.experience.forEach((role) => {
-    ensureSpace(30);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    setColor(INK);
-    doc.text(role.org, margin, y);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    setColor(ACCENT);
-    doc.text(role.period, pageWidth - margin, y, { align: "right" });
-    y += 13;
-    writeLines(role.role, { size: 9.5, style: "italic", color: MUTE, gap: 4 });
-    role.bullets.forEach((bullet) => {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(9.5);
-      setColor(INK);
-      const lines = doc.splitTextToSize(bullet, contentWidth - 14);
-      const lineHeight = 9.5 * 1.32;
-      lines.forEach((line, index) => {
-        ensureSpace(lineHeight);
-        if (index === 0) {
-          doc.text("\u2022", margin + 2, y);
-        }
-        doc.text(line, margin + 14, y);
-        y += lineHeight;
-      });
-      y += 1.5;
-    });
-    y += 6;
-  });
-
-  // Awards
-  if (Array.isArray(data.awards) && data.awards.length) {
-    sectionHeading("Awards");
-    data.awards.forEach((award) => {
-      writeLines(`${award.title} - ${award.org}`, {
-        size: 10.5,
-        style: "bold",
-        color: INK,
-        gap: 1,
-      });
-      writeLines(award.description, { size: 9.3, color: MUTE, gap: 6 });
-    });
+const downloadResume = async () => {
+  if (!window.ResumePdf) {
+    throw new Error("Resume PDF renderer is unavailable");
   }
 
-  // Education
-  sectionHeading("Education");
-  data.education.forEach((edu) => {
-    writeLines(`${edu.level} - ${edu.place} - ${edu.meta}`, {
-      size: 9.4,
-      color: INK,
-      gap: 1,
-    });
-  });
-
-  // Footer links
-  y += 6;
-  const l = data.links;
-  writeLines(
-    `Portfolio: ${stripUrl(l.portfolio.url)}   |   Creative: ${stripUrl(
-      l.creative.url
-    )}`,
-    { size: 8.6, color: MUTE, gap: 0 }
-  );
-
-  return doc;
-};
-
-const resumeDownloadFilename = () => {
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const stamp =
-    `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}` +
-    `${pad(now.getHours())}${pad(now.getMinutes())}`;
-  return `rajasekar-resume-${stamp}.pdf`;
-};
-
-const downloadResume = async () => {
   const response = await fetch(RESUME_DATA_URL, { cache: "no-store" });
   if (!response.ok) {
     throw new Error(`Could not load resume data (${response.status})`);
   }
+
   const data = await response.json();
   const JsPDF = await loadJsPdf();
-  const doc = buildResumePdf(JsPDF, data);
-  doc.save(resumeDownloadFilename());
+  const doc = window.ResumePdf.buildResumePdf(JsPDF, data);
+  doc.save(window.ResumePdf.resumeDownloadFilename());
 };
 
 if (downloadResumeButton) {
@@ -246,7 +56,6 @@ if (downloadResumeButton) {
     downloadResume()
       .catch((error) => {
         console.error(error);
-        // Fall back to the printable HTML source if PDF generation fails.
         window.open(downloadResumeButton.getAttribute("href"), "_blank");
       })
       .finally(() => {
