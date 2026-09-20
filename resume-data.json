@@ -59,8 +59,6 @@
     { "group": "Tools", "items": ["Selenium", "MoEngage"] }
   ],
   "education": [
-    { "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" },
-    { "level": "HSC", "meta": "87.4%", "place": "Infant Jesus MHSS" },
-    { "level": "SSLC", "meta": "86.5%", "place": "St. Mary's Matriculation" }
+    { "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" }
   ]
 }
