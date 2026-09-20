@@ -1,7 +1,7 @@
 {
   "name": "Rajasekar C",
-  "title": "Data Engineer | Product Engineer",
-  "summary": "Data Engineer with 5+ years building high-volume production systems, backend services, and data platforms. Experienced in SQL, Python, PostgreSQL, ETL, and production automation, supporting systems that process approximately 50 million records daily. Currently building independent software products from architecture through deployment.",
+  "title": "Data Engineer",
+  "summary": "Data Engineer with 5+ years building high-volume production data systems, ETL pipelines, and SQL-backed reporting platforms. Experienced in Python, SQL, PL/SQL, PostgreSQL, and Oracle, designing data pipelines and schemas that support batch processing of approximately 50 million records daily, with a focus on data ingestion, data modelling, data quality, and production reliability.",
   "contact": {
     "phone": { "label": "+91 7904348791", "url": "tel:+917904348791" },
     "email": { "label": "rajasekarc1142@gmail.com", "url": "mailto:rajasekarc1142@gmail.com" },
@@ -16,30 +16,18 @@
   },
   "experience": [
     {
-      "org": "Independent Product Engineer & Founder",
-      "role": "Independent Product Engineer",
-      "period": "Jun 2025 - Present",
-      "bullets": [
-        "Designed and built software products end to end, owning system architecture, backend, and deployment",
-        "Built backend services and REST APIs on PostgreSQL and Redis, adding caching and automated background jobs for reliability",
-        "Containerized and shipped services with Docker, managing source, releases, and CI-style workflows through Git and GitHub",
-        "Automated data indexing, metadata handling, and operational tasks to reduce manual effort and keep systems consistent",
-        "Leveraged AI-assisted development tools, including Cursor, Claude, and Codex, to accelerate prototyping, testing, and feature delivery"
-      ]
-    },
-    {
       "org": "Digit Insurance",
       "role": "Data Engineer",
       "period": "Nov 2023 - Jun 2025",
       "bullets": [
-        "Built a Flask and Pandas automation tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, earning the company \"Tech Titan\" award",
-        "Designed and ran ETL pipelines processing ~50M records/day, keeping downstream reporting accurate and timely",
-        "Automated MoEngage customer notifications through real-time stored procedures for policy-renewal detection, eliminating redundant alerts",
-        "Versioned PostgreSQL schemas by extracting DDL into Git, making deployments traceable, reviewable, and reproducible",
-        "Implemented PII classification and secure credential storage to keep data handling compliant",
-        "Delivered ETL pipelines and schemas for the Bima Satrak regulatory reporting service",
-        "Resolved 4000+ production issues, cutting the open backlog from ~600 to under 70",
-        "Automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas, replacing manual runs"
+        "Built a Flask and Pandas data automation tool that cut Vahan issue resolution from ~30 minutes to under 1 minute, earning the company \"Tech Titan\" award",
+        "Designed and operated ETL data pipelines processing ~50M records/day for batch processing and downstream reporting",
+        "Automated MoEngage customer notifications through real-time SQL stored procedures for policy-renewal detection, eliminating redundant alerts",
+        "Owned PostgreSQL schema design and DDL versioning in Git, making data model deployments traceable, reviewable, and reproducible",
+        "Implemented PII classification and secure credential storage to strengthen data quality and compliant data handling",
+        "Delivered ETL pipelines, data ingestion flows, and schemas for the Bima Satrak regulatory reporting service",
+        "Resolved 4000+ production data issues, cutting the open backlog from ~600 to under 70",
+        "Automated recurring credit-update and Excel-to-database data ingestion with SQL and Pandas, replacing manual runs"
       ]
     },
     {
@@ -47,20 +35,10 @@
       "role": "Software Engineer",
       "period": "Jan 2020 - Nov 2023",
       "bullets": [
-        "Built and maintained Oracle SQL and PL/SQL solutions, including stored procedures and reports, for banking and insurance production systems",
-        "Owned incident response for live banking and insurance systems, diagnosing root causes and deploying fixes to production",
-        "Tuned slow queries and stored procedures to improve database performance under high-usage production workloads",
-        "Managed deployments and database maintenance and recovery across client production environments"
-      ]
-    },
-    {
-      "org": "Construction Business",
-      "role": "Founder / Civil Engineer",
-      "period": "2013 - 2019",
-      "bullets": [
-        "Founded and ran a construction business delivering residential and commercial projects end to end",
-        "Managed vendors, clients, budgets, and schedules across concurrent projects",
-        "Led site teams and daily operations, owning quality and on-time delivery"
+        "Built and maintained Oracle SQL and PL/SQL data solutions, including stored procedures and production reports, for banking and insurance systems",
+        "Owned incident response for live production databases, diagnosing root causes and deploying fixes across client data environments",
+        "Tuned slow SQL queries and stored procedures to improve database performance under high-usage production workloads",
+        "Managed database deployments, maintenance, and recovery for production data systems across client environments"
       ]
     }
   ],
@@ -108,12 +86,11 @@
   "skills": [
     { "group": "Languages", "items": ["SQL", "PL/SQL", "Python", "Shell"] },
     { "group": "Databases", "items": ["PostgreSQL", "Oracle", "Redis", "DB2"] },
+    { "group": "Data Engineering", "items": ["ETL", "ELT", "Data Pipelines", "Data Ingestion", "Data Modelling", "Data Warehousing", "Batch Processing", "Pandas", "PySpark"] },
     { "group": "Backend", "items": ["Flask", "REST API", "Stored Procedures", "Database Design", "Performance Optimisation"] },
-    { "group": "Data Engineering", "items": ["ETL", "Data Modelling", "Data Warehousing", "Pandas", "Automation"] },
+    { "group": "Cloud & Big Data", "items": ["Databricks", "ClickHouse"] },
     { "group": "DevOps", "items": ["Docker", "Git", "Linux", "GitHub Workflows"] },
-    { "group": "Cloud & Big Data", "items": ["PySpark", "ClickHouse", "Databricks"] },
-    { "group": "Developer Tools", "items": ["Xcode", "Selenium", "MoEngage"] },
-    { "group": "AI Development", "items": ["Cursor", "Claude", "Codex"] }
+    { "group": "Tools", "items": ["Selenium", "MoEngage"] }
   ],
   "education": [
     { "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" },
