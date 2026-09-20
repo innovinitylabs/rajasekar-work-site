@@ -57,6 +57,7 @@
     { "group": "Backend", "items": ["Flask", "REST APIs", "Stored Procedures", "Database Design", "Query Optimization"] },
     { "group": "Data Platforms", "items": ["Databricks", "ClickHouse"] },
     { "group": "DevOps", "items": ["Docker", "Git", "Linux", "GitHub Workflows"] },
+    { "group": "Developer Tools", "items": ["Cursor", "Claude", "GPT Codex", "GitHub Copilot"] },
     { "group": "Other", "items": ["Selenium", "MoEngage"] }
   ],
   "education": [
