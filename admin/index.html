@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Management Console | rajasekar.work</title>
+    <script>
+      (function () {
+        const storedTheme = localStorage.getItem("theme") || "light";
+        document.documentElement.dataset.theme = storedTheme;
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+    <script src="../resume-pdf.js" defer></script>
+    <script src="admin.js" defer></script>
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="container admin-header-inner">
+        <div class="admin-brand-group">
+          <a class="brand" href="../">Rajasekar C</a>
+          <span class="admin-badge">Admin System</span>
+        </div>
+        <div class="admin-auth-widget" id="admin-auth-widget">
+          <!-- Populated by admin.js -->
+        </div>
+      </div>
+    </header>
+
+    <main class="container" style="padding-top:1.5rem;">
+      <nav class="tab-nav" aria-label="Admin Sections">
+        <button type="button" class="tab-btn is-active" data-tab="profiles">Resume Profiles</button>
+        <button type="button" class="tab-btn" data-tab="applications">Job Applications</button>
+      </nav>
+
+      <!-- TAB PANEL: PROFILES -->
+      <section id="tab-panel-profiles" class="admin-layout-grid">
+        <!-- Col 1: Profile List -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h2>Profiles</h2>
+            <button type="button" class="button button-primary btn-small" id="btn-new-profile">+ New</button>
+          </div>
+          <div class="profile-list" id="admin-profile-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Col 2: Profile Editor Form -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>Editing: <span id="active-profile-name" style="color:var(--accent);">Profile</span></h3>
+            <button type="button" class="button button-primary btn-small" id="btn-save-profiles">Save Changes</button>
+          </div>
+
+          <form id="profile-editor-form" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label" for="input-profile-name">Profile Name</label>
+              <input class="form-input" id="input-profile-name" type="text" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="input-target-title">Target Job Title</label>
+              <input class="form-input" id="input-target-title" type="text" required />
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="input-layout">Template Layout</label>
+                <select class="form-select" id="input-layout">
+                  <option value="ats-classic">ATS Classic (Single Column)</option>
+                  <option value="modern-visual">Modern Visual (Interactive)</option>
+                  <option value="executive">Executive Summary</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="input-accent-color">Accent Color</label>
+                <input class="form-input" id="input-accent-color" type="text" placeholder="#2457c5" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                <label class="form-label" for="input-summary-override" style="margin:0;">Professional Summary Override</label>
+                <button type="button" class="button button-secondary" id="btn-reset-summary" style="min-height:22px; padding:0.15rem 0.5rem; font-size:0.72rem;">Use Master Summary</button>
+              </div>
+              <textarea class="form-textarea" id="input-summary-override" placeholder="Leave blank to inherit the master resume summary..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Section Visibility</label>
+              <div class="visibility-grid" id="visibility-checkboxes">
+                <!-- Checkboxes populated dynamically -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Selected Experience (by Stable ID)</label>
+              <div class="checkbox-tree" id="experience-checkboxes">
+                <!-- Checkboxes populated dynamically -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Selected Skills Groups</label>
+              <div class="checkbox-tree" id="skills-checkboxes">
+                <!-- Checkboxes populated dynamically -->
+              </div>
+            </div>
+
+            <div class="admin-actions-bar">
+              <button type="button" class="button button-secondary btn-small" id="btn-duplicate-profile">Duplicate</button>
+              <button type="button" class="button btn-danger btn-small" id="btn-delete-profile">Delete</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Col 3: Live Preview & Export -->
+        <div class="admin-preview-col">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>Live Profile Preview</h3>
+              <button type="button" class="button button-secondary btn-small" id="btn-export-profile-pdf">
+                Export Profile PDF
+              </button>
+            </div>
+            <div id="profile-live-preview">
+              <!-- Live preview rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB PANEL: APPLICATIONS -->
+      <section id="tab-panel-applications" style="display:none; padding-bottom:3rem;">
+        <div style="display:grid; grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr); gap:1.5rem; align-items:start;">
+          <div>
+            <h3 style="margin:0 0 1rem; font-size:1.1rem;">Active Job Applications</h3>
+            <div id="applications-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>+ Log New Application</h3>
+            </div>
+            <form id="form-new-app">
+              <div class="form-group">
+                <label class="form-label" for="app-company">Company Name</label>
+                <input class="form-input" id="app-company" type="text" required placeholder="e.g. Acme Corp" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="app-title">Target Role Title</label>
+                <input class="form-input" id="app-title" type="text" required placeholder="e.g. Staff Data Engineer" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="app-profile-select">Attached Resume Profile</label>
+                <select class="form-select" id="app-profile-select">
+                  <!-- Populated dynamically -->
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="app-status">Application Status</label>
+                <select class="form-select" id="app-status">
+                  <option value="Draft">Draft</option>
+                  <option value="Applied" selected>Applied</option>
+                  <option value="Screening">Screening</option>
+                  <option value="Interviewing">Interviewing</option>
+                  <option value="Offered">Offered</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Archived">Archived</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="app-notes">Notes / Referral</label>
+                <textarea class="form-textarea" id="app-notes" style="min-height:60px;" placeholder="Job posting URL, referral name, recruiter contact..."></textarea>
+              </div>
+              <button type="submit" class="button button-primary" style="width:100%;">Add Application</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal for Creating New Profile -->
+    <div class="modal-backdrop" id="modal-new-profile" style="display:none;">
+      <div class="modal-dialog">
+        <h3 style="margin:0 0 1rem;">Create New Resume Profile</h3>
+        <form id="form-new-profile">
+          <div class="form-group">
+            <label class="form-label" for="new-profile-name">Profile Display Name</label>
+            <input class="form-input" id="new-profile-name" type="text" placeholder="e.g. Lead Platform Engineer" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-profile-id">Profile ID (Slug)</label>
+            <input class="form-input" id="new-profile-id" type="text" placeholder="e.g. lead-platform-engineer" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-profile-title">Target Job Title</label>
+            <input class="form-input" id="new-profile-title" type="text" placeholder="e.g. Senior Data Engineer" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-profile-base">Clone Settings From</label>
+            <select class="form-select" id="new-profile-base">
+              <option value="data-engineer">Data Engineer (Default)</option>
+              <option value="ai-product-engineer">AI / Product Engineer</option>
+              <option value="database-developer">Database Developer</option>
+            </select>
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:0.6rem; margin-top:1.25rem;">
+            <button type="button" class="button button-secondary btn-small" id="btn-cancel-new-profile">Cancel</button>
+            <button type="submit" class="button button-primary btn-small">Create Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="admin-status-toast" class="contributions-tooltip" style="position:fixed; bottom:24px; right:24px; transform:none; padding:0.6rem 1rem; border-radius:8px; display:none; z-index:999;"></div>
+  </body>
+</html>
