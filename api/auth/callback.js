@@ -42,18 +42,27 @@ module.exports = async function handler(req, res) {
   const { code, state, error, error_description } = req.query || {};
 
   if (error) {
-    return res.status(400).send(`OAuth Error: ${error_description || error}`);
+    res.writeHead(302, {
+      Location: `/admin/?error=${encodeURIComponent(error_description || error)}`,
+    });
+    return res.end();
   }
 
   if (!code || !state) {
-    return res.status(400).json({ error: "Missing code or state parameter" });
+    res.writeHead(302, {
+      Location: "/admin/?error=missing_code_or_state",
+    });
+    return res.end();
   }
 
-  const cookies = parseCookies(req.headers.cookie);
+  const cookies = parseCookies(req.headers ? req.headers.cookie : "");
   const cookieState = cookies.oauth_state;
 
   if (!cookieState || cookieState !== state || !verifyOAuthState(state, config.sessionSecret)) {
-    return res.status(403).json({ error: "Invalid or expired OAuth state parameter (CSRF protection)" });
+    res.writeHead(302, {
+      Location: "/admin/?error=invalid_csrf_state",
+    });
+    return res.end();
   }
 
   try {
@@ -79,10 +88,10 @@ module.exports = async function handler(req, res) {
 
     const accessToken = tokenRes.data && tokenRes.data.access_token;
     if (!accessToken) {
-      return res.status(401).json({
-        error: "Failed to exchange token with GitHub",
-        details: tokenRes.data,
+      res.writeHead(302, {
+        Location: "/admin/?error=token_exchange_failed",
       });
+      return res.end();
     }
 
     // 2. Fetch authenticated user profile
@@ -97,17 +106,21 @@ module.exports = async function handler(req, res) {
 
     const user = userRes.data;
     if (!user || !user.login) {
-      return res.status(401).json({ error: "Unable to retrieve GitHub user profile" });
+      res.writeHead(302, {
+        Location: "/admin/?error=user_fetch_failed",
+      });
+      return res.end();
     }
 
     // 3. Strict Admin Access Control
-    if (user.login.toLowerCase() !== config.adminUsername) {
-      return res.status(403).send(
-        `Access Forbidden: Account "${user.login}" is not authorized. Access is strictly restricted to administrator "${config.adminUsername}".`
-      );
+    if (user.login.toLowerCase() !== config.adminUsername.toLowerCase()) {
+      res.writeHead(302, {
+        Location: `/admin/?error=forbidden&user=${encodeURIComponent(user.login)}`,
+      });
+      return res.end();
     }
 
-    // 4. Issue Session Cookie
+    // 4. Issue Session Cookie for verified administrator
     const sessionToken = createSessionToken(user, config.sessionSecret);
     const sessionCookie = serializeCookie("admin_session", sessionToken, {
       maxAge: 7 * 24 * 60 * 60, // 7 days
@@ -126,6 +139,9 @@ module.exports = async function handler(req, res) {
     res.writeHead(302, { Location: "/admin/" });
     res.end();
   } catch (err) {
-    return res.status(500).json({ error: "Internal server error during authentication", message: err.message });
+    res.writeHead(302, {
+      Location: `/admin/?error=${encodeURIComponent(err.message)}`,
+    });
+    res.end();
   }
 };

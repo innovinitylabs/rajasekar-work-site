@@ -1,5 +1,111 @@
 /* admin/admin.css - Administrative Interface for rajasekar.work */
 
+/* -------------------------------------------------------------------------- */
+/* Login Gate & Access Control View                                           */
+/* -------------------------------------------------------------------------- */
+
+.admin-auth-gate {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-gate-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.25rem;
+}
+
+.login-card {
+  width: min(100%, 480px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+
+.login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(201, 59, 43, 0.08);
+  color: #c93b2b;
+  border: 1px solid rgba(201, 59, 43, 0.22);
+  margin-bottom: 1.25rem;
+}
+
+.login-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.login-description {
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 1.5rem;
+}
+
+.login-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.82rem 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.login-error-banner {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin-bottom: 1.35rem;
+  text-align: left;
+}
+
+.login-error-banner.error {
+  background: rgba(201, 59, 43, 0.1);
+  color: #c93b2b;
+  border: 1px solid rgba(201, 59, 43, 0.25);
+}
+
+.login-error-banner.success {
+  background: rgba(36, 87, 197, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(36, 87, 197, 0.25);
+}
+
+.login-footnote {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 1.6rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Admin Application Header & Controls                                        */
+/* -------------------------------------------------------------------------- */
+
 .admin-header {
   border-bottom: 1px solid var(--line);
   padding: 0.9rem 0;

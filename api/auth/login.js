@@ -11,13 +11,18 @@ module.exports = async function handler(req, res) {
   const config = getConfig();
 
   if (!config.isConfigured) {
-    return res.status(501).json({
-      error: "GitHub OAuth not configured",
-      message:
-        "Please configure GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables in your deployment.",
-      status: "unconfigured",
-      adminTarget: config.adminUsername,
-    });
+    if (req.headers.accept && req.headers.accept.includes("application/json")) {
+      return res.status(501).json({
+        error: "GitHub OAuth not configured",
+        message:
+          "Please configure GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables in your deployment.",
+        status: "unconfigured",
+        adminTarget: config.adminUsername,
+      });
+    }
+
+    res.writeHead(302, { Location: "/admin/?error=unconfigured" });
+    return res.end();
   }
 
   const state = createOAuthState(config.sessionSecret);
@@ -27,7 +32,10 @@ module.exports = async function handler(req, res) {
     sameSite: "Lax",
   });
 
-  const redirectUri = `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth/callback`;
+  const proto = req.headers["x-forwarded-proto"] || "https";
+  const host = req.headers.host;
+  const redirectUri = `${proto}://${host}/api/auth/callback`;
+
   const githubAuthUrl = new URL("https://github.com/login/oauth/authorize");
   githubAuthUrl.searchParams.set("client_id", config.clientId);
   githubAuthUrl.searchParams.set("redirect_uri", redirectUri);

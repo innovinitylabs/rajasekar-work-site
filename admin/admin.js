@@ -3,14 +3,22 @@
 (function () {
   const root = document.documentElement;
 
+  // View Containers
+  const views = {
+    login: document.getElementById("admin-login-view"),
+    app: document.getElementById("admin-app-view"),
+    loginError: document.getElementById("login-error-banner"),
+    loginThemeToggle: document.getElementById("login-theme-toggle"),
+  };
+
   // State
   let state = {
     master: null,
     profiles: [],
     applications: [],
     activeProfileId: "data-engineer",
-    auth: { authenticated: false, adminTarget: "innovinitylabs" },
-    activeTab: "profiles", // "profiles" | "applications"
+    user: null,
+    activeTab: "profiles",
   };
 
   const JSPDF_CDN_URL =
@@ -33,7 +41,7 @@
     return jsPdfPromise;
   };
 
-  // DOM Elements
+  // DOM Elements in App View
   const el = {
     authWidget: document.getElementById("admin-auth-widget"),
     profileList: document.getElementById("admin-profile-list"),
@@ -78,116 +86,148 @@
     }, 3500);
   };
 
-  // Data Loading
-  const init = async () => {
-    // 1. Check Auth Session
-    try {
-      const authRes = await fetch("/api/auth/session");
-      if (authRes.ok) {
-        state.auth = await authRes.json();
-      }
-    } catch {
-      // Local dev / offline
-    }
-    renderAuth();
-
-    // 2. Fetch Profiles and Master Data
-    try {
-      const res = await fetch("/api/profiles");
-      if (res.ok) {
-        const data = await res.json();
-        state.master = data.master;
-        state.profiles = data.profiles;
-        state.applications = data.applications || [];
-      } else {
-        throw new Error("API unavailable");
-      }
-    } catch {
-      // Fallback: fetch raw resume-data.json
-      const rawRes = await fetch("../resume-data.json");
-      const raw = await rawRes.json();
-      state.master = {
-        name: raw.name,
-        title: raw.title,
-        summary: raw.summary,
-        contact: raw.contact,
-        proof: (raw.proof || []).map((p, i) => ({ id: `proof-${i + 1}`, ...p })),
-        experience: (raw.experience || []).map((e, i) => ({
-          id: `exp-${e.org.toLowerCase().replace(/\s+/g, "-")}`,
-          ...e,
-        })),
-        skills: (raw.skills || []).map((s, i) => ({
-          id: `skill-${s.group.toLowerCase().replace(/\s+/g, "-")}`,
-          ...s,
-        })),
-        education: (raw.education || []).map((ed, i) => ({
-          id: `edu-${i + 1}`,
-          ...ed,
-        })),
-        independentWork: [],
-      };
-
-      // Check localStorage for drafted profiles
-      const saved = localStorage.getItem("rajasekar_profiles");
-      if (saved) {
-        try {
-          state.profiles = JSON.parse(saved);
-        } catch {}
-      }
-      if (!state.profiles || state.profiles.length === 0) {
-        state.profiles = [
-          {
-            id: "data-engineer",
-            name: "Data Engineer",
-            isDefault: true,
-            targetTitle: "Data Engineer",
-            summaryOverride: null,
-            selectedExperience: ["exp-digit-insurance", "exp-appzwork"],
-            selectedSkills: state.master.skills.map((s) => s.id),
-            selectedProjects: [],
-            sectionVisibility: {
-              proof: true,
-              summary: true,
-              skills: true,
-              experience: true,
-              projects: false,
-              education: true,
-              contact: true,
-            },
-            layout: "ats-classic",
-            accentColor: "#2457c5",
-          },
-        ];
-      }
-    }
-
-    renderProfileList();
-    renderActiveProfile();
-    renderApplications();
+  const showLoginError = (message, type = "error") => {
+    if (!views.loginError) return;
+    views.loginError.className = `login-error-banner ${type}`;
+    views.loginError.textContent = message;
+    views.loginError.style.display = "block";
   };
 
-  const renderAuth = () => {
-    if (!el.authWidget) return;
-    if (state.auth && state.auth.authenticated) {
-      el.authWidget.innerHTML = `
-        <div class="admin-user-pill">
-          ${
-            state.auth.user.avatar
-              ? `<img src="${state.auth.user.avatar}" class="admin-user-avatar" alt="Avatar" />`
-              : ""
-          }
-          <span>@${state.auth.user.login}</span>
-        </div>
-        <a href="/api/auth/logout" class="button button-secondary btn-small">Logout</a>
-      `;
-    } else {
-      el.authWidget.innerHTML = `
-        <span class="admin-badge" style="background:rgba(201,59,43,0.1); color:#c93b2b; border-color:rgba(201,59,43,0.3);">
-          Local / Unauthenticated
-        </span>
-        <a href="/api/auth/login" class="button button-primary btn-small">Login with GitHub</a>
-      `;
+  const setupThemeToggle = (btn) => {
+    if (!btn) return;
+    const isDark = root.dataset.theme === "dark";
+    btn.setAttribute("aria-pressed", String(isDark));
+    btn.addEventListener("click", () => {
+      const next = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      localStorage.setItem("theme", next);
+      btn.setAttribute("aria-pressed", String(next === "dark"));
+    });
+  };
+
+  /**
+   * Enforces the unauthenticated login gate state.
+   */
+  const showLoginGate = (errorMessage = null, type = "error") => {
+    if (views.app) views.app.style.display = "none";
+    if (views.login) views.login.style.display = "flex";
+    localStorage.removeItem("rajasekar_profiles");
+
+    if (errorMessage) {
+      showLoginError(errorMessage, type);
     }
+  };
+
+  /**
+   * Primary Initialization Flow.
+   * Strictly enforces session verification before revealing dashboard.
+   */
+  const init = async () => {
+    setupThemeToggle(views.loginThemeToggle);
+
+    // 1. Check for URL Error Parameters
+    const params = new URLSearchParams(window.location.search);
+    const urlError = params.get("error");
+    const loggedOut = params.get("logged_out");
+    const unauthorizedUser = params.get("user");
+
+    if (loggedOut) {
+      showLoginGate("You have been logged out successfully.", "success");
+      return;
+    }
+
+    if (urlError) {
+      if (urlError === "forbidden") {
+        showLoginGate(
+          `Access Denied: Account "${unauthorizedUser || "unknown"}" is not authorized. Access is strictly restricted to administrator @innovinitylabs.`
+        );
+      } else if (urlError === "unconfigured") {
+        showLoginGate(
+          "GitHub OAuth is not configured on this deployment. Please configure GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in environment settings."
+        );
+      } else if (urlError === "invalid_csrf_state") {
+        showLoginGate("Authentication request timed out or CSRF state mismatch. Please sign in again.");
+      } else {
+        showLoginGate(`Authentication failed: ${urlError}`);
+      }
+      return;
+    }
+
+    // 2. Query Server-Side Session API
+    let sessionData = null;
+    try {
+      const authRes = await fetch("/api/auth/session", { cache: "no-store" });
+      if (authRes.ok) {
+        sessionData = await authRes.json();
+      } else {
+        showLoginGate("Authentication service unavailable. Please try again later.");
+        return;
+      }
+    } catch (err) {
+      console.warn("Auth check failed:", err);
+      showLoginGate("Could not connect to authentication service.");
+      return;
+    }
+
+    // 3. Strict Gate: Must be authenticated AND authorized
+    if (!sessionData || !sessionData.authenticated || !sessionData.authorized) {
+      const msg = sessionData && sessionData.error ? sessionData.error : null;
+      showLoginGate(msg);
+      return;
+    }
+
+    // 4. Authenticated & Authorized -> Reveal Dashboard and Load Private Data
+    state.user = sessionData.user;
+    if (views.login) views.login.style.display = "none";
+    if (views.app) views.app.style.display = "block";
+
+    renderAuthHeader();
+    await loadPrivateAdminData();
+  };
+
+  /**
+   * Loads private profiles and applications from the protected /api/profiles endpoint.
+   */
+  const loadPrivateAdminData = async () => {
+    try {
+      const res = await fetch("/api/profiles", { cache: "no-store" });
+
+      if (res.status === 401 || res.status === 403) {
+        showLoginGate("Your administrator session has expired. Please sign in again.");
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`API error (${res.status})`);
+      }
+
+      const data = await res.json();
+      state.master = data.master;
+      state.profiles = data.profiles || [];
+      state.applications = data.applications || [];
+
+      renderProfileList();
+      renderActiveProfile();
+      renderApplications();
+    } catch (err) {
+      console.error("Failed to load profiles:", err);
+      showToast("Failed to load profile data from server", true);
+    }
+  };
+
+  const renderAuthHeader = () => {
+    if (!el.authWidget || !state.user) return;
+    el.authWidget.innerHTML = `
+      <div class="admin-user-pill">
+        ${
+          state.user.avatar
+            ? `<img src="${state.user.avatar}" class="admin-user-avatar" alt="${state.user.login}" />`
+            : ""
+        }
+        <span>@${state.user.login}</span>
+      </div>
+      <a href="/api/auth/logout" class="button button-secondary btn-small">Logout</a>
+    `;
   };
 
   const getActiveProfile = () => {
@@ -228,7 +268,6 @@
       el.profileList.appendChild(btn);
     });
 
-    // Populate app profile dropdown
     if (el.appProfileSelect) {
       el.appProfileSelect.innerHTML = state.profiles
         .map((p) => `<option value="${p.id}">${p.name} (${p.targetTitle})</option>`)
@@ -247,13 +286,11 @@
     if (el.inputLayout) el.inputLayout.value = profile.layout || "ats-classic";
     if (el.inputAccent) el.inputAccent.value = profile.accentColor || "#2457c5";
 
-    // Disable delete on default profile
     if (el.btnDelete) {
       el.btnDelete.disabled = Boolean(profile.isDefault);
       el.btnDelete.style.opacity = profile.isDefault ? "0.4" : "1";
     }
 
-    // Experience Checkboxes
     if (el.experienceCheckboxes && state.master) {
       const selectedExp = new Set(profile.selectedExperience || []);
       el.experienceCheckboxes.innerHTML = state.master.experience
@@ -272,7 +309,6 @@
         .join("");
     }
 
-    // Skills Checkboxes
     if (el.skillsCheckboxes && state.master) {
       const selectedSkills = new Set(profile.selectedSkills || []);
       el.skillsCheckboxes.innerHTML = state.master.skills
@@ -291,7 +327,6 @@
         .join("");
     }
 
-    // Visibility Checkboxes
     if (el.visibilityCheckboxes) {
       const vis = profile.sectionVisibility || {};
       const keys = [
@@ -415,7 +450,6 @@
     el.previewPane.innerHTML = html;
   };
 
-  // Sync profile form input back into state
   const captureActiveProfileChanges = () => {
     const profile = getActiveProfile();
     if (!profile) return;
@@ -456,7 +490,6 @@
     profile.updatedAt = new Date().toISOString();
   };
 
-  // Event Listeners
   if (el.profileForm) {
     el.profileForm.addEventListener("input", () => {
       captureActiveProfileChanges();
@@ -556,7 +589,6 @@
   if (el.btnSaveProfile) {
     el.btnSaveProfile.addEventListener("click", async () => {
       captureActiveProfileChanges();
-      localStorage.setItem("rajasekar_profiles", JSON.stringify(state.profiles));
 
       try {
         const res = await fetch("/api/profiles", {
@@ -567,13 +599,19 @@
             applications: state.applications,
           }),
         });
+
+        if (res.status === 401 || res.status === 403) {
+          showLoginGate("Session expired. Please sign in again to save changes.");
+          return;
+        }
+
         if (res.ok) {
-          showToast("Saved profiles to server & local storage!");
+          showToast("Saved profiles to server!");
         } else {
-          showToast("Saved locally (Server requires admin login)");
+          showToast("Failed to save changes", true);
         }
       } catch {
-        showToast("Saved locally (Offline/Draft mode)");
+        showToast("Network error while saving", true);
       }
     });
   }
@@ -604,7 +642,6 @@
     });
   }
 
-  // Applications tab logic
   const renderApplications = () => {
     if (!el.applicationsList) return;
     if (state.applications.length === 0) {
@@ -637,7 +674,7 @@
   };
 
   if (el.formNewApp) {
-    el.formNewApp.addEventListener("submit", (e) => {
+    el.formNewApp.addEventListener("submit", async (e) => {
       e.preventDefault();
       const company = document.getElementById("app-company").value.trim();
       const jobTitle = document.getElementById("app-title").value.trim();
@@ -660,10 +697,24 @@
       renderApplications();
       el.formNewApp.reset();
       showToast(`Logged application to ${company}`);
+
+      // Auto-sync applications to server
+      try {
+        const res = await fetch("/api/profiles", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            profiles: state.profiles,
+            applications: state.applications,
+          }),
+        });
+        if (res.status === 401 || res.status === 403) {
+          showLoginGate("Session expired. Please sign in again.");
+        }
+      } catch {}
     });
   }
 
-  // Tabs switching
   el.tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       el.tabs.forEach((t) => t.classList.remove("is-active"));
@@ -678,5 +729,9 @@
     });
   });
 
-  init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

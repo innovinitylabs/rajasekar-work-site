@@ -6,22 +6,23 @@ const {
   saveProfiles,
   getApplications,
   saveApplications,
-  resolveProfile,
 } = require("../lib/resume-system");
-const { getConfig, parseCookies, verifySessionToken } = require("../lib/auth");
+const { validateAdminSession } = require("../lib/auth");
 
 module.exports = async function handler(req, res) {
   const method = req.method;
-  const config = getConfig();
 
-  // Authentication check helper
-  const isAuthenticated = () => {
-    // If not configured, allow local dev access
-    if (!config.isConfigured) return true;
-    const cookies = parseCookies(req.headers.cookie);
-    const user = verifySessionToken(cookies.admin_session, config.sessionSecret);
-    return Boolean(user && user.user.toLowerCase() === config.adminUsername);
-  };
+  // Strict independent server-side session authorization check
+  const auth = validateAdminSession(req.headers ? req.headers.cookie : "");
+
+  if (auth.status !== 200) {
+    res.setHeader("Content-Type", "application/json");
+    return res.status(auth.status).json({
+      error: auth.error,
+      authenticated: false,
+      status: auth.status,
+    });
+  }
 
   if (method === "GET") {
     const master = getMasterResume();
@@ -32,15 +33,12 @@ module.exports = async function handler(req, res) {
       master,
       profiles,
       applications,
-      adminUsername: config.adminUsername,
+      adminUsername: auth.config.adminUsername,
+      user: auth.session.user,
     });
   }
 
   if (method === "POST") {
-    if (!isAuthenticated()) {
-      return res.status(401).json({ error: "Unauthorized: Administrator login required" });
-    }
-
     try {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
 
