@@ -127,7 +127,14 @@
     // The portfolio destination is fixed on purpose.
     out.push({ key: "portfolio", text: "Portfolio: https://rajasekar.work", url: "https://rajasekar.work" });
     if (contact.email) out.push({ key: "email", text: String(contact.email.url).replace(/^mailto:/i, ""), url: `mailto:${String(contact.email.url).replace(/^mailto:/i, "")}` });
-    if (contact.phone) out.push({ key: "phone", text: contact.phone.label, url: `tel:${String(contact.phone.url).replace(/^tel:/i, "")}` });
+    if (contact.phone) {
+      // A null url means "display only" (public build): no tel: link, so the number is not in the markup as a link.
+      out.push({
+        key: "phone",
+        text: contact.phone.label,
+        url: contact.phone.url === null ? null : `tel:${String(contact.phone.url).replace(/^tel:/i, "")}`,
+      });
+    }
     if (contact.linkedin) out.push({ key: "linkedin", text: `LinkedIn: ${bare(contact.linkedin.label)}`, url: toHttps(contact.linkedin.url) });
     if (contact.github) out.push({ key: "github", text: `GitHub: ${bare(contact.github.label)}`, url: toHttps(contact.github.url) });
     return out;
@@ -151,6 +158,26 @@
     detail: e.place ? [e.place, e.meta].filter(Boolean).join(" | ") : "",
     inline: e.place ? "" : e.meta || "",
   });
+
+  /**
+   * Public-safe phone label: country code and the last four digits only, e.g.
+   * "+91 7904348791" -> "+91 xxx xxx 8791". The full number stays in the private master.
+   */
+  const maskPhone = (label) => {
+    const text = String(label || "").trim();
+    const digits = text.replace(/\D/g, "");
+    const last4 = digits.slice(-4);
+    const cc = text.startsWith("+") ? text.split(/\s/)[0] : "";
+    return `${cc} xxx xxx ${last4}`.trim();
+  };
+
+  /** Copy of a contact object that is safe to publish: masked phone, no tel: link. */
+  const publicContact = (contact) => {
+    if (!contact) return contact;
+    const copy = JSON.parse(JSON.stringify(contact));
+    if (copy.phone) copy.phone = { label: maskPhone(copy.phone.label), url: null };
+    return copy;
+  };
 
   const DEFAULT_VISIBILITY = {
     proof: true,
@@ -253,5 +280,5 @@
     };
   };
 
-  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, educationDisplay, resolveProfile, SHOWCASE, LINK_TYPES, DEFAULT_VISIBILITY };
+  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, educationDisplay, maskPhone, publicContact, resolveProfile, SHOWCASE, LINK_TYPES, DEFAULT_VISIBILITY };
 });
