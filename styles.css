@@ -7,6 +7,12 @@
   --line: rgba(28, 28, 26, 0.1);
   --accent: #4f6486;
   --accent-soft: rgba(79, 100, 134, 0.08);
+  --accent-indie: #c2593f;
+  --accent-indie-soft: rgba(194, 89, 63, 0.08);
+  --badge-indie-bg: rgba(194, 89, 63, 0.08);
+  --badge-indie-text: #9e3f28;
+  --badge-corp-bg: rgba(79, 100, 134, 0.08);
+  --badge-corp-text: #4f6486;
   --shadow: none;
   --radius: 12px;
   --max-width: 860px;
@@ -21,6 +27,12 @@
   --line: rgba(244, 241, 234, 0.14);
   --accent: #b7cae8;
   --accent-soft: rgba(183, 202, 232, 0.14);
+  --accent-indie: #e88d76;
+  --accent-indie-soft: rgba(232, 141, 118, 0.14);
+  --badge-indie-bg: rgba(232, 141, 118, 0.12);
+  --badge-indie-text: #f0a38f;
+  --badge-corp-bg: rgba(183, 202, 232, 0.12);
+  --badge-corp-text: #b7cae8;
 }
 
 *,
@@ -733,4 +745,233 @@ img {
     opacity: 1;
     transform: none;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Work Track Visual Identity (Enterprise vs Independent Development)         */
+/* -------------------------------------------------------------------------- */
+
+.badge-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.badge-track.corp {
+  background: var(--badge-corp-bg);
+  color: var(--badge-corp-text);
+  border: 1px solid rgba(79, 100, 134, 0.2);
+}
+
+.badge-track.indie {
+  background: var(--badge-indie-bg);
+  color: var(--badge-indie-text);
+  border: 1px solid rgba(194, 89, 63, 0.24);
+}
+
+.experience-card.is-indie {
+  border-left: 2px solid var(--accent-indie);
+  padding-left: 1.1rem;
+}
+
+.indie-accent-text {
+  color: var(--accent-indie);
+}
+
+/* -------------------------------------------------------------------------- */
+/* GitHub Contribution Graph Component                                       */
+/* -------------------------------------------------------------------------- */
+
+.contributions-container {
+  padding: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-top: 1rem;
+  position: relative;
+}
+
+.contributions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.contributions-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.contributions-count {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.contributions-subtext {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.contributions-scroll {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.contributions-graph-inner {
+  display: flex;
+  flex-direction: column;
+  min-width: 680px;
+}
+
+.contributions-months-row {
+  display: flex;
+  padding-left: 28px;
+  font-size: 0.72rem;
+  color: var(--muted);
+  height: 16px;
+  margin-bottom: 4px;
+}
+
+.contributions-month-label {
+  flex: 1;
+  text-align: left;
+}
+
+.contributions-body-row {
+  display: flex;
+  gap: 6px;
+}
+
+.contributions-weekdays-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 22px;
+  height: 88px;
+  font-size: 0.68rem;
+  color: var(--muted);
+  padding: 2px 0;
+}
+
+.contributions-calendar-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.contributions-week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contributions-day-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background-color: var(--line);
+  transition: transform 0.15s ease, outline 0.15s ease;
+  cursor: pointer;
+}
+
+.contributions-day-cell:hover {
+  transform: scale(1.3);
+  outline: 1px solid var(--accent);
+  z-index: 5;
+}
+
+.contributions-day-cell.level-0 {
+  background-color: rgba(28, 28, 26, 0.05);
+}
+
+[data-theme="dark"] .contributions-day-cell.level-0 {
+  background-color: rgba(244, 241, 234, 0.06);
+}
+
+.contributions-day-cell.level-1 {
+  background-color: rgba(79, 100, 134, 0.28);
+}
+
+[data-theme="dark"] .contributions-day-cell.level-1 {
+  background-color: rgba(183, 202, 232, 0.28);
+}
+
+.contributions-day-cell.level-2 {
+  background-color: rgba(79, 100, 134, 0.52);
+}
+
+[data-theme="dark"] .contributions-day-cell.level-2 {
+  background-color: rgba(183, 202, 232, 0.52);
+}
+
+.contributions-day-cell.level-3 {
+  background-color: rgba(79, 100, 134, 0.78);
+}
+
+[data-theme="dark"] .contributions-day-cell.level-3 {
+  background-color: rgba(183, 202, 232, 0.78);
+}
+
+.contributions-day-cell.level-4 {
+  background-color: var(--accent);
+}
+
+.contributions-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.85rem;
+  padding-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.contributions-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.contributions-legend .contributions-day-cell {
+  cursor: default;
+}
+
+.contributions-legend .contributions-day-cell:hover {
+  transform: none;
+  outline: none;
+}
+
+.contributions-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface-strong);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translate(-50%, -120%);
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.contributions-tooltip.is-active {
+  opacity: 1;
 }

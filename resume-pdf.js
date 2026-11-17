@@ -9,7 +9,7 @@
     root.ResumePdf = api;
   }
 })(typeof window !== "undefined" ? window : globalThis, function createResumePdfApi() {
-  const ACCENT = [36, 87, 197];
+  const DEFAULT_ACCENT = [36, 87, 197];
   const INK = [16, 24, 40];
   const MUTE = [71, 84, 103];
 
@@ -20,17 +20,35 @@
       .replace(/^tel:/, "")
       .replace(/\/$/, "");
 
-  const buildResumePdf = (JsPDF, data) => {
+  const hexToRgb = (hex) => {
+    if (!hex || typeof hex !== "string") return null;
+    const clean = hex.replace(/^#/, "");
+    if (clean.length === 6) {
+      return [
+        parseInt(clean.slice(0, 2), 16),
+        parseInt(clean.slice(2, 4), 16),
+        parseInt(clean.slice(4, 6), 16),
+      ];
+    }
+    return null;
+  };
+
+  const buildResumePdf = (JsPDF, data, options = {}) => {
     const doc = new JsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 40;
+    const margin = options.margin || 40;
     const contentWidth = pageWidth - margin * 2;
     let y = margin;
 
+    const accentColor =
+      (options.accentColor && hexToRgb(options.accentColor)) ||
+      (data.accentColor && hexToRgb(data.accentColor)) ||
+      DEFAULT_ACCENT;
+
     doc.setProperties({
       title: `${data.name} - ${data.title}`,
-      subject: "Data Engineer resume",
+      subject: `${data.title} resume`,
       author: data.name,
       keywords: "Data Engineer, ETL, SQL, Python, PostgreSQL, Oracle",
     });
@@ -68,7 +86,7 @@
       y += 7;
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
-      setColor(ACCENT);
+      setColor(accentColor);
       doc.text(label.toUpperCase(), margin, y);
       y += 5;
       doc.setDrawColor(208, 213, 221);
@@ -105,115 +123,160 @@
     writeLines(data.title, {
       size: 10.5,
       style: "bold",
-      color: ACCENT,
+      color: accentColor,
       gap: 2,
     });
 
     const contact = data.contact;
-    writeContactLine([
-      { text: contact.phone.label, url: contact.phone.url },
-      { text: stripUrl(contact.email.url), url: contact.email.url },
-      { text: contact.linkedin.label, url: contact.linkedin.url },
-    ]);
-    writeContactLine([
-      { text: `GitHub: ${contact.github.label}`, url: contact.github.url },
-      {
-        text: `Portfolio: ${contact.portfolio.label}`,
-        url: contact.portfolio.url,
-      },
-    ]);
+    if (contact) {
+      const line1 = [];
+      if (contact.phone) line1.push({ text: contact.phone.label, url: contact.phone.url });
+      if (contact.email) line1.push({ text: stripUrl(contact.email.url), url: contact.email.url });
+      if (contact.linkedin) line1.push({ text: contact.linkedin.label, url: contact.linkedin.url });
+      if (line1.length > 0) writeContactLine(line1);
+
+      const line2 = [];
+      if (contact.github) line2.push({ text: `GitHub: ${contact.github.label}`, url: contact.github.url });
+      if (contact.portfolio) line2.push({ text: `Portfolio: ${contact.portfolio.label}`, url: contact.portfolio.url });
+      if (line2.length > 0) writeContactLine(line2);
+    }
 
     doc.setDrawColor(208, 213, 221);
     doc.setLineWidth(0.7);
     doc.line(margin, y, pageWidth - margin, y);
     y += 5;
 
-    sectionHeading("Summary", 30);
-    writeLines(data.summary, { size: 9.8, color: MUTE, gap: 0 });
+    if (data.summary) {
+      sectionHeading("Summary", 30);
+      writeLines(data.summary, { size: 9.8, color: MUTE, gap: 0 });
+    }
 
-    sectionHeading("Skills", 48);
-    data.skills.forEach((group) => {
-      const label = `${group.group}: `;
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      const labelWidth = doc.getTextWidth(label);
-      doc.setFont("helvetica", "normal");
-      const valueLines = doc.splitTextToSize(
-        group.items.join(", "),
-        contentWidth - labelWidth
-      );
-      const lineHeight = 12;
-
-      ensureSpace(lineHeight);
-      setColor(INK);
-      doc.setFont("helvetica", "bold");
-      doc.text(label, margin, y);
-      doc.setFont("helvetica", "normal");
-      setColor(MUTE);
-
-      valueLines.forEach((line, index) => {
-        if (index > 0) {
-          ensureSpace(lineHeight);
-        }
-        doc.text(line, margin + (index === 0 ? labelWidth : 0), y);
-        y += lineHeight;
-      });
-      y += 1.5;
-    });
-
-    sectionHeading("Experience");
-    data.experience.forEach((role) => {
-      ensureSpace(28);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10.5);
-      setColor(INK);
-      doc.text(role.org, margin, y);
-      y += 11;
-      writeLines(`${role.role} | ${role.period}`, {
-        size: 9.2,
-        style: "italic",
-        color: MUTE,
-        gap: 2,
-      });
-
-      role.bullets.forEach((bullet) => {
+    if (data.skills && data.skills.length > 0) {
+      sectionHeading("Skills", 48);
+      data.skills.forEach((group) => {
+        const label = `${group.group}: `;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        const labelWidth = doc.getTextWidth(label);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(9.5);
-        setColor(INK);
-        const lines = doc.splitTextToSize(bullet, contentWidth - 12);
-        const lineHeight = 12.2;
+        const valueLines = doc.splitTextToSize(
+          group.items.join(", "),
+          contentWidth - labelWidth
+        );
+        const lineHeight = 12;
 
-        lines.forEach((line, index) => {
-          ensureSpace(lineHeight);
-          if (index === 0) {
-            doc.text("\u2022", margin + 1, y);
+        ensureSpace(lineHeight);
+        setColor(INK);
+        doc.setFont("helvetica", "bold");
+        doc.text(label, margin, y);
+        doc.setFont("helvetica", "normal");
+        setColor(MUTE);
+
+        valueLines.forEach((line, index) => {
+          if (index > 0) {
+            ensureSpace(lineHeight);
           }
-          doc.text(line, margin + 12, y);
+          doc.text(line, margin + (index === 0 ? labelWidth : 0), y);
           y += lineHeight;
         });
-        y += 2;
+        y += 1.5;
       });
+    }
 
-      y += 8;
-    });
+    if (data.experience && data.experience.length > 0) {
+      sectionHeading("Experience");
+      data.experience.forEach((role) => {
+        ensureSpace(28);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10.5);
+        setColor(INK);
+        doc.text(role.org, margin, y);
+        y += 11;
+        writeLines(`${role.role} | ${role.period}`, {
+          size: 9.2,
+          style: "italic",
+          color: MUTE,
+          gap: 2,
+        });
 
-    sectionHeading("Education", 26);
-    data.education.forEach((education) => {
-      writeLines(
-        `${education.level} - ${education.place} - ${education.meta}`,
-        { size: 9.5, color: INK, gap: 0 }
-      );
-    });
+        (role.bullets || []).forEach((bullet) => {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9.5);
+          setColor(INK);
+          const lines = doc.splitTextToSize(bullet, contentWidth - 12);
+          const lineHeight = 12.2;
+
+          lines.forEach((line, index) => {
+            ensureSpace(lineHeight);
+            if (index === 0) {
+              doc.text("\u2022", margin + 1, y);
+            }
+            doc.text(line, margin + 12, y);
+            y += lineHeight;
+          });
+          y += 2;
+        });
+
+        y += 8;
+      });
+    }
+
+    if (data.projects && data.projects.length > 0) {
+      sectionHeading("Projects");
+      data.projects.forEach((proj) => {
+        ensureSpace(28);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10.5);
+        setColor(INK);
+        doc.text(proj.title, margin, y);
+        y += 11;
+        writeLines(`${proj.role} | ${proj.period}`, {
+          size: 9.2,
+          style: "italic",
+          color: MUTE,
+          gap: 2,
+        });
+        if (proj.description) {
+          writeLines(proj.description, { size: 9.5, color: MUTE, gap: 2 });
+        }
+        (proj.bullets || []).forEach((bullet) => {
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(9.5);
+          setColor(INK);
+          const lines = doc.splitTextToSize(bullet, contentWidth - 12);
+          const lineHeight = 12.2;
+          lines.forEach((line, index) => {
+            ensureSpace(lineHeight);
+            if (index === 0) doc.text("\u2022", margin + 1, y);
+            doc.text(line, margin + 12, y);
+            y += lineHeight;
+          });
+          y += 2;
+        });
+        y += 6;
+      });
+    }
+
+    if (data.education && data.education.length > 0) {
+      sectionHeading("Education", 26);
+      data.education.forEach((education) => {
+        writeLines(
+          `${education.level} - ${education.place} - ${education.meta}`,
+          { size: 9.5, color: INK, gap: 0 }
+        );
+      });
+    }
 
     return doc;
   };
 
-  const resumeDownloadFilename = (date = new Date()) => {
+  const resumeDownloadFilename = (date = new Date(), profileSlug = "") => {
     const pad = (value) => String(value).padStart(2, "0");
     const stamp =
       `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}` +
       `${pad(date.getHours())}${pad(date.getMinutes())}`;
-    return `rajasekar-resume-${stamp}.pdf`;
+    const slugPart = profileSlug && profileSlug !== "data-engineer" ? `-${profileSlug}` : "";
+    return `rajasekar-resume${slugPart}-${stamp}.pdf`;
   };
 
   return { buildResumePdf, resumeDownloadFilename };
