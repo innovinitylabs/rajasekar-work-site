@@ -16,16 +16,13 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../styles.css" />
-    <link rel="stylesheet" href="admin.css" />
-    <script src="../resume-pdf.js" defer></script>
-    <script src="admin.js" defer></script>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+    <script src="/resume-pdf.js" defer></script>
+    <script src="/admin/admin.js" defer></script>
     <style>
-      /* Ensure admin app is hidden before auth check completes */
+      /* Ensure admin app dashboard is strictly hidden before auth check completes */
       #admin-app-view {
-        display: none;
-      }
-      #admin-login-view {
         display: none;
       }
     </style>
@@ -38,11 +35,11 @@
       <header class="admin-header">
         <div class="container admin-header-inner">
           <div class="admin-brand-group">
-            <a class="brand" href="../">Rajasekar C</a>
+            <a class="brand" href="/">Rajasekar C</a>
             <span class="admin-badge">Admin System</span>
           </div>
           <div class="header-actions">
-            <a href="../" class="site-nav" style="font-size:0.83rem; color:var(--muted); text-decoration:none;">&larr; Back to Portfolio</a>
+            <a href="/" class="site-nav" style="font-size:0.83rem; color:var(--muted); text-decoration:none;">&larr; Back to Portfolio</a>
             <button
               class="theme-toggle"
               type="button"
@@ -92,7 +89,7 @@
       <header class="admin-header">
         <div class="container admin-header-inner">
           <div class="admin-brand-group">
-            <a class="brand" href="../">Rajasekar C</a>
+            <a class="brand" href="/">Rajasekar C</a>
             <span class="admin-badge">Admin System</span>
           </div>
           <div class="admin-auth-widget" id="admin-auth-widget">

@@ -69,7 +69,7 @@ const createMockReqRes = ({ method = "GET", headers = {}, body = null, query = {
   return { req, res };
 };
 
-test("SECURITY 1: Visiting admin HTML starts in a gated, non-revealing state", () => {
+test("SECURITY 1: Visiting admin HTML starts in a gated, non-revealing state with correct static asset paths", () => {
   const adminHtml = fs.readFileSync(path.join(ROOT, "admin", "index.html"), "utf8");
   assert.ok(adminHtml.includes('id="admin-login-view"'), "Login view container must exist");
   assert.ok(adminHtml.includes('id="admin-app-view"'), "Admin app view container must exist");
@@ -80,6 +80,23 @@ test("SECURITY 1: Visiting admin HTML starts in a gated, non-revealing state", (
   );
   assert.ok(adminHtml.includes("Continue with GitHub"), "Must include GitHub login button");
   assert.ok(adminHtml.includes("innovinitylabs"), "Must identify authorized administrator");
+
+  // Verify static asset references are root-relative to avoid 404 regardless of trailing slash
+  assert.ok(adminHtml.includes('href="/admin/admin.css"'), "admin.css must be root-relative /admin/admin.css");
+  assert.ok(adminHtml.includes('src="/admin/admin.js"'), "admin.js must be root-relative /admin/admin.js");
+  assert.ok(adminHtml.includes('href="/styles.css"'), "styles.css must be root-relative /styles.css");
+  assert.ok(adminHtml.includes('src="/resume-pdf.js"'), "resume-pdf.js must be root-relative /resume-pdf.js");
+});
+
+test("ROUTING: vercel.json includes rewrites for /admin and fallback assets", () => {
+  const vercelConfig = JSON.parse(fs.readFileSync(path.join(ROOT, "vercel.json"), "utf8"));
+  assert.ok(Array.isArray(vercelConfig.rewrites), "rewrites array must exist");
+  
+  const sources = vercelConfig.rewrites.map((r) => r.source);
+  assert.ok(sources.includes("/admin"), "Must rewrite /admin");
+  assert.ok(sources.includes("/admin/"), "Must rewrite /admin/");
+  assert.ok(sources.includes("/admin.css"), "Must rewrite /admin.css");
+  assert.ok(sources.includes("/admin.js"), "Must rewrite /admin.js");
 });
 
 test("SECURITY 2: Unauthenticated GET /api/profiles receives HTTP 401 with zero data exposed", async () => {
