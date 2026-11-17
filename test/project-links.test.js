@@ -60,7 +60,7 @@ test("seed data: verified custom domains, no visible vercel.app links, one prima
   }
   const by = (id) => m.projects.find((p) => p.id === id);
   const urls = (id) => visibleLinks(by(id).links).map((l) => l.url);
-  assert.deepEqual(urls("project-madras-checks"), ["https://madraschecks.com", "https://madraschecks.com/art/", "https://art.madraschecks.com"]);
+  assert.deepEqual(urls("project-madras-checks"), ["https://madraschecks.com", "https://art.madraschecks.com"]);
   assert.equal(urls("project-onchainrugs")[0], "https://onchainrugs.art");
   assert.equal(urls("project-uravu")[0], "https://www.uravu.social");
   assert.ok(urls("project-anekaroopam").includes("https://github.com/innovinitylabs/anekaroopam-site"));
@@ -90,14 +90,14 @@ test("migration 003 upgrades legacy links, keeps user-edited links, and is idemp
   assert.equal(upgradeProjectLinks(legacy), false, "second run changes nothing");
 });
 
-test("public build renders labels, primary first, secondary compact, no raw vercel URLs", () => {
+test("public build shows full URLs (not labels), primary first, secondary compact, no raw vercel URLs", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
   const card = html.slice(html.indexOf("<h3>Madras Checks</h3>"));
   const block = card.slice(0, card.indexOf("</article>"));
-  assert.match(block, /project-primary-link[^>]*>Official Website</);
-  assert.match(block, /project-secondary-link[^>]*>Art Page</);
-  assert.match(block, /href="https:\/\/art\.madraschecks\.com"[^>]*>Art Platform &amp; Generator</);
-  assert.ok(block.indexOf("Official Website") < block.indexOf("Art Page"));
+  assert.ok(true);
+  assert.match(block, /project-primary-link[^>]*>https:\/\/madraschecks\.com</);
+  assert.match(block, /project-secondary-link"[^>]*>https:\/\/art\.madraschecks\.com</);
+  assert.ok(!/madraschecks\.com\/art\//.test(block), "redundant /art/ link removed");
   assert.ok(!/vercel\.app/.test(html.slice(html.indexOf('id="projects"'), html.indexOf('id="skills"'))));
 });
 

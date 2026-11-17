@@ -147,10 +147,10 @@ Rajasekar C
                   <span class="timeline">Jun 2025 - Present</span>
                 </div>
                 <ul>
-                <li>Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications</li>
-                <li>Built OnchainRugs, a Next.js and Solidity application for generative on-chain NFTs with multi-chain wallet integration, Redis caching, and a deterministic server and browser renderer</li>
-                <li>Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS backed by a native Swift calculation kit, with a Python oracle used to check numerical parity</li>
-                <li>Use AI-assisted development tools (Cursor, Claude, ChatGPT, GitHub Copilot) across design, implementation, and testing</li>
+                <li>Design and build complete software products independently, from architecture to deployment, across web (Next.js, React, TypeScript), native iOS and macOS (Swift, SwiftUI) and generative-art applications; the web products run on Vercel under their own domains</li>
+                <li>Built OnchainRugs end to end: Solidity ERC721A contracts (Foundry), multi-chain wallet integration (wagmi, viem, RainbowKit), a deterministic p5-compatible renderer shared by browser, server and Puppeteer-generated previews, and a webhook that keeps an Upstash Redis cache in sync with chain events</li>
+                <li>Implemented backend and data workflows: Next.js server actions with Zod validation, Neon PostgreSQL persistence with SQL migrations and transactional email via Resend (Uravu), and GitHub OAuth on Vercel serverless functions for a Decap CMS content workflow (Valipokkann)</li>
+                <li>Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS on a native C and Swift calculation layer, checked against a Python oracle with golden fixtures and numerical parity tests; use Cursor, Claude, ChatGPT and GitHub Copilot across design, implementation and testing</li>
                 </ul>
               </article>
 
@@ -205,6 +205,27 @@ Rajasekar C
               <article class="experience-card project-card">
                 <div class="experience-header">
                   <div>
+                    <h3>Madras Checks</h3>
+                    <p>Web / brand site · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.</p>
+                <ul>
+                  <li>Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>CSS</li>
+                </ul>
+                <p class="project-links"><a class="project-primary-link" href="https://madraschecks.com" target="_blank" rel="noreferrer" data-link-type="website" title="Official Website">https://madraschecks.com</a> <span class="project-secondary-links"><a class="project-secondary-link" href="https://art.madraschecks.com" target="_blank" rel="noreferrer" data-link-type="generator" title="Art Platform">https://art.madraschecks.com</a></span></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
                     <h3>OnchainRugs</h3>
                     <p>Web3 / generative art · Sole developer</p>
                   </div>
@@ -227,7 +248,97 @@ Rajasekar C
                   <li>Upstash Redis</li>
                   <li>Puppeteer</li>
                 </ul>
-                <p class="project-links"><a class="project-primary-link" href="https://onchainrugs.art" target="_blank" rel="noreferrer" data-link-type="website">Official Website</a></p>
+                <p class="project-links"><a class="project-primary-link" href="https://onchainrugs.art" target="_blank" rel="noreferrer" data-link-type="website" title="Official Website">https://onchainrugs.art</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Anekaroopam</h3>
+                    <p>Web / digital art platform · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Digital art platform for multistable figurative emergence, including a browser-based Perception Engine for building rotational artworks.</p>
+                <ul>
+                  <li>Built the Perception Engine: import artwork, define perceptual states, rotate or snap between them, and export a standalone offline HTML file or a JSON configuration</li>
+                  <li>Built an image-preparation tool that converts to AVIF, WebP, PNG, and JPEG in the browser using a Web Worker, with side-by-side comparison and size metrics</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Tailwind CSS</li>
+                  <li>Framer Motion</li>
+                  <li>Web Workers</li>
+                </ul>
+                <p class="project-links"><a class="project-primary-link" href="https://anekaroopam.art" target="_blank" rel="noreferrer" data-link-type="website" title="Official Website">https://anekaroopam.art</a> <span class="project-secondary-links"><a class="project-secondary-link" href="https://github.com/innovinitylabs/anekaroopam-site" target="_blank" rel="noreferrer" data-link-type="github" title="GitHub">https://github.com/innovinitylabs/anekaroopam-site</a></span></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Uravu</h3>
+                    <p>Web / pre-launch product site · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.</p>
+                <ul>
+                  <li>Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend</li>
+                  <li>Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Tailwind CSS</li>
+                  <li>Three.js</li>
+                  <li>Neon Postgres</li>
+                  <li>Zod</li>
+                  <li>Resend</li>
+                </ul>
+                <p class="project-links"><a class="project-primary-link" href="https://www.uravu.social" target="_blank" rel="noreferrer" data-link-type="website" title="Official Website">https://www.uravu.social</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Hard COpy</h3>
+                    <p>Native app / iPadOS and macOS · Sole developer</p>
+                  </div>
+                  <span class="timeline">In development</span>
+                </div>
+                <p class="project-description">Native handwritten notebook for iPadOS and macOS, tagline &quot;Beyond Paper&quot;, built in Swift and SwiftUI.</p>
+                <ul>
+                  <li>Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Swift</li>
+                  <li>SwiftUI</li>
+                  <li>Swift Package Manager</li>
+                  <li>XcodeGen</li>
+                </ul>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Rotate the Cow</h3>
+                    <p>Native app / iOS · Sole developer</p>
+                  </div>
+                  <span class="timeline">In development</span>
+                </div>
+                <p class="project-description">Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.</p>
+                <ul>
+                  <li>Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Swift</li>
+                  <li>SwiftUI</li>
+                  <li>RealityKit</li>
+                  <li>XcodeGen</li>
+                </ul>
               </article>
 
               <article class="experience-card project-card">
@@ -258,77 +369,6 @@ Rajasekar C
               <article class="experience-card project-card">
                 <div class="experience-header">
                   <div>
-                    <h3>Uravu</h3>
-                    <p>Web / pre-launch product site · Sole developer</p>
-                  </div>
-                  <span class="timeline">Deployed</span>
-                </div>
-                <p class="project-description">Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.</p>
-                <ul>
-                  <li>Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend</li>
-                  <li>Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)</li>
-                </ul>
-                <ul class="tag-list">
-                  <li>Next.js</li>
-                  <li>React</li>
-                  <li>TypeScript</li>
-                  <li>Tailwind CSS</li>
-                  <li>Three.js</li>
-                  <li>Neon Postgres</li>
-                  <li>Zod</li>
-                  <li>Resend</li>
-                </ul>
-                <p class="project-links"><a class="project-primary-link" href="https://www.uravu.social" target="_blank" rel="noreferrer" data-link-type="website">Official Website</a></p>
-              </article>
-
-              <article class="experience-card project-card">
-                <div class="experience-header">
-                  <div>
-                    <h3>Anekaroopam</h3>
-                    <p>Web / digital art platform · Sole developer</p>
-                  </div>
-                  <span class="timeline">Deployed</span>
-                </div>
-                <p class="project-description">Digital art platform for multistable figurative emergence, including a browser-based Perception Engine for building rotational artworks.</p>
-                <ul>
-                  <li>Built the Perception Engine: import artwork, define perceptual states, rotate or snap between them, and export a standalone offline HTML file or a JSON configuration</li>
-                  <li>Built an image-preparation tool that converts to AVIF, WebP, PNG, and JPEG in the browser using a Web Worker, with side-by-side comparison and size metrics</li>
-                </ul>
-                <ul class="tag-list">
-                  <li>Next.js</li>
-                  <li>React</li>
-                  <li>TypeScript</li>
-                  <li>Tailwind CSS</li>
-                  <li>Framer Motion</li>
-                  <li>Web Workers</li>
-                </ul>
-                <p class="project-links"><a class="project-primary-link" href="https://anekaroopam.art" target="_blank" rel="noreferrer" data-link-type="website">Official Website</a> <span class="project-secondary-links"><a class="project-secondary-link" href="https://github.com/innovinitylabs/anekaroopam-site" target="_blank" rel="noreferrer" data-link-type="github">GitHub</a></span></p>
-              </article>
-
-              <article class="experience-card project-card">
-                <div class="experience-header">
-                  <div>
-                    <h3>Madras Checks</h3>
-                    <p>Web / brand site · Sole developer</p>
-                  </div>
-                  <span class="timeline">Deployed</span>
-                </div>
-                <p class="project-description">Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.</p>
-                <ul>
-                  <li>Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository</li>
-                </ul>
-                <ul class="tag-list">
-                  <li>Next.js</li>
-                  <li>React</li>
-                  <li>TypeScript</li>
-                  <li>CSS</li>
-                </ul>
-                <p class="project-links"><a class="project-primary-link" href="https://madraschecks.com" target="_blank" rel="noreferrer" data-link-type="website">Official Website</a> <span class="project-secondary-links"><a class="project-secondary-link" href="https://madraschecks.com/art/" target="_blank" rel="noreferrer" data-link-type="website">Art Page</a> · <a class="project-secondary-link" href="https://art.madraschecks.com" target="_blank" rel="noreferrer" data-link-type="generator">Art Platform &amp; Generator</a></span></p>
-              </article>
-
-              <article class="experience-card project-card">
-                <div class="experience-header">
-                  <div>
                     <h3>Valipokkann</h3>
                     <p>Web / artist portfolio · Sole developer</p>
                   </div>
@@ -348,47 +388,7 @@ Rajasekar C
                   <li>Decap CMS</li>
                   <li>Vercel Functions</li>
                 </ul>
-                <p class="project-links"><a class="project-primary-link" href="https://valipokkann.in" target="_blank" rel="noreferrer" data-link-type="website">Official Website</a></p>
-              </article>
-
-              <article class="experience-card project-card">
-                <div class="experience-header">
-                  <div>
-                    <h3>Rotate the Cow</h3>
-                    <p>Native app / iOS · Sole developer</p>
-                  </div>
-                  <span class="timeline">In development</span>
-                </div>
-                <p class="project-description">Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.</p>
-                <ul>
-                  <li>Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)</li>
-                </ul>
-                <ul class="tag-list">
-                  <li>Swift</li>
-                  <li>SwiftUI</li>
-                  <li>RealityKit</li>
-                  <li>XcodeGen</li>
-                </ul>
-              </article>
-
-              <article class="experience-card project-card">
-                <div class="experience-header">
-                  <div>
-                    <h3>Hard COpy</h3>
-                    <p>Native app / iPadOS and macOS · Sole developer</p>
-                  </div>
-                  <span class="timeline">In development</span>
-                </div>
-                <p class="project-description">Native handwritten notebook for iPadOS and macOS, tagline &quot;Beyond Paper&quot;, built in Swift and SwiftUI.</p>
-                <ul>
-                  <li>Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo</li>
-                </ul>
-                <ul class="tag-list">
-                  <li>Swift</li>
-                  <li>SwiftUI</li>
-                  <li>Swift Package Manager</li>
-                  <li>XcodeGen</li>
-                </ul>
+                <p class="project-links"><a class="project-primary-link" href="https://valipokkann.in" target="_blank" rel="noreferrer" data-link-type="website" title="Official Website">https://valipokkann.in</a></p>
               </article>
             <!-- /build:projects -->
             </div>
@@ -458,12 +458,18 @@ Rajasekar C
               </article>
 
               <article class="skill-group">
-                <h3>DevOps and Developer Tools</h3>
+                <h3>DevOps</h3>
                 <ul class="tag-list">
                 <li>Docker</li>
                 <li>Git</li>
                 <li>Linux</li>
                 <li>GitHub Workflows</li>
+                </ul>
+              </article>
+
+              <article class="skill-group">
+                <h3>Developer Tools</h3>
+                <ul class="tag-list">
                 <li>Cursor</li>
                 <li>Claude</li>
                 <li>ChatGPT</li>

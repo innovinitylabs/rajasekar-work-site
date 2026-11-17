@@ -174,6 +174,26 @@
     doc.line(margin, y, pageWidth - margin, y);
     y += 5;
 
+    if (data.proof && data.proof.length > 0) {
+      y += 9;
+      data.proof.forEach((item) => {
+        ensureSpace(14);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        setColor(accentColor);
+        doc.text(item.value, margin, y);
+        const vw = doc.getTextWidth(item.value) + 6;
+        doc.setFont("helvetica", "normal");
+        setColor(MUTE);
+        const lines = doc.splitTextToSize(item.text, contentWidth - vw - wrapSafety);
+        lines.forEach((line, i) => {
+          doc.text(line, margin + vw, y);
+          y += i < lines.length - 1 ? 11.5 : 0;
+        });
+        y += 12;
+      });
+    }
+
     if (data.summary) {
       sectionHeading("Summary", 30);
       writeLines(data.summary, { size: 9.8, color: MUTE, gap: 0 });
@@ -226,6 +246,14 @@
           color: MUTE,
           gap: 2,
         });
+        if (role.context && role.context.length > 0) {
+          writeLines(`Client projects: ${role.context.join("; ")}`, {
+            size: 9.2,
+            style: "italic",
+            color: MUTE,
+            gap: 2,
+          });
+        }
 
         (role.bullets || []).forEach((bullet) => {
           doc.setFont("helvetica", "normal");
@@ -250,8 +278,31 @@
       });
     }
 
+    const twoPage = data.pageMode === "two-page";
+    const drawEducation = () => {
+    if (data.education && data.education.length > 0) {
+      sectionHeading("Education", 26);
+      data.education.forEach((education) => {
+        writeLines(
+          `${education.level} - ${education.place} - ${education.meta}`,
+          { size: 9.5, color: INK, gap: 0 }
+        );
+      });
+    }
+    };
+    let educationDrawn = false;
+    if (twoPage && data.education && data.education.length > 0 && y + 12 + 12 * data.education.length + 24 <= pageHeight - margin) {
+      drawEducation(); // fits naturally at the end of page 1
+      educationDrawn = true;
+    }
+
     if (data.projects && data.projects.length > 0) {
-      sectionHeading("Projects", data.projectDetail === "compact" ? 60 : 110);
+      if (twoPage) {
+        doc.addPage();
+        y = margin;
+        sectionHeading((data.showcase && data.showcase.heading) || "Independent Development | Selected Work", 60);
+        if (data.showcase && data.showcase.intro) writeLines(data.showcase.intro, { size: 9.5, color: MUTE, gap: 6 });
+      } else sectionHeading("Projects", data.projectDetail === "compact" ? 60 : 110);
       const compact = data.projectDetail === "compact";
       data.projects.forEach((proj) => {
         ensureSpace(compact ? 40 : 90);
@@ -260,7 +311,7 @@
         setColor(INK);
         doc.text(proj.title, margin, y);
         const projectMeta = [proj.role, proj.period, proj.status].filter(Boolean).join(" | ");
-        if (compact) {
+        if (compact || twoPage) {
           // One line: "Title  Sole developer | Deployed"
           const titleWidth = doc.getTextWidth(proj.title);
           doc.setFont("helvetica", "italic");
@@ -277,7 +328,7 @@
         if (proj.description && !compact) {
           writeLines(proj.description, { size: 9.5, color: MUTE, gap: 2 });
         }
-        if (!compact) {
+        if (!compact && !twoPage) {
           (proj.bullets || []).forEach((bullet) => {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9.5);
@@ -308,19 +359,11 @@
             { size: 9, prefix: "Links: ", gap: 11.5 }
           );
         }
-        y += compact ? 2 : 6;
+        y += compact ? 2 : twoPage ? 15 : 6;
       });
     }
 
-    if (data.education && data.education.length > 0) {
-      sectionHeading("Education", 26);
-      data.education.forEach((education) => {
-        writeLines(
-          `${education.level} - ${education.place} - ${education.meta}`,
-          { size: 9.5, color: INK, gap: 0 }
-        );
-      });
-    }
+    if (!educationDrawn) drawEducation();
 
     return doc;
   };

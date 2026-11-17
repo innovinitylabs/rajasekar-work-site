@@ -528,12 +528,12 @@
   box-sizing: border-box;
   width: 794px;
   min-height: 1123px;
-  padding: 53px 53px 60px;
+  padding: 48px 48px 48px;
   background: #fff;
   color: #101828;
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 12.5px;
-  line-height: 1.38;
+  font-size: 12.67px; /* 9.5pt, as in the PDF */
+  line-height: 1.25;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
   position: relative;
 }
@@ -541,13 +541,14 @@
 .resume-page .rp-title { font-weight: 700; font-size: 14px; margin: 3px 0 4px; }
 .resume-page .rp-contact { font-size: 11px; color: #475467; margin-bottom: 8px; }
 .resume-page .rp-summary { color: #475467; }
-.resume-page .rp-h { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #d0d5dd; padding-bottom: 3px; margin: 14px 0 7px; }
-.resume-page .rp-role { margin-bottom: 9px; }
+.resume-page .rp-h { font-size: 13.3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; border-bottom: 1px solid #d0d5dd; padding-bottom: 3px; margin: 10px 0 6px; }
+.resume-page .rp-role { margin-bottom: 8px; }
 .resume-page .rp-role-top { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; font-size: 13px; }
 .resume-page .rp-role-top span:last-child { font-weight: 400; color: #475467; font-size: 11.5px; white-space: nowrap; }
 .resume-page .rp-sub { font-style: italic; color: #475467; font-size: 11.5px; }
 .resume-page ul { margin: 3px 0 0; padding-left: 18px; }
-.resume-page li { margin-bottom: 2px; }
+.resume-page li { margin-bottom: 1px; }
+.resume-page .rp-metrics div { margin: 0; }
 .resume-page .rp-skill b { font-weight: 700; }
 .resume-page .rp-tech { color: #475467; font-size: 11.5px; }
 .resume-page .rp-proof { display: flex; gap: 14px; margin: 6px 0; }
@@ -591,3 +592,9 @@
 }
 
 .resume-page a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+
+.resume-page + .resume-page { margin-top: 24px; }
+.resume-page .rp-metrics { margin: 6px 0 4px; font-size: 12px; color: #475467; }
+.resume-page .rp-meta { font-weight: 400; font-style: italic; color: #475467; font-size: 11.5px; margin-left: 6px; }
+.resume-page .rp-role-top > span:first-child { white-space: normal; }
+.resume-page .rp-role-top > span:only-child { font-weight: 700; color: #101828; font-size: 13px; white-space: normal; }

@@ -32,10 +32,10 @@ test("every profile PDF is A4 portrait", () => {
   }
 });
 
-test("page counts: Data Engineer and Database Developer fit one A4 page; project-focused AI profile is a clean two pages", async () => {
+test("page counts: Data Engineer is a deliberate two-page A4 resume, Database Developer fits one page, AI profile is a clean two pages", async () => {
   const counts = {};
   for (const p of seed) counts[p.id] = (await pages(build(p).doc)).count;
-  assert.deepEqual(counts, { "data-engineer": 1, "ai-product-engineer": 2, "database-developer": 1 });
+  assert.deepEqual(counts, { "data-engineer": 2, "ai-product-engineer": 2, "database-developer": 1 });
 });
 
 test("Portfolio is the first header item, shows the full https URL, and has an explicit URI annotation over the text", () => {

@@ -65,6 +65,34 @@
         margin-top: 2pt;
       }
 
+      .proof p {
+        margin: 0 0 2pt;
+        color: #475467;
+      }
+
+      .proof strong {
+        color: #2457c5;
+      }
+
+      .role-context {
+        font-style: italic;
+        color: #475467;
+        margin-bottom: 2pt;
+      }
+
+      .page-break {
+        break-before: page;
+      }
+
+      .showcase-intro {
+        color: #475467;
+        margin-bottom: 6pt;
+      }
+
+      a {
+        overflow-wrap: anywhere;
+      }
+
       .contact {
         margin-top: 4pt;
         font-size: 8.8pt;
@@ -168,6 +196,14 @@ Data Engineer
         </p>
       </header>
 
+      <!-- build:proof -->
+        <section class="proof">
+          <p><strong>50M records/day</strong> Designed and operated production ETL pipelines at scale.</p>
+          <p><strong>30 min to under 1 min</strong> Built Flask and Pandas automation recognized with the Tech Titan Award.</p>
+          <p><strong>4000+ issues resolved</strong> Reduced the open production-data backlog from approximately 600 to under 70.</p>
+        </section>
+      <!-- /build:proof -->
+
       <section>
         <h2>Summary</h2>
         <p class="summary">
@@ -186,9 +222,7 @@ Data Engineer
           <li><strong>Databases:</strong> PostgreSQL, Oracle, DB2, Redis, ClickHouse</li>
           <li><strong>Backend Development:</strong> Flask, REST APIs, Stored Procedures, Database Design, Query Optimization</li>
           <li><strong>Cloud and Data Platforms:</strong> Neon, Vercel</li>
-          <li><strong>DevOps and Developer Tools:</strong> Docker, Git, Linux, GitHub Workflows, Cursor, Claude, ChatGPT, GPT Codex, GitHub Copilot</li>
-          <li><strong>Currently Learning:</strong> Databricks, Apache Spark, PySpark</li>
-          <li><strong>Other:</strong> Selenium, MoEngage</li>
+          <li><strong>DevOps:</strong> Docker, Git, Linux, GitHub Workflows</li>
         <!-- /build:skills -->
         </ul>
       </section>
@@ -205,7 +239,10 @@ Data Engineer
             <div class="role-time">Jun 2025 - Present</div>
           </div>
           <ul class="bullets">
-          <li>Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications</li>
+          <li>Design and build complete software products independently, from architecture to deployment, across web (Next.js, React, TypeScript), native iOS and macOS (Swift, SwiftUI) and generative-art applications; the web products run on Vercel under their own domains</li>
+          <li>Built OnchainRugs end to end: Solidity ERC721A contracts (Foundry), multi-chain wallet integration (wagmi, viem, RainbowKit), a deterministic p5-compatible renderer shared by browser, server and Puppeteer-generated previews, and a webhook that keeps an Upstash Redis cache in sync with chain events</li>
+          <li>Implemented backend and data workflows: Next.js server actions with Zod validation, Neon PostgreSQL persistence with SQL migrations and transactional email via Resend (Uravu), and GitHub OAuth on Vercel serverless functions for a Decap CMS content workflow (Valipokkann)</li>
+          <li>Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS on a native C and Swift calculation layer, checked against a Python oracle with golden fixtures and numerical parity tests; use Cursor, Claude, ChatGPT and GitHub Copilot across design, implementation and testing</li>
           </ul>
         </div>
 
@@ -236,6 +273,7 @@ Data Engineer
             </div>
             <div class="role-time">Jan 2020 - Nov 2023</div>
           </div>
+          <p class="role-context">Client projects: BMO Capital Accounts: banking and capital accounts project; EvoBrix-X: insurance-sector project by CNSI</p>
           <ul class="bullets">
           <li>Built and maintained Oracle SQL and PL/SQL solutions, stored procedures, and production reports for banking and insurance data systems</li>
           <li>Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments</li>
@@ -247,8 +285,21 @@ Data Engineer
       </section>
 
       <!-- build:projects -->
-        <section>
-          <h2>Projects</h2>
+        <section class="page-break">
+          <h2>Independent Development | Selected Work</h2>
+          <p class="showcase-intro">Since June 2025, independently building software products spanning data-driven applications, generative systems, creative technology and AI-assisted products.</p>
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Madras Checks</h3>
+                <p>Sole developer | Deployed</p>
+              </div>
+            </div>
+            <p class="project-description">Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.</p>
+            <p class="project-tech"><strong>Technologies:</strong> Next.js, React, TypeScript, CSS</p>
+            <p class="project-tech"><strong>Links:</strong> <a href="https://madraschecks.com">https://madraschecks.com</a> | <a href="https://art.madraschecks.com">https://art.madraschecks.com</a></p>
+          </div>
+
           <div class="role">
             <div class="role-header">
               <div class="role-title">
@@ -256,8 +307,21 @@ Data Engineer
                 <p>Sole developer | Deployed</p>
               </div>
             </div>
+            <p class="project-description">Next.js application for minting, previewing, maintaining, and exploring generative on-chain rug NFTs tied to EVM smart contracts.</p>
             <p class="project-tech"><strong>Technologies:</strong> Next.js, TypeScript, Solidity, Foundry, wagmi, viem, RainbowKit, Upstash Redis, Puppeteer</p>
             <p class="project-tech"><strong>Links:</strong> <a href="https://onchainrugs.art">https://onchainrugs.art</a></p>
+          </div>
+
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Anekaroopam</h3>
+                <p>Sole developer | Deployed</p>
+              </div>
+            </div>
+            <p class="project-description">Digital art platform for multistable figurative emergence, including a browser-based Perception Engine for building rotational artworks.</p>
+            <p class="project-tech"><strong>Technologies:</strong> Next.js, React, TypeScript, Tailwind CSS, Framer Motion, Web Workers</p>
+            <p class="project-tech"><strong>Links:</strong> <a href="https://anekaroopam.art">https://anekaroopam.art</a> | <a href="https://github.com/innovinitylabs/anekaroopam-site">https://github.com/innovinitylabs/anekaroopam-site</a></p>
           </div>
 
           <div class="role">
@@ -267,8 +331,54 @@ Data Engineer
                 <p>Sole developer | Deployed</p>
               </div>
             </div>
+            <p class="project-description">Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.</p>
             <p class="project-tech"><strong>Technologies:</strong> Next.js, React, TypeScript, Tailwind CSS, Three.js, Neon Postgres, Zod, Resend</p>
             <p class="project-tech"><strong>Links:</strong> <a href="https://www.uravu.social">https://www.uravu.social</a></p>
+          </div>
+
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Hard COpy</h3>
+                <p>Sole developer | In development</p>
+              </div>
+            </div>
+            <p class="project-description">Native handwritten notebook for iPadOS and macOS, tagline &quot;Beyond Paper&quot;, built in Swift and SwiftUI.</p>
+            <p class="project-tech"><strong>Technologies:</strong> Swift, SwiftUI, Swift Package Manager, XcodeGen</p>
+          </div>
+
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Rotate the Cow</h3>
+                <p>Sole developer | In development</p>
+              </div>
+            </div>
+            <p class="project-description">Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.</p>
+            <p class="project-tech"><strong>Technologies:</strong> Swift, SwiftUI, RealityKit, XcodeGen</p>
+          </div>
+
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Pocket Astro</h3>
+                <p>Sole developer | In development</p>
+              </div>
+            </div>
+            <p class="project-description">Offline-first native SwiftUI app for iOS and macOS that renders chart reports and dasha timelines from a Swift calculation kit.</p>
+            <p class="project-tech"><strong>Technologies:</strong> Swift, SwiftUI, Swift Package Manager, C, Swiss Ephemeris, Python, XcodeGen, WidgetKit</p>
+          </div>
+
+          <div class="role">
+            <div class="role-header">
+              <div class="role-title">
+                <h3>Valipokkann</h3>
+                <p>Sole developer | Deployed</p>
+              </div>
+            </div>
+            <p class="project-description">Personal artist website with an art gallery, photography, articles, music, and a Thirukkural section with an image studio for social posts.</p>
+            <p class="project-tech"><strong>Technologies:</strong> React, TypeScript, Vite, Tailwind CSS, Framer Motion, Decap CMS, Vercel Functions</p>
+            <p class="project-tech"><strong>Links:</strong> <a href="https://valipokkann.in">https://valipokkann.in</a></p>
           </div>
         </section>
       <!-- /build:projects -->
