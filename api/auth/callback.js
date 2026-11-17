@@ -1,35 +1,33 @@
 "use strict";
 
-const https = require("https");
 const {
   getConfig,
   verifyOAuthState,
   createSessionToken,
   parseCookies,
   serializeCookie,
+  cookieOptionsFor,
+  SESSION_TTL_MS,
 } = require("../../lib/auth");
 
-const fetchJson = (url, options = {}, postData = null) => {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, options, (res) => {
-      let body = "";
-      res.on("data", (chunk) => (body += chunk));
-      res.on("end", () => {
-        try {
-          const json = JSON.parse(body);
-          resolve({ status: res.statusCode, data: json });
-        } catch {
-          resolve({ status: res.statusCode, text: body });
-        }
-      });
-    });
+const REQUEST_TIMEOUT_MS = 8000;
 
-    req.on("error", reject);
-    if (postData) {
-      req.write(typeof postData === "string" ? postData : JSON.stringify(postData));
-    }
-    req.end();
-  });
+const githubJson = async (url, init) => {
+  const res = await fetch(url, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* non-JSON response */
+  }
+  return { status: res.status, data };
+};
+
+const redirect = (res, location, cookies) => {
+  if (cookies) res.setHeader("Set-Cookie", cookies);
+  res.setHeader("Cache-Control", "no-store");
+  res.writeHead(302, { Location: location });
+  res.end();
 };
 
 module.exports = async function handler(req, res) {
@@ -39,109 +37,58 @@ module.exports = async function handler(req, res) {
   }
 
   const config = getConfig();
-  const { code, state, error, error_description } = req.query || {};
+  const cookieOpts = cookieOptionsFor(req);
+  const clearState = serializeCookie("oauth_state", "", { ...cookieOpts, maxAge: 0 });
+  const { code, state, error } = req.query || {};
 
-  if (error) {
-    res.writeHead(302, {
-      Location: `/admin/?error=${encodeURIComponent(error_description || error)}`,
-    });
-    return res.end();
+  if (!config.isConfigured) return redirect(res, "/admin/?error=unconfigured");
+  if (error) return redirect(res, "/admin/?error=oauth_denied", clearState);
+  if (typeof code !== "string" || typeof state !== "string" || !code || !state) {
+    return redirect(res, "/admin/?error=missing_code_or_state", clearState);
   }
 
-  if (!code || !state) {
-    res.writeHead(302, {
-      Location: "/admin/?error=missing_code_or_state",
-    });
-    return res.end();
-  }
-
-  const cookies = parseCookies(req.headers ? req.headers.cookie : "");
-  const cookieState = cookies.oauth_state;
-
+  // CSRF: the state we issued must come back both in the URL and in our own cookie, signed and unexpired.
+  const cookieState = parseCookies(req.headers ? req.headers.cookie : "").oauth_state;
   if (!cookieState || cookieState !== state || !verifyOAuthState(state, config.sessionSecret)) {
-    res.writeHead(302, {
-      Location: "/admin/?error=invalid_csrf_state",
-    });
-    return res.end();
+    return redirect(res, "/admin/?error=invalid_csrf_state", clearState);
   }
 
   try {
-    // 1. Exchange code for access token
-    const tokenPayload = {
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      code,
-    };
-
-    const tokenRes = await fetchJson(
-      "https://github.com/login/oauth/access_token",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "User-Agent": "rajasekar-work-admin",
-        },
+    const tokenRes = await githubJson("https://github.com/login/oauth/access_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "User-Agent": "rajasekar-work-admin",
       },
-      tokenPayload
-    );
-
+      body: JSON.stringify({ client_id: config.clientId, client_secret: config.clientSecret, code }),
+    });
     const accessToken = tokenRes.data && tokenRes.data.access_token;
-    if (!accessToken) {
-      res.writeHead(302, {
-        Location: "/admin/?error=token_exchange_failed",
-      });
-      return res.end();
-    }
+    if (!accessToken) return redirect(res, "/admin/?error=token_exchange_failed", clearState);
 
-    // 2. Fetch authenticated user profile
-    const userRes = await fetchJson("https://api.github.com/user", {
-      method: "GET",
+    const userRes = await githubJson("https://api.github.com/user", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        Accept: "application/vnd.github.v3+json",
+        Accept: "application/vnd.github+json",
         "User-Agent": "rajasekar-work-admin",
       },
     });
-
     const user = userRes.data;
-    if (!user || !user.login) {
-      res.writeHead(302, {
-        Location: "/admin/?error=user_fetch_failed",
-      });
-      return res.end();
-    }
+    if (!user || typeof user.login !== "string") return redirect(res, "/admin/?error=user_fetch_failed", clearState);
 
-    // 3. Strict Admin Access Control
-    if (user.login.toLowerCase() !== config.adminUsername.toLowerCase()) {
-      res.writeHead(302, {
-        Location: `/admin/?error=forbidden&user=${encodeURIComponent(user.login)}`,
-      });
-      return res.end();
-    }
+    const isAdmin =
+      user.login.toLowerCase() === config.adminUsername &&
+      (!config.adminId || String(user.id) === config.adminId);
+    if (!isAdmin) return redirect(res, "/admin/?error=forbidden", clearState);
 
-    // 4. Issue Session Cookie for verified administrator
     const sessionToken = createSessionToken(user, config.sessionSecret);
     const sessionCookie = serializeCookie("admin_session", sessionToken, {
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      httpOnly: true,
+      ...cookieOpts,
+      maxAge: Math.floor(SESSION_TTL_MS / 1000),
       sameSite: "Lax",
     });
-
-    // Clear state cookie
-    const clearStateCookie = serializeCookie("oauth_state", "", {
-      maxAge: 0,
-      httpOnly: true,
-      sameSite: "Lax",
-    });
-
-    res.setHeader("Set-Cookie", [sessionCookie, clearStateCookie]);
-    res.writeHead(302, { Location: "/admin/" });
-    res.end();
-  } catch (err) {
-    res.writeHead(302, {
-      Location: `/admin/?error=${encodeURIComponent(err.message)}`,
-    });
-    res.end();
+    return redirect(res, "/admin/", [sessionCookie, clearState]);
+  } catch {
+    return redirect(res, "/admin/?error=auth_failed", clearState);
   }
 };

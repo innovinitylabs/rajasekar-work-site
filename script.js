@@ -3,7 +3,7 @@ const themeToggles = [...document.querySelectorAll(".theme-toggle")];
 const revealElements = [...document.querySelectorAll(".reveal")];
 const downloadResumeButton = document.getElementById("download-resume");
 
-const RESUME_DATA_URL = "resume-data.json";
+const RESUME_DATA_URL = "resume-default.json";
 const JSPDF_CDN_URL =
   "https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js";
 

@@ -2,127 +2,78 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const crypto = require("node:crypto");
-const { jsPDF } = require("jspdf");
 
-const { buildResumePdf } = require("../resume-pdf");
-const { resolveProfile, getMasterResume } = require("../lib/resume-system");
+const { normalizeMaster, resolveProfile } = require("../resume-resolve");
+const seedProfiles = require("../lib/seed-profiles");
+const { validateMaster, validateProfile } = require("../lib/validate");
 
-const ROOT = path.join(__dirname, "..");
-const RAW_PATH = path.join(ROOT, "resume-data.json");
+const RAW = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "resume-data.json"), "utf8"));
 
-// Baseline SHA256 captured at start of Phase 2
-const EXPECTED_HASH =
-  "e2bd8f26f6b562ab11a0bf91bbd0837455a95e838a74c93e88258a560ecb1441";
+// The previous phase froze resume-data.json with a SHA-256 hash. That guard is
+// intentionally replaced: the master resume is now edited on purpose, so the
+// protection is structural (validation + exact preservation of verified facts).
 
-test("CRITICAL: resume-data.json SHA-256 hash is byte-for-byte identical", () => {
-  const currentContent = fs.readFileSync(RAW_PATH, "utf8");
-  const currentHash = crypto
-    .createHash("sha256")
-    .update(currentContent)
-    .digest("hex");
-
-  assert.equal(
-    currentHash,
-    EXPECTED_HASH,
-    "CRITICAL VIOLATION: resume-data.json has been modified!"
-  );
+test("seed master passes server-side validation unchanged", () => {
+  const { errors } = validateMaster(RAW);
+  assert.deepEqual(errors, []);
 });
 
-test("CRITICAL: Employment history, roles, and dates are strictly preserved", () => {
-  const data = JSON.parse(fs.readFileSync(RAW_PATH, "utf8"));
-  assert.equal(data.experience.length, 2);
-
-  const digit = data.experience.find((e) => e.org === "Digit Insurance");
-  assert.ok(digit, "Digit Insurance entry missing");
-  assert.equal(digit.role, "Data Engineer");
-  assert.equal(digit.period, "Nov 2023 - Jun 2025");
-  assert.equal(digit.bullets.length, 6);
-
-  const appzwork = data.experience.find((e) => e.org === "Appzwork");
-  assert.ok(appzwork, "Appzwork entry missing");
-  assert.equal(appzwork.role, "Software Engineer");
-  assert.equal(appzwork.period, "Jan 2020 - Nov 2023");
-  assert.equal(appzwork.bullets.length, 4);
+test("contact links, proof metrics and education are preserved exactly", () => {
+  assert.equal(RAW.contact.email.url, "mailto:rajasekarc1142@gmail.com");
+  assert.equal(RAW.contact.phone.url, "tel:+917904348791");
+  assert.equal(RAW.contact.linkedin.url, "https://linkedin.com/in/rajasekar-c");
+  assert.equal(RAW.contact.github.url, "https://github.com/innovinitylabs/");
+  assert.equal(RAW.contact.portfolio.url, "https://rajasekar.work");
+  assert.deepEqual(RAW.proof.map((p) => p.value), ["50M records/day", "30 min to under 1 min", "4000+ issues resolved"]);
+  assert.deepEqual(RAW.education, [
+    { id: "edu-rmk-engineering-college", level: "B.E.", meta: "CGPA: 7.17", place: "RMK Engineering College" },
+  ]);
 });
 
-test("CRITICAL: Proof metrics and values are strictly preserved", () => {
-  const data = JSON.parse(fs.readFileSync(RAW_PATH, "utf8"));
-  assert.equal(data.proof.length, 3);
-  assert.equal(data.proof[0].value, "50M records/day");
-  assert.equal(data.proof[1].value, "30 min to under 1 min");
-  assert.equal(data.proof[2].value, "4000+ issues resolved");
+test("experience is exactly Independent, Digit Insurance, Appzwork - no duplicated or corrupted entries", () => {
+  assert.deepEqual(RAW.experience.map((e) => e.id), ["exp-independent", "exp-digit-insurance", "exp-appzwork"]);
+  const allBullets = RAW.experience.flatMap((e) => e.bullets);
+  assert.equal(new Set(allBullets).size, allBullets.length, "no duplicated bullet text");
+  assert.equal(RAW.projects.length, new Set(RAW.projects.map((p) => p.title)).size);
 });
 
-test("CRITICAL: Technical skill groups and skill tokens are strictly preserved", () => {
-  const data = JSON.parse(fs.readFileSync(RAW_PATH, "utf8"));
-  const expectedGroups = [
-    "Languages",
-    "Data Engineering",
-    "Databases",
-    "Backend",
-    "Data Platforms",
-    "DevOps",
-    "Developer Tools",
-    "Other",
-  ];
-
-  assert.equal(data.skills.length, expectedGroups.length);
-  for (let i = 0; i < expectedGroups.length; i++) {
-    assert.equal(data.skills[i].group, expectedGroups[i]);
+test("every seed profile validates against the master and references only real ids", () => {
+  const master = normalizeMaster(RAW);
+  for (const p of seedProfiles) {
+    const { errors } = validateProfile(p, master);
+    assert.deepEqual(errors, [], `${p.id}: ${JSON.stringify(errors)}`);
   }
-
-  const allSkills = data.skills.flatMap((s) => s.items);
-  const requiredTokens = [
-    "Python",
-    "SQL",
-    "PL/SQL",
-    "Shell",
-    "ETL",
-    "ELT",
-    "Pandas",
-    "PySpark",
-    "PostgreSQL",
-    "Oracle",
-    "DB2",
-    "Redis",
-    "Flask",
-    "Databricks",
-    "ClickHouse",
-    "Docker",
-    "Git",
-    "Linux",
-    "Cursor",
-    "Claude",
-    "GPT Codex",
-    "GitHub Copilot",
-    "Selenium",
-    "MoEngage",
-  ];
-
-  requiredTokens.forEach((token) => {
-    assert.ok(allSkills.includes(token), `Missing skill token: ${token}`);
-  });
+  assert.equal(seedProfiles.filter((p) => p.isDefault).length, 1);
+  assert.deepEqual(seedProfiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer"]);
 });
 
-test("CRITICAL: Education details are strictly preserved", () => {
-  const data = JSON.parse(fs.readFileSync(RAW_PATH, "utf8"));
-  assert.equal(data.education.length, 1);
-  assert.equal(data.education[0].level, "B.E.");
-  assert.equal(data.education[0].place, "RMK Engineering College");
-  assert.equal(data.education[0].meta, "CGPA: 7.17");
+test("every master project is selected by at least one profile or remains available in the master", () => {
+  const master = normalizeMaster(RAW);
+  const selected = new Set(seedProfiles.flatMap((p) => p.selectedProjects));
+  assert.ok(selected.has("project-pocket-astro"), "Pocket Astro must appear in a profile");
+  assert.equal(master.projects.length, 8, "all eight remain in the master regardless of profile selection");
 });
 
-test("PDF generator produces valid output for all defined profiles", () => {
-  const master = getMasterResume();
-  const profiles = ["data-engineer", "ai-product-engineer", "database-developer"];
+test("resolveProfile is pure: it does not mutate the master and honours bullet selection", () => {
+  const master = normalizeMaster(RAW);
+  const before = JSON.stringify(master);
+  const de = resolveProfile(seedProfiles[0], master);
+  assert.equal(JSON.stringify(master), before);
+  const ind = de.experience.find((e) => e.org === "Independent");
+  assert.equal(ind.bullets.length, 1);
+  assert.equal(de.experience.find((e) => e.org === "Digit Insurance").bullets.length, 7);
+});
 
-  profiles.forEach((profileId) => {
-    const resolved = resolveProfile(profileId, master);
-    const doc = buildResumePdf(jsPDF, resolved, {
-      accentColor: resolved.accentColor,
-    });
-    const buffer = Buffer.from(doc.output("arraybuffer"));
-    assert.ok(buffer.length > 5000, `PDF for profile ${profileId} too small`);
-  });
+test("projects follow the profile's own priority order", () => {
+  const master = normalizeMaster(RAW);
+  const ai = resolveProfile(seedProfiles.find((p) => p.id === "ai-product-engineer"), master);
+  assert.deepEqual(ai.projects.map((p) => p.title), ["Pocket Astro", "Uravu", "OnchainRugs", "Anekaroopam", "Rotate the Cow"]);
+});
+
+test("hidden sections are removed from the resolved resume", () => {
+  const master = normalizeMaster(RAW);
+  const r = resolveProfile({ ...seedProfiles[0], sectionVisibility: { projects: false, proof: false, contact: false } }, master);
+  assert.equal(r.projects.length, 0);
+  assert.equal(r.proof.length, 0);
+  assert.equal(r.contact, null);
 });

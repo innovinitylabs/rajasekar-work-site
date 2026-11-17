@@ -3,11 +3,19 @@
 /*
  * build.js
  *
- * Single source of truth -> two rendered views.
+ * Authoritative data -> rendered views.
  *
- * Reads resume-data.json and injects generated HTML into the marked regions
- * of index.html (website) and resume-source.html (print/PDF source).
- * Edit resume-data.json, then run `node build.js` to update both files.
+ * Data source:
+ *   - DATABASE_URL set   -> master resume + profiles are read from PostgreSQL
+ *                           (the production source of truth). A failure aborts
+ *                           the build rather than publishing stale content.
+ *   - DATABASE_URL unset -> resume-data.json and the seed profiles are used
+ *                           (local/offline builds and CI).
+ *
+ * Outputs:
+ *   - index.html           public portfolio (full master, all public projects)
+ *   - resume-source.html   printable ATS resume of the DEFAULT profile
+ *   - resume-default.json  resolved default profile, used by the browser PDF button
  *
  * Regions are delimited by matching HTML comments:
  *   <!-- build:KEY -->  ... generated content ...  <!-- /build:KEY -->
@@ -18,11 +26,15 @@ const fs = require("fs");
 const path = require("path");
 
 const ROOT = __dirname;
-const DATA_PATH = path.join(ROOT, "resume-data.json");
+const DEFAULT_JSON_PATH = path.join(ROOT, "resume-default.json");
 const INDEX_PATH = path.join(ROOT, "index.html");
 const SOURCE_PATH = path.join(ROOT, "resume-source.html");
 
-const data = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
+const { normalizeMaster, resolveProfile } = require("./resume-resolve");
+
+// Assigned in main() before any renderer runs.
+let data; // normalised master (public portfolio view)
+let resume; // resolved default profile (ATS resume view)
 
 const escapeHtml = (value) =>
   String(value)
@@ -164,10 +176,42 @@ const webFooterLinks = () => {
   ].join("\n");
 };
 
+const webProjects = () =>
+  data.projects
+    .filter((p) => p.isPublic)
+    .map((p) => {
+      const tech = p.technologies.map((t) => `    <li>${escapeHtml(t)}</li>`).join("\n");
+      const bullets = p.bullets.map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
+      const links = p.links
+        .map(
+          (l) =>
+            `<a href="${escapeHtml(l.url)}" target="_blank" rel="noreferrer">${escapeHtml(l.label)}</a>`
+        )
+        .join(" · ");
+      return [
+        `<article class="experience-card project-card">`,
+        `  <div class="experience-header">`,
+        `    <div>`,
+        `      <h3>${escapeHtml(p.title)}</h3>`,
+        `      <p>${escapeHtml([p.category, p.role].filter(Boolean).join(" · "))}</p>`,
+        `    </div>`,
+        `    <span class="timeline">${escapeHtml(p.status)}</span>`,
+        `  </div>`,
+        p.description ? `  <p class="project-description">${escapeHtml(p.description)}</p>` : "",
+        p.bullets.length ? `  <ul>\n${bullets}\n  </ul>` : "",
+        tech ? `  <ul class="tag-list">\n${tech}\n  </ul>` : "",
+        links ? `  <p class="project-links">${links}</p>` : "",
+        `</article>`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+
 /* ------------------------------ print markup ------------------------------ */
 
 const printContact = () => {
-  const c = data.contact;
+  const c = resume.contact || data.contact;
   const link = (item, prefix = "") =>
     `<a href="${escapeHtml(item.url)}">${prefix}${escapeHtml(
       item.label
@@ -189,7 +233,7 @@ const printContact = () => {
 };
 
 const printExperience = () =>
-  data.experience
+  resume.experience
     .map((role) => {
       const bullets = role.bullets
         .map((b) => `  <li>${escapeHtml(b)}</li>`)
@@ -212,7 +256,7 @@ const printExperience = () =>
     .join("\n\n");
 
 const printSkills = () =>
-  data.skills
+  resume.skills
     .map(
       (group) =>
         `<li><strong>${escapeHtml(group.group)}:</strong> ${escapeHtml(
@@ -222,7 +266,7 @@ const printSkills = () =>
     .join("\n");
 
 const printEducation = () =>
-  data.education
+  resume.education
     .map(
       (edu) =>
         `<li>${escapeHtml(edu.level)} - ${escapeHtml(edu.place)} - ${escapeHtml(
@@ -231,8 +275,59 @@ const printEducation = () =>
     )
     .join("\n");
 
+const printProjects = () => {
+  if (!resume.projects.length) return "";
+  const compact = resume.projectDetail === "compact";
+  const items = resume.projects
+    .map((p) => {
+      const bullets = p.bullets.map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
+      const meta = [p.role, p.status].filter(Boolean).join(" | ");
+      return [
+        `<div class="role">`,
+        `  <div class="role-header">`,
+        `    <div class="role-title">`,
+        `      <h3>${escapeHtml(p.title)}</h3>`,
+        `      <p>${escapeHtml(meta)}</p>`,
+        `    </div>`,
+        `  </div>`,
+        p.description && !compact ? `  <p class="project-description">${escapeHtml(p.description)}</p>` : "",
+        p.bullets.length && !compact ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
+        p.technologies.length ? `  <p class="project-tech"><strong>Technologies:</strong> ${escapeHtml(p.technologies.join(", "))}</p>` : "",
+        `</div>`,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
+    .join("\n\n");
+  return `<section>\n  <h2>Projects</h2>\n${indent(items, 2)}\n</section>`;
+};
+
+/* -------------------------------- data load ------------------------------- */
+
+const loadData = async () => {
+  const db = require("./lib/db");
+  if (db.isConfigured()) {
+    const { defaultStore: store } = require("./lib/store");
+    try {
+      const [masterState, profiles] = await Promise.all([store.getMaster(), store.listProfiles()]);
+      const profile = profiles.find((p) => p.isDefault) || profiles[0];
+      console.log(`Reading master v${masterState.version} and profile "${profile.id}" from PostgreSQL`);
+      return { master: masterState.master, profile };
+    } finally {
+      await db.closePool();
+    }
+  }
+  console.log("DATABASE_URL not set: building from resume-data.json and seed profiles");
+  const seedProfiles = require("./lib/seed-profiles");
+  return {
+    master: normalizeMaster(JSON.parse(fs.readFileSync(path.join(ROOT, "resume-data.json"), "utf8"))),
+    profile: seedProfiles.find((p) => p.isDefault) || seedProfiles[0],
+  };
+};
+
 /* -------------------------------- assembly -------------------------------- */
 
+const assemble = () => {
 let indexHtml = fs.readFileSync(INDEX_PATH, "utf8");
 indexHtml = replaceRegion(
   indexHtml,
@@ -253,6 +348,7 @@ indexHtml = replaceRegion(indexHtml, "summary", escapeHtml(data.summary), 16);
 indexHtml = replaceRegion(indexHtml, "hero-actions", webHeroActions(), 16);
 indexHtml = replaceRegion(indexHtml, "proof", webProof(), 14);
 indexHtml = replaceRegion(indexHtml, "experience", webExperience(), 14);
+indexHtml = replaceRegion(indexHtml, "projects", webProjects(), 14);
 indexHtml = replaceRegion(indexHtml, "skills", webSkills(), 14);
 indexHtml = replaceRegion(indexHtml, "education", webEducation(), 14);
 indexHtml = replaceRegion(indexHtml, "contact", webContact(), 14);
@@ -267,12 +363,27 @@ sourceHtml = replaceRegion(
   4
 );
 sourceHtml = replaceRegion(sourceHtml, "name", escapeHtml(data.name), 0);
-sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(data.title), 0);
-sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(data.summary), 10);
+sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(resume.title), 0);
+sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(resume.summary), 10);
 sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);
 sourceHtml = replaceRegion(sourceHtml, "skills", printSkills(), 10);
 sourceHtml = replaceRegion(sourceHtml, "education", printEducation(), 10);
+sourceHtml = replaceRegion(sourceHtml, "projects", printProjects(), 8);
 fs.writeFileSync(SOURCE_PATH, sourceHtml);
 
-console.log("Built index.html and resume-source.html from resume-data.json");
+fs.writeFileSync(DEFAULT_JSON_PATH, JSON.stringify(resume, null, 2) + "\n");
+
+console.log(`Built index.html, resume-source.html and resume-default.json (profile "${resume.profileId}")`);
+};
+
+loadData()
+  .then(({ master, profile }) => {
+    data = master;
+    resume = resolveProfile(profile, master);
+    assemble();
+  })
+  .catch((err) => {
+    console.error("Build failed:", err && err.message ? err.message : err);
+    process.exit(1);
+  });
