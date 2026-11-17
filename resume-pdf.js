@@ -328,8 +328,9 @@
         if (proj.description && !compact) {
           writeLines(proj.description, { size: 9.5, color: MUTE, gap: 2 });
         }
-        if (!compact && !twoPage) {
-          (proj.bullets || []).forEach((bullet) => {
+        const bulletCap = twoPage ? (data.showcase && data.showcase.bulletsPerProject) || 0 : Infinity;
+        if (!compact && bulletCap > 0) {
+          (proj.bullets || []).slice(0, bulletCap).forEach((bullet) => {
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9.5);
             setColor(INK);
@@ -362,6 +363,11 @@
         y += compact ? 2 : twoPage ? 15 : 6;
       });
     }
+
+    (data.extraSections || []).forEach((sec) => {
+      sectionHeading(sec.heading, 60);
+      sec.paragraphs.forEach((para) => writeLines(para, { size: 9.5, color: INK, gap: 3 }));
+    });
 
     if (!educationDrawn) drawEducation();
 

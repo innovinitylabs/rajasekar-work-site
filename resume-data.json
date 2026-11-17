@@ -52,7 +52,8 @@
         "Design and build complete software products independently, from architecture to deployment, across web (Next.js, React, TypeScript), native iOS and macOS (Swift, SwiftUI) and generative-art applications; the web products run on Vercel under their own domains",
         "Built OnchainRugs end to end: Solidity ERC721A contracts (Foundry), multi-chain wallet integration (wagmi, viem, RainbowKit), a deterministic p5-compatible renderer shared by browser, server and Puppeteer-generated previews, and a webhook that keeps an Upstash Redis cache in sync with chain events",
         "Implemented backend and data workflows: Next.js server actions with Zod validation, Neon PostgreSQL persistence with SQL migrations and transactional email via Resend (Uravu), and GitHub OAuth on Vercel serverless functions for a Decap CMS content workflow (Valipokkann)",
-        "Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS on a native C and Swift calculation layer, checked against a Python oracle with golden fixtures and numerical parity tests; use Cursor, Claude, ChatGPT and GitHub Copilot across design, implementation and testing"
+        "Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS on a native C and Swift calculation layer, checked against a Python oracle with golden fixtures and numerical parity tests; use Cursor, Claude, ChatGPT and GitHub Copilot across design, implementation and testing",
+        "Conceived and built Uravu, a pre-launch concept for AI as an atmospheric mediator in human-to-human conversation: wrote an independent research and design dossier (not peer-reviewed), and implemented the site, an emotional-network simulation rendered with WebGL, and a Neon PostgreSQL waitlist; no AI model is integrated yet"
       ]
     },
     {
@@ -241,6 +242,13 @@
           "url": "https://www.uravu.social",
           "type": "website",
           "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Research Dossier",
+          "url": "https://www.uravu.social/research",
+          "type": "documentation",
+          "primary": false,
           "visible": true
         },
         {
@@ -445,6 +453,15 @@
       ]
     },
     {
+      "id": "skill-ai-systems",
+      "group": "AI Systems",
+      "items": [
+        "Local LLM integration",
+        "On-device AI assistants",
+        "AI-assisted development"
+      ]
+    },
+    {
       "id": "skill-currently-learning",
       "group": "Currently Learning",
       "items": [
@@ -465,9 +482,15 @@
   "education": [
     {
       "id": "edu-rmk-engineering-college",
-      "level": "B.E.",
+      "level": "B.E. in Civil Engineering",
       "meta": "CGPA: 7.17",
       "place": "RMK Engineering College"
+    },
+    {
+      "id": "edu-datacamp-deep-learning",
+      "level": "Coursework",
+      "meta": "Introductory course",
+      "place": "DataCamp: Introduction to Deep Learning with Python"
     }
   ]
 }

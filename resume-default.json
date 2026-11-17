@@ -6,7 +6,8 @@
   "pageMode": "two-page",
   "showcase": {
     "heading": "Independent Development | Selected Work",
-    "intro": "Since June 2025, independently building software products spanning data-driven applications, generative systems, creative technology and AI-assisted products."
+    "intro": "Since June 2025, independently building software products spanning data-driven applications, generative systems, creative technology and AI-assisted products.",
+    "bulletsPerProject": 0
   },
   "accentColor": "#2457c5",
   "sectionVisibility": {
@@ -308,6 +309,10 @@
         {
           "label": "Official Website",
           "url": "https://www.uravu.social"
+        },
+        {
+          "label": "Research Dossier",
+          "url": "https://www.uravu.social/research"
         }
       ]
     },
@@ -400,9 +405,10 @@
   ],
   "education": [
     {
-      "level": "B.E.",
+      "level": "B.E. in Civil Engineering",
       "place": "RMK Engineering College",
       "meta": "CGPA: 7.17"
     }
-  ]
+  ],
+  "extraSections": []
 }

@@ -59,11 +59,11 @@ const getBootstrap = async () => {
   return call(m.profiles, req, res);
 };
 
-test("first request migrates the schema and seeds master, 3 profiles and the legacy application exactly once", { skip }, async () => {
+test("first request migrates the schema and seeds master, 4 profiles and the legacy application exactly once", { skip }, async () => {
   const out = await getBootstrap();
   assert.equal(out.status, 200);
   assert.equal(out.body.storage.backend, "postgres");
-  assert.deepEqual(out.body.profiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer"]);
+  assert.deepEqual(out.body.profiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency"]);
   assert.equal(out.body.profiles.filter((p) => p.isDefault).length, 1);
   assert.equal(out.body.applications.length, 1);
   assert.equal(out.body.master.projects.length, 8);
@@ -71,7 +71,7 @@ test("first request migrates the schema and seeds master, 3 profiles and the leg
 
   // Seeding is recorded, so it never repeats.
   const again = await getBootstrap();
-  assert.equal(again.body.profiles.length, 3);
+  assert.equal(again.body.profiles.length, 4);
 });
 
 test("PERSISTENCE: created profile survives a closed pool + brand-new store (simulated cold start)", { skip }, async () => {
@@ -538,6 +538,72 @@ test("MIGRATION 004 upgrades a pre-two-page database in place and is idempotent"
   await m.db.migrate(pool);
   assert.equal((await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version, v);
   await pool.end();
+});
+
+test("MIGRATION 005 adds profile options, upgrades master, and inserts the research profile without touching other profiles", { skip }, async () => {
+  const { Pool } = require("pg");
+  const pool = new Pool({ connectionString: TEST_URL });
+  const before = (await pool.query("SELECT id, version, selected_skills, selected_projects FROM profiles WHERE id IN ('data-engineer','database-developer') ORDER BY id")).rows;
+  const { rows } = await pool.query("SELECT data FROM master_resume WHERE id = 1");
+  const legacy = rows[0].data;
+  const ind = legacy.experience.find((e) => e.id === "exp-independent");
+  ind.bullets = ind.bullets.slice(0, 4); // the four bullets that existed before migration 005
+  legacy.education = legacy.education.filter((e) => e.id !== "edu-datacamp-deep-learning");
+  legacy.education[0].level = "B.E.";
+  legacy.skills = legacy.skills.filter((x) => x.id !== "skill-ai-systems");
+  const uravu = legacy.projects.find((p) => p.id === "project-uravu");
+  uravu.links = uravu.links.filter((l) => !/research/.test(l.url));
+  await pool.query("UPDATE master_resume SET data = $1::jsonb WHERE id = 1", [JSON.stringify(legacy)]);
+  await pool.query("DELETE FROM profiles WHERE id = 'anthropic-research-residency'");
+  await pool.query("UPDATE profiles SET options = '{}'::jsonb");
+  await pool.query("DELETE FROM schema_migrations WHERE id = '005_profile_options_research_profile'");
+
+  await m.db.migrate(pool);
+
+  const d = (await pool.query("SELECT data FROM master_resume WHERE id = 1")).rows[0].data;
+  assert.equal(d.experience.find((e) => e.id === "exp-independent").bullets.length, 5);
+  assert.equal(d.education[0].level, "B.E. in Civil Engineering");
+  assert.ok(d.education.some((e) => e.id === "edu-datacamp-deep-learning" && e.meta === "Introductory course"));
+  assert.ok(d.skills.some((x) => x.id === "skill-ai-systems"));
+  assert.ok(d.projects.find((p) => p.id === "project-uravu").links.some((l) => l.url === "https://www.uravu.social/research"));
+
+  const research = (await pool.query("SELECT name, project_detail, options, selected_projects FROM profiles WHERE id = 'anthropic-research-residency'")).rows[0];
+  assert.equal(research.name, "Anthropic Research Residency");
+  assert.equal(research.options.displayName, "Rajasekar Chandrasekar");
+  assert.deepEqual(research.selected_projects, ["project-uravu", "project-pocket-astro", "project-onchainrugs", "project-madras-checks"]);
+  const after = (await pool.query("SELECT id, version, selected_skills, selected_projects, options FROM profiles WHERE id IN ('data-engineer','database-developer') ORDER BY id")).rows;
+  after.forEach((a, i) => {
+    assert.deepEqual(a.selected_skills, before[i].selected_skills, "skills untouched");
+    assert.deepEqual(a.selected_projects, before[i].selected_projects, "projects untouched");
+    assert.deepEqual(a.options.selectedEducation, ["edu-rmk-engineering-college"], "existing profile keeps only the degree");
+  });
+  const v = (await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version;
+  await m.db.migrate(pool);
+  assert.equal((await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version, v, "idempotent");
+  assert.equal((await pool.query("SELECT count(*)::int n FROM profiles WHERE id='anthropic-research-residency'")).rows[0].n, 1);
+  await pool.end();
+});
+
+test("RESEARCH PROFILE via the API: persisted options survive a cold start and a restore", { skip }, async () => {
+  const boot = await getBootstrap();
+  const p = boot.body.profiles.find((x) => x.id === "anthropic-research-residency");
+  assert.ok(p, "profile is in the bootstrap");
+  assert.equal(p.options.displayName, "Rajasekar Chandrasekar");
+  const edited = { ...p, options: { ...p.options, extraSections: [...p.options.extraSections, { heading: "Note", paragraphs: ["Edited via API."] }] } };
+  const r = adminRequest("PUT", { body: edited });
+  assert.equal((await call(m.profiles, r.req, r.res)).status, 200);
+  await m.db.closePool();
+  const fresh = (await m.store.createStore().listProfiles()).find((x) => x.id === "anthropic-research-residency");
+  assert.equal(fresh.options.extraSections.at(-1).heading, "Note");
+  const bad = adminRequest("PUT", { body: { ...fresh, options: { selectedEducation: ["edu-nope"] } } });
+  assert.equal((await call(m.profiles, bad.req, bad.res)).status, 400);
+
+  const exp = adminRequest("GET");
+  const snap = (await call(m.exporter, exp.req, exp.res)).body;
+  assert.equal(snap.profiles.find((x) => x.id === "anthropic-research-residency").options.displayName, "Rajasekar Chandrasekar");
+  await m.store.defaultStore.restoreAll(JSON.parse(JSON.stringify(snap)));
+  const again = (await getBootstrap()).body.profiles.find((x) => x.id === "anthropic-research-residency");
+  assert.deepEqual(again.options, snap.profiles.find((x) => x.id === "anthropic-research-residency").options);
 });
 
 test("teardown", { skip }, async () => {

@@ -257,6 +257,11 @@ const printProof = () =>
         .join("\n")}\n</section>`
     : "";
 
+const printExtraSections = () =>
+  (resume.extraSections || [])
+    .map((x) => `<section>\n  <h2>${escapeHtml(x.heading)}</h2>\n${x.paragraphs.map((t) => `  <p>${escapeHtml(t)}</p>`).join("\n")}\n</section>`)
+    .join("\n");
+
 const printSkills = () =>
   resume.skills
     .map(
@@ -283,7 +288,8 @@ const printProjects = () => {
   const showcase = resume.pageMode === "two-page";
   const items = resume.projects
     .map((p) => {
-      const bullets = p.bullets.map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
+      const cap = showcase ? (resume.showcase && resume.showcase.bulletsPerProject) || 0 : Infinity;
+      const bullets = p.bullets.slice(0, cap).map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
       const meta = [p.role, p.status].filter(Boolean).join(" | ");
       return [
         `<div class="role">`,
@@ -294,7 +300,7 @@ const printProjects = () => {
         `    </div>`,
         `  </div>`,
         p.description && !compact ? `  <p class="project-description">${escapeHtml(p.description)}</p>` : "",
-        p.bullets.length && !compact && !showcase ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
+        p.bullets.length && !compact && (!showcase || (resume.showcase && resume.showcase.bulletsPerProject > 0)) ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
         p.technologies.length ? `  <p class="project-tech"><strong>Technologies:</strong> ${escapeHtml(p.technologies.join(", "))}</p>` : "",
         p.links.length
           ? `  <p class="project-tech"><strong>Links:</strong> ${p.links
@@ -373,7 +379,7 @@ sourceHtml = replaceRegion(
   `<title>${escapeHtml(data.name)} Resume</title>`,
   4
 );
-sourceHtml = replaceRegion(sourceHtml, "name", escapeHtml(data.name), 0);
+sourceHtml = replaceRegion(sourceHtml, "name", escapeHtml(resume.name), 0);
 sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(resume.title), 0);
 sourceHtml = replaceRegion(sourceHtml, "proof", printProof(), 8);
 sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(resume.summary), 10);
@@ -381,7 +387,7 @@ sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);
 sourceHtml = replaceRegion(sourceHtml, "skills", printSkills(), 10);
 sourceHtml = replaceRegion(sourceHtml, "education", printEducation(), 10);
-sourceHtml = replaceRegion(sourceHtml, "projects", printProjects(), 8);
+sourceHtml = replaceRegion(sourceHtml, "projects", `${printProjects()}\n${printExtraSections()}`, 8);
 fs.writeFileSync(SOURCE_PATH, sourceHtml);
 
 fs.writeFileSync(DEFAULT_JSON_PATH, JSON.stringify(resume, null, 2) + "\n");

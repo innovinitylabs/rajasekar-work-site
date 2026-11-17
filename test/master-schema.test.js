@@ -56,5 +56,5 @@ test("custom profile supports summary overrides and section filtering", () => {
 
 test("resolveProfile requires a profile object (no hidden file reads)", () => {
   assert.throws(() => resolveProfile("data-engineer", getMasterResume()), TypeError);
-  assert.equal(SEED_PROFILES.length, 3);
+  assert.equal(SEED_PROFILES.length, 4);
 });

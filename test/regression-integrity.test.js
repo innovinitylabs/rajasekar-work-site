@@ -26,7 +26,8 @@ test("contact links, proof metrics and education are preserved exactly", () => {
   assert.equal(RAW.contact.portfolio.url, "https://rajasekar.work");
   assert.deepEqual(RAW.proof.map((p) => p.value), ["50M records/day", "30 min to under 1 min", "4000+ issues resolved"]);
   assert.deepEqual(RAW.education, [
-    { id: "edu-rmk-engineering-college", level: "B.E.", meta: "CGPA: 7.17", place: "RMK Engineering College" },
+    { id: "edu-rmk-engineering-college", level: "B.E. in Civil Engineering", meta: "CGPA: 7.17", place: "RMK Engineering College" },
+    { id: "edu-datacamp-deep-learning", level: "Coursework", meta: "Introductory course", place: "DataCamp: Introduction to Deep Learning with Python" },
   ]);
 });
 
@@ -44,7 +45,7 @@ test("every seed profile validates against the master and references only real i
     assert.deepEqual(errors, [], `${p.id}: ${JSON.stringify(errors)}`);
   }
   assert.equal(seedProfiles.filter((p) => p.isDefault).length, 1);
-  assert.deepEqual(seedProfiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer"]);
+  assert.deepEqual(seedProfiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency"]);
 });
 
 test("every master project is selected by at least one profile or remains available in the master", () => {

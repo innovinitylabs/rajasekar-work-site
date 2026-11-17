@@ -114,4 +114,5 @@ test("admin page: full-width preview sits below the editor inside the main colum
   assert.match(css, /min-height: 1123px/);
   assert.ok(html.includes('data-preview-mode="saved"') && html.includes('data-preview-mode="draft"'));
   assert.ok(html.includes('id="btn-export-profile-pdf"'));
+  assert.ok(html.includes('<option value="showcase">'), "the project-style selector must offer every stored value, or saving would silently change it");
 });
