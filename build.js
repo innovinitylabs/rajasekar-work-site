@@ -30,7 +30,7 @@ const DEFAULT_JSON_PATH = path.join(ROOT, "resume-default.json");
 const INDEX_PATH = path.join(ROOT, "index.html");
 const SOURCE_PATH = path.join(ROOT, "resume-source.html");
 
-const { normalizeMaster, resolveProfile, visibleLinks } = require("./resume-resolve");
+const { normalizeMaster, resolveProfile, visibleLinks, contactLinks } = require("./resume-resolve");
 
 // Assigned in main() before any renderer runs.
 let data; // normalised master (public portfolio view)
@@ -216,25 +216,10 @@ const webProjects = () =>
 /* ------------------------------ print markup ------------------------------ */
 
 const printContact = () => {
-  const c = resume.contact || data.contact;
-  const link = (item, prefix = "") =>
-    `<a href="${escapeHtml(item.url)}">${prefix}${escapeHtml(
-      item.label
-    )}</a>`;
-  const primary = [
-    link(c.phone),
-    link(c.email),
-    link(c.linkedin, "LinkedIn: "),
-  ].join(" | ");
-  const secondary = [
-    link(c.github, "GitHub: "),
-    link(c.portfolio, "Portfolio: "),
-  ].join(" | ");
-
-  return [
-    `<span class="contact-line">${primary}</span>`,
-    `<span class="contact-line">${secondary}</span>`,
-  ].join("\n");
+  const items = resume.contactLinks && resume.contactLinks.length ? resume.contactLinks : contactLinks(data.contact);
+  return `<span class="contact-line">${items
+    .map((i) => `<a href="${escapeHtml(i.url)}">${escapeHtml(i.text)}</a>`)
+    .join(" | ")}</span>`;
 };
 
 const printExperience = () =>
@@ -298,6 +283,11 @@ const printProjects = () => {
         p.description && !compact ? `  <p class="project-description">${escapeHtml(p.description)}</p>` : "",
         p.bullets.length && !compact ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
         p.technologies.length ? `  <p class="project-tech"><strong>Technologies:</strong> ${escapeHtml(p.technologies.join(", "))}</p>` : "",
+        p.links.length
+          ? `  <p class="project-tech"><strong>Links:</strong> ${p.links
+              .map((l) => `<a href="${escapeHtml(l.url)}">${escapeHtml(l.label)}</a>`)
+              .join(" | ")}</p>`
+          : "",
         `</div>`,
       ]
         .filter(Boolean)

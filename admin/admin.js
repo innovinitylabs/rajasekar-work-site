@@ -459,14 +459,12 @@
     return window.ResumeResolve.resolveProfile(profile, state.master);
   };
 
-  const CONTACT_ORDER = [["phone", ""], ["email", ""], ["linkedin", "LinkedIn: "], ["github", "GitHub: "], ["portfolio", "Portfolio: "]];
-
   const resumePageHtml = (r, unsaved) => {
     const c = /^#[0-9a-fA-F]{6}$/.test(r.accentColor) ? r.accentColor : "#2457c5";
     const compact = r.projectDetail === "compact";
-    const contact = r.contact
-      ? CONTACT_ORDER.filter(([k]) => r.contact[k]).map(([k, pre]) => esc(pre + r.contact[k].label)).join(" &nbsp;|&nbsp; ")
-      : "";
+    const contact = (r.contactLinks || [])
+      .map((i) => `<a href="${esc(i.url)}" target="_blank" rel="noreferrer">${esc(i.text)}</a>`)
+      .join(" &nbsp;|&nbsp; ");
     const heading = (t) => `<div class="rp-h" style="color:${c};">${t}</div>`;
     let html = `<div class="resume-page layout-${esc(r.layout)}${unsaved ? " is-unsaved" : ""}" style="--accent-c:${c};">
       <h1>${esc(r.name)}</h1>
@@ -490,7 +488,8 @@
         <div class="rp-role"><div class="rp-role-top"><span>${esc(p.title)}</span><span>${esc(p.status)}</span></div>
           <div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>
           ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
-          ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}</div>`).join("");
+          ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}
+          ${p.links.length ? `<div class="rp-tech">Links: ${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label)}</a>`).join(" | ")}</div>` : ""}</div>`).join("");
     }
     if (r.education.length) {
       html += heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("");

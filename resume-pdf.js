@@ -127,18 +127,39 @@
       gap: 2,
     });
 
-    const contact = data.contact;
-    if (contact) {
-      const line1 = [];
-      if (contact.phone) line1.push({ text: contact.phone.label, url: contact.phone.url });
-      if (contact.email) line1.push({ text: stripUrl(contact.email.url), url: contact.email.url });
-      if (contact.linkedin) line1.push({ text: contact.linkedin.label, url: contact.linkedin.url });
-      if (line1.length > 0) writeContactLine(line1);
+    // Linked items on one or more lines, wrapping between items (never mid-URL).
+    const writeLinkLine = (items, { size = 8.8, prefix = "", gap = 11, indent = 0 } = {}) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(size);
+      setColor(MUTE);
+      const sep = "  |  ";
+      let x = margin + indent;
+      if (prefix) {
+        doc.setFont("helvetica", "bold");
+        doc.text(prefix, x, y);
+        x += doc.getTextWidth(prefix);
+        doc.setFont("helvetica", "normal");
+      }
+      const start = x;
+      items.forEach((item, index) => {
+        const w = doc.getTextWidth(item.text);
+        const sepW = index > 0 ? doc.getTextWidth(sep) : 0;
+        if (index > 0 && x + sepW + w > pageWidth - margin) {
+          y += gap;
+          ensureSpace(gap);
+          x = start;
+        } else if (index > 0) {
+          doc.text(sep, x, y);
+          x += sepW;
+        }
+        doc.textWithLink(item.text, x, y, { url: item.url });
+        x += w;
+      });
+      y += gap;
+    };
 
-      const line2 = [];
-      if (contact.github) line2.push({ text: `GitHub: ${contact.github.label}`, url: contact.github.url });
-      if (contact.portfolio) line2.push({ text: `Portfolio: ${contact.portfolio.label}`, url: contact.portfolio.url });
-      if (line2.length > 0) writeContactLine(line2);
+    if (data.contactLinks && data.contactLinks.length > 0) {
+      writeLinkLine(data.contactLinks);
     }
 
     doc.setDrawColor(208, 213, 221);
@@ -270,6 +291,13 @@
             color: MUTE,
             gap: 2,
           });
+        }
+        if (proj.links && proj.links.length > 0) {
+          ensureSpace(12);
+          writeLinkLine(
+            proj.links.map((l) => ({ text: l.label, url: l.url })),
+            { size: 9, prefix: "Links: ", gap: 11.5 }
+          );
         }
         y += compact ? 2 : 6;
       });

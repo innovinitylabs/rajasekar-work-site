@@ -113,6 +113,25 @@
     return [...vis.filter((l) => l.primary), ...vis.filter((l) => !l.primary)];
   };
 
+  const toHttps = (u) => String(u || "").replace(/^http:\/\//i, "https://");
+  const bare = (u) => String(u || "").replace(/^https?:\/\//i, "").replace(/\/$/, "");
+
+  /**
+   * Header contact links in the one canonical order used by the public resume,
+   * admin preview and PDF: Portfolio, Email, Phone, LinkedIn, GitHub.
+   */
+  const contactLinks = (contact) => {
+    if (!contact) return [];
+    const out = [];
+    // The portfolio destination is fixed on purpose.
+    out.push({ key: "portfolio", text: "Portfolio: rajasekar.work", url: "https://rajasekar.work" });
+    if (contact.email) out.push({ key: "email", text: String(contact.email.url).replace(/^mailto:/i, ""), url: `mailto:${String(contact.email.url).replace(/^mailto:/i, "")}` });
+    if (contact.phone) out.push({ key: "phone", text: contact.phone.label, url: `tel:${String(contact.phone.url).replace(/^tel:/i, "")}` });
+    if (contact.linkedin) out.push({ key: "linkedin", text: `LinkedIn: ${bare(contact.linkedin.label)}`, url: toHttps(contact.linkedin.url) });
+    if (contact.github) out.push({ key: "github", text: `GitHub: ${bare(contact.github.label)}`, url: toHttps(contact.github.url) });
+    return out;
+  };
+
   const DEFAULT_VISIBILITY = {
     proof: true,
     summary: true,
@@ -175,7 +194,7 @@
         description: p.description,
         technologies: [...p.technologies],
         bullets: [...p.bullets],
-        links: clone(p.links),
+        links: visibleLinks(p.links).map((l) => ({ label: l.label, url: l.url })),
       }));
 
     return {
@@ -189,6 +208,7 @@
       title: profile.targetTitle || master.title,
       summary: visibility.summary ? profile.summaryOverride || master.summary : "",
       contact: visibility.contact ? clone(master.contact) : null,
+      contactLinks: visibility.contact ? contactLinks(master.contact) : [],
       proof: visibility.proof ? clone(master.proof) : [],
       experience: visibility.experience ? experience : [],
       skills: visibility.skills ? skills : [],
@@ -199,5 +219,5 @@
     };
   };
 
-  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, resolveProfile, LINK_TYPES, DEFAULT_VISIBILITY };
+  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, resolveProfile, LINK_TYPES, DEFAULT_VISIBILITY };
 });
