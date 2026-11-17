@@ -34,7 +34,7 @@ test("build generates website and ATS resume from source data", () => {
   assert.ok(!resume.includes("<h2>Awards</h2>"));
   assert.ok(!resume.includes("valipokkann.in"));
   assert.ok(resume.includes("rajasekar.work"));
-  assert.equal((resume.match(/class="contact-line"/g) || []).length, 2);
+  assert.equal((resume.match(/class="contact-line"/g) || []).length, 1);
   assert.ok(resume.includes("<strong>Programming Languages:</strong>"));
 
   // Public portfolio shows every public master project; the ATS resume shows the default profile's selection.

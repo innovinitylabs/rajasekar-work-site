@@ -42,6 +42,33 @@
       "url": "https://valipokkann.in"
     }
   },
+  "contactLinks": [
+    {
+      "key": "portfolio",
+      "text": "Portfolio: rajasekar.work",
+      "url": "https://rajasekar.work"
+    },
+    {
+      "key": "email",
+      "text": "rajasekarc1142@gmail.com",
+      "url": "mailto:rajasekarc1142@gmail.com"
+    },
+    {
+      "key": "phone",
+      "text": "+91 7904348791",
+      "url": "tel:+917904348791"
+    },
+    {
+      "key": "linkedin",
+      "text": "LinkedIn: linkedin.com/in/rajasekar-c",
+      "url": "https://linkedin.com/in/rajasekar-c"
+    },
+    {
+      "key": "github",
+      "text": "GitHub: github.com/innovinitylabs",
+      "url": "https://github.com/innovinitylabs/"
+    }
+  ],
   "proof": [
     {
       "id": "proof-1",
@@ -201,17 +228,7 @@
       "links": [
         {
           "label": "Official Website",
-          "url": "https://onchainrugs.art",
-          "type": "website",
-          "primary": true,
-          "visible": true
-        },
-        {
-          "label": "Vercel deployment",
-          "url": "https://onchain-rugs.vercel.app",
-          "type": "demo",
-          "primary": false,
-          "visible": false
+          "url": "https://onchainrugs.art"
         }
       ]
     },
@@ -239,17 +256,7 @@
       "links": [
         {
           "label": "Official Website",
-          "url": "https://www.uravu.social",
-          "type": "website",
-          "primary": true,
-          "visible": true
-        },
-        {
-          "label": "Vercel deployment",
-          "url": "https://uravu-site.vercel.app",
-          "type": "demo",
-          "primary": false,
-          "visible": false
+          "url": "https://www.uravu.social"
         }
       ]
     }
