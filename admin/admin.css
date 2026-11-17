@@ -598,5 +598,8 @@
 .resume-page .rp-meta { font-weight: 400; font-style: italic; color: #475467; font-size: 11.5px; margin-left: 6px; }
 .resume-page .rp-role-top > span:first-child { white-space: normal; }
 .resume-page .rp-role-top > span:only-child { font-weight: 700; color: #101828; font-size: 13px; white-space: normal; }
-.resume-page .rp-extra { margin-bottom: 4px; }
+.resume-page .rp-extra { margin-bottom: 3px; } /* 2pt, as in the PDF */
+/* Page 2 of the two-page layout mirrors the PDF rhythm: 9pt between projects, 1.5pt between bullets. */
+.resume-page[data-page="2"] .rp-role { margin-bottom: 12px; }
+.resume-page[data-page="2"] li { margin-bottom: 2px; }
 .resume-page .rp-edu-detail { color: #475467; }

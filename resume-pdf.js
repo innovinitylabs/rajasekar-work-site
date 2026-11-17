@@ -312,7 +312,7 @@
         doc.addPage();
         y = margin;
         sectionHeading((data.showcase && data.showcase.heading) || "Independent Development | Selected Work", 60);
-        if (data.showcase && data.showcase.intro) writeLines(data.showcase.intro, { size: 9.5, color: MUTE, gap: 6 });
+        if (data.showcase && data.showcase.intro) writeLines(data.showcase.intro, { size: 9.5, color: MUTE, gap: 4 });
       } else sectionHeading("Projects", data.projectDetail === "compact" ? 60 : 110);
       const compact = data.projectDetail === "compact";
       data.projects.forEach((proj) => {
@@ -354,7 +354,7 @@
               doc.text(line, margin + 12, y);
               y += lineHeight;
             });
-            y += 2;
+            y += twoPage ? 1.5 : 2; // same bullet rhythm as the experience bullets on page 1
           });
         }
         if (proj.technologies && proj.technologies.length > 0) {
@@ -371,16 +371,18 @@
             { size: 9, prefix: "Links: ", gap: 11.5 }
           );
         }
-        y += compact ? 2 : twoPage ? 15 : 6;
+        y += compact ? 2 : twoPage ? 9 : 6;
       });
     }
 
     (data.extraSections || []).forEach((sec) => {
       sectionHeading(sec.heading, 60);
-      sec.paragraphs.forEach((para) => writeLines(para, { size: 9.5, color: INK, gap: 3 }));
+      sec.paragraphs.forEach((para) => writeLines(para, { size: 9.5, color: INK, gap: 2 }));
     });
 
     if (!educationDrawn) drawEducation();
+    // Layout diagnostics (used by tests): where the last line ended, and the bottom limit.
+    doc.layoutInfo = { endY: y, limitY: pageHeight - margin, pages: doc.getNumberOfPages() };
 
     return doc;
   };

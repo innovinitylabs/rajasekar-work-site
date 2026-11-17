@@ -131,3 +131,43 @@ test("options validation rejects unknown ids and oversize text", () => {
   assert.ok(bad({ extraSections: [{ heading: "", paragraphs: ["x"] }] }).length);
   assert.ok(bad("nope").length);
 });
+
+test("layout: exactly two A4 pages with room to spare; all four education entries together on page 2, in order", async () => {
+  const { doc, count, pages } = await read();
+  assert.equal(count, 2);
+  assert.equal(doc.layoutInfo.pages, 2);
+  assert.ok(doc.layoutInfo.endY <= doc.layoutInfo.limitY - 8, `last line ends at ${doc.layoutInfo.endY}, limit ${doc.layoutInfo.limitY}`);
+  const p2 = pages[1];
+  const section = p2.slice(p2.indexOf("EDUCATION"));
+  const order = ["B.E. (Anna University)", "RMK Engineering College", "Higher Secondary (12th Standard)", "Secondary School (10th Standard)", "DataCamp: Introduction to Deep Learning with Python"];
+  let at = -1;
+  for (const o of order) {
+    const i = section.indexOf(o, at + 1);
+    assert.ok(i > at, `education order/missing on page 2: ${o}`);
+    at = i;
+  }
+  assert.ok(section.includes("87.4%") && section.includes("86.5%") && section.includes("Introductory course"), "no education detail dropped");
+  assert.ok(!pages[0].includes("EDUCATION"));
+});
+
+test("layout: nothing is dropped to fit: all Uravu and Pocket Astro bullets and every project link are present", async () => {
+  const { text, doc } = await read();
+  [
+    "Conceived the concept and design philosophy", "Research dossier at /research", "Implemented the site and prototype end to end",
+    "Built a provider-based AI layer", "Added an answer-validation step", "Checks the native calculation layer against a Python oracle",
+    "Developed the Solidity contracts", "Generated dynamic social-preview images",
+  ].forEach((k) => assert.ok(text.includes(k), `missing: ${k}`));
+  const uris = [...doc.output().matchAll(/\/URI \(([^)]*)\)/g)].map((m) => m[1]);
+  ["https://www.uravu.social", "https://www.uravu.social/research", "https://onchainrugs.art", "https://madraschecks.com", "https://art.madraschecks.com"].forEach((u) => assert.ok(uris.includes(u), u));
+});
+
+test("layout: the PDF has no clipped or overlapping text (every line starts inside the margins)", async () => {
+  const { doc } = await read();
+  const xs = [...doc.output().matchAll(/([\d.]+) [\d.]+ Td/g)].map((m) => Number(m[1]));
+  assert.ok(xs.length > 100 && xs.every((x) => x >= 35 && x < 595.28 - 36));
+});
+
+test("layout: admin preview carries the same page-2 spacing rules as the PDF", () => {
+  const css = fs.readFileSync(path.join(__dirname, "..", "admin", "admin.css"), "utf8");
+  assert.match(css, /\[data-page="2"\] \.rp-role \{ margin-bottom: 12px; \}/);
+});
