@@ -71,6 +71,8 @@
     return SECTION_LABELS.map(([k]) => (k === "projects" ? v[k] === true : v[k] !== false));
   };
   const sorted = (a) => [...(a || [])].sort();
+  // JSONB reorders object keys, so compare options with keys sorted recursively.
+  const sortKeys = (v) => (Array.isArray(v) ? v.map(sortKeys) : v && typeof v === "object" ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, sortKeys(v[k])])) : v);
   const profileSnapshot = (p) => JSON.stringify({
     name: p.name, isDefault: Boolean(p.isDefault), targetTitle: p.targetTitle || "", summaryOverride: p.summaryOverride || null,
     selectedExperience: sorted(p.selectedExperience),
@@ -79,6 +81,7 @@
     selectedProjects: p.selectedProjects || [],
     sectionVisibility: normVisibility(p.sectionVisibility),
     layout: p.layout, accentColor: p.accentColor, projectDetail: p.projectDetail || "detailed",
+    options: sortKeys(p.options || {}),
   });
 
   const isProfileDirty = (p) => state.savedJson[p.id] !== profileSnapshot(p);
@@ -411,6 +414,7 @@
       .join("");
 
     renderProjectPicker(profile);
+    renderProfileOptions(profile);
 
     const vis = profile.sectionVisibility || {};
     $("visibility-checkboxes").innerHTML = SECTION_LABELS
@@ -422,6 +426,80 @@
       .join("");
 
     renderLivePreview();
+  };
+
+  const optionsHtml = (profile) => {
+    const o = profile.options || {};
+    const eduSel = new Set(o.selectedEducation || []);
+    const ov = o.projectOverrides || {};
+    const sc = o.showcase || {};
+    const projects = (profile.selectedProjects || []).map((id) => state.master.projects.find((p) => p.id === id)).filter(Boolean);
+    return `
+      <div class="form-group"><label class="form-label" for="opt-display-name">Name on resume (blank = master name)</label>
+        <input class="form-input" id="opt-display-name" maxlength="120" value="${esc(o.displayName || "")}" /></div>
+      <div class="form-group"><label class="form-label">Education entries (none ticked = all)</label>
+        ${state.master.education.map((e) => `<label class="checkbox-item"><input type="checkbox" data-opt-edu="${esc(e.id)}" ${eduSel.has(e.id) ? "checked" : ""} /><span>${esc(e.level)} - ${esc(e.place)}</span></label>`).join("")}</div>
+      <div class="form-group"><label class="form-label">Two-page layout, page 2 (used when Projects are "Showcase")</label>
+        <input class="form-input" id="opt-sc-heading" placeholder="Heading (blank = default)" maxlength="120" value="${esc(sc.heading || "")}" style="margin-bottom:0.4rem;" />
+        <textarea class="form-textarea" id="opt-sc-intro" rows="2" maxlength="600" placeholder="Introduction (blank = default)">${esc(sc.intro || "")}</textarea>
+        <label class="form-label" for="opt-sc-bullets" style="margin-top:0.4rem;">Bullets per project</label>
+        <select class="form-select" id="opt-sc-bullets" style="width:auto;">${[0, 1, 2, 3, 4].map((n) => `<option ${n === (sc.bulletsPerProject || 0) ? "selected" : ""}>${n}</option>`).join("")}</select></div>
+      <div class="form-group"><label class="form-label">Project wording for this profile (blank = master wording)</label>
+        ${projects.length ? projects.map((p) => {
+          const x = ov[p.id] || {};
+          return `<details style="margin-bottom:0.4rem;"><summary>${esc(p.title)}${x.description || x.bullets || x.role ? " •" : ""}</summary>
+            <input class="form-input" data-opt-ov="${esc(p.id)}" data-f="role" placeholder="Role" maxlength="200" value="${esc(x.role || "")}" style="margin:0.3rem 0;" />
+            <textarea class="form-textarea" data-opt-ov="${esc(p.id)}" data-f="description" rows="2" maxlength="1200" placeholder="Description">${esc(x.description || "")}</textarea>
+            <textarea class="form-textarea" data-opt-ov="${esc(p.id)}" data-f="bullets" rows="4" placeholder="Bullets, one per line">${esc((x.bullets || []).join("\n"))}</textarea></details>`;
+        }).join("") : `<p class="proof-text" style="font-size:0.78rem;">Select projects first.</p>`}</div>
+      <div class="form-group"><label class="form-label">Extra text sections (page 2, before education)</label>
+        ${(o.extraSections || []).map((x, i) => `<div class="master-block" data-opt-sec="${i}">
+          <input class="form-input" data-f="heading" maxlength="80" placeholder="Heading" value="${esc(x.heading)}" style="margin-bottom:0.4rem;" />
+          <textarea class="form-textarea" data-f="paragraphs" rows="5" placeholder="Paragraphs separated by a blank line">${esc((x.paragraphs || []).join("\n\n"))}</textarea>
+          <button type="button" class="button btn-danger mini-btn" data-opt-sec-remove="${i}" style="margin-top:0.4rem;">Remove section</button></div>`).join("")}
+        <button type="button" class="button button-secondary mini-btn" id="btn-opt-sec-add">+ Add section</button></div>`;
+  };
+
+  const renderProfileOptions = (profile) => {
+    const host = $("profile-options");
+    if (host && state.master) host.innerHTML = optionsHtml(profile);
+  };
+
+  /** Reads the options form back into profile.options (empty values are omitted). */
+  const captureOptions = (p) => {
+    const host = $("profile-options");
+    if (!host || !host.firstElementChild) return;
+    const o = {};
+    const dn = host.querySelector("#opt-display-name").value.trim();
+    if (dn) o.displayName = dn;
+    const edu = [...host.querySelectorAll("[data-opt-edu]:checked")].map((i) => i.dataset.optEdu);
+    if (edu.length) o.selectedEducation = edu;
+    const sc = {};
+    const h = host.querySelector("#opt-sc-heading").value.trim();
+    const intro = host.querySelector("#opt-sc-intro").value.trim();
+    const n = Number(host.querySelector("#opt-sc-bullets").value);
+    if (h) sc.heading = h;
+    if (intro) sc.intro = intro;
+    if (n > 0) sc.bulletsPerProject = n;
+    if (Object.keys(sc).length) o.showcase = sc;
+    const ov = {};
+    host.querySelectorAll("[data-opt-ov]").forEach((el) => {
+      const id = el.dataset.optOv;
+      const v = el.value.trim();
+      if (!v) return;
+      ov[id] = ov[id] || {};
+      ov[id][el.dataset.f] = el.dataset.f === "bullets" ? v.split("\n").map((x) => x.trim()).filter(Boolean) : v;
+    });
+    // keep wording for projects that are currently deselected (their form rows are not shown)
+    const prev = (p.options && p.options.projectOverrides) || {};
+    for (const id of Object.keys(prev)) if (!(p.selectedProjects || []).includes(id) && !ov[id]) ov[id] = prev[id];
+    if (Object.keys(ov).length) o.projectOverrides = ov;
+    const secs = [...host.querySelectorAll("[data-opt-sec]")].map((el) => ({
+      heading: el.querySelector('[data-f="heading"]').value.trim(),
+      paragraphs: el.querySelector('[data-f="paragraphs"]').value.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean),
+    })).filter((x) => x.heading || x.paragraphs.length);
+    if (secs.length) o.extraSections = secs;
+    p.options = o;
   };
 
   /** Selected projects first (in priority order), then the remaining master projects. */
@@ -491,21 +569,23 @@
       ? heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("")
       : "";
 
+    const bulletCap = twoPage ? (r.showcase && r.showcase.bulletsPerProject) || 0 : Infinity;
+    const extras = (r.extraSections || []).map((x) => heading(esc(x.heading)) + x.paragraphs.map((t) => `<div class="rp-extra">${esc(t)}</div>`).join("")).join("");
     let projects = "";
     if (r.projects.length) {
       projects = r.projects.map((p) => `
         <div class="rp-role"><div class="rp-role-top"><span>${esc(p.title)}${twoPage || compact ? ` <i class="rp-meta">${esc([p.role, p.period, p.status].filter(Boolean).join(" | "))}</i>` : ""}</span>${twoPage || compact ? "" : `<span>${esc(p.status)}</span>`}</div>
           ${twoPage || compact ? "" : `<div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>`}
-          ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${!twoPage && p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
+          ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${bulletCap > 0 && p.bullets.length ? `<ul>${p.bullets.slice(0, bulletCap).map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
           ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}
           ${links(p)}</div>`).join("");
     }
 
     if (twoPage && r.showcase) {
       // Mirrors the PDF: experience on page 1, selected work (and education) on page 2.
-      return page(first, 1) + page(`${heading(esc(r.showcase.heading))}<div class="rp-summary" style="margin-bottom:8px;">${esc(r.showcase.intro)}</div>${projects}${education}`, 2);
+      return page(first, 1) + page(`${heading(esc(r.showcase.heading))}<div class="rp-summary" style="margin-bottom:8px;">${esc(r.showcase.intro)}</div>${projects}${extras}${education}`, 2);
     }
-    return page(first + (projects ? heading("Projects") + projects : "") + education, 1);
+    return page(first + (projects ? heading("Projects") + projects : "") + extras + education, 1);
   };
 
   /** Scales the fixed-width A4 page to the available width: whole page visible, no horizontal scroll. */
@@ -577,6 +657,7 @@
     const vis = {};
     $("visibility-checkboxes").querySelectorAll('input[name="vis"]').forEach((cb) => (vis[cb.value] = cb.checked));
     p.sectionVisibility = vis;
+    captureOptions(p);
   };
 
   const onProfileInput = (e) => {
@@ -586,7 +667,7 @@
     const p = getActiveProfile();
     // enabling/disabling bullet boxes depends on the experience checkbox
     if (target && target.name === "exp") renderActiveProfile();
-    else if (target && target.name === "project") { renderProjectPicker(p); renderLivePreview(); }
+    else if (target && target.name === "project") { renderProjectPicker(p); renderProfileOptions(p); renderLivePreview(); }
     else renderLivePreview();
     renderProfileList();
     refreshStatus();
@@ -619,6 +700,21 @@
     );
     window.addEventListener("resize", fitPreview);
     if (window.ResizeObserver) new ResizeObserver(fitPreview).observe($("preview-stage"));
+    $("profile-options").addEventListener("click", (e) => {
+      const p = getActiveProfile();
+      if (e.target.id === "btn-opt-sec-add") {
+        captureActiveProfile();
+        p.options = p.options || {};
+        p.options.extraSections = [...(p.options.extraSections || []), { heading: "New section", paragraphs: [] }];
+        renderProfileOptions(p); renderLivePreview(); refreshStatus();
+      }
+      const rm = e.target.closest("[data-opt-sec-remove]");
+      if (rm) {
+        captureActiveProfile();
+        p.options.extraSections.splice(Number(rm.dataset.optSecRemove), 1);
+        renderProfileOptions(p); renderLivePreview(); refreshStatus();
+      }
+    });
     $("btn-save-profiles").addEventListener("click", saveActiveProfile);
     $("btn-duplicate-profile").addEventListener("click", duplicateProfile);
     $("btn-delete-profile").addEventListener("click", deleteProfile);

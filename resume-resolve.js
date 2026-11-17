@@ -159,6 +159,7 @@
     }
 
     const visibility = { ...DEFAULT_VISIBILITY, ...(profile.sectionVisibility || {}) };
+    const options = profile.options || {};
 
     const expIds = new Set(
       Array.isArray(profile.selectedExperience) && profile.selectedExperience.length > 0
@@ -192,15 +193,19 @@
     const projects = (profile.selectedProjects || [])
       .map((id) => projectsById.get(id))
       .filter(Boolean)
-      .map((p) => ({
+      .map((p) => {
+        const ov = (options.projectOverrides || {})[p.id] || {};
+        return { ...p, ov };
+      })
+      .map(({ ov, ...p }) => ({
         id: p.id,
         title: p.title,
         status: p.status,
-        role: p.role,
+        role: ov.role || p.role,
         period: p.period,
-        description: p.description,
+        description: ov.description || p.description,
         technologies: [...p.technologies],
-        bullets: [...p.bullets],
+        bullets: ov.bullets ? [...ov.bullets] : [...p.bullets],
         links: visibleLinks(p.links).map((l) => ({ label: l.label, url: l.url })),
       }));
 
@@ -211,10 +216,13 @@
       projectDetail: ["compact", "showcase"].includes(profile.projectDetail) ? profile.projectDetail : "detailed",
       // "showcase" = deliberate two-page A4: experience on page 1, all selected projects on page 2
       pageMode: profile.projectDetail === "showcase" ? "two-page" : "flow",
-      showcase: profile.projectDetail === "showcase" ? SHOWCASE : null,
+      showcase:
+        profile.projectDetail === "showcase"
+          ? { ...SHOWCASE, ...(options.showcase || {}), bulletsPerProject: (options.showcase || {}).bulletsPerProject || 0 }
+          : null,
       accentColor: profile.accentColor || "#2457c5",
       sectionVisibility: visibility,
-      name: master.name,
+      name: options.displayName || master.name,
       title: profile.targetTitle || master.title,
       summary: visibility.summary ? profile.summaryOverride || master.summary : "",
       contact: visibility.contact ? clone(master.contact) : null,
@@ -224,8 +232,11 @@
       skills: visibility.skills ? skills : [],
       projects: visibility.projects ? projects : [],
       education: visibility.education
-        ? master.education.map((e) => ({ level: e.level, place: e.place, meta: e.meta }))
+        ? master.education
+            .filter((e) => !(options.selectedEducation || []).length || options.selectedEducation.includes(e.id))
+            .map((e) => ({ level: e.level, place: e.place, meta: e.meta }))
         : [],
+      extraSections: (options.extraSections || []).map((x) => ({ heading: x.heading, paragraphs: [...x.paragraphs] })),
     };
   };
 
