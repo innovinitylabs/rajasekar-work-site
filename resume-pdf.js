@@ -153,13 +153,13 @@
             }
             const cw = doc.getTextWidth(chunk);
             doc.text(chunk, ci === 0 ? x : start, y);
-            addLink(ci === 0 ? x : start, y, cw, size, item.url);
+            if (item.url) addLink(ci === 0 ? x : start, y, cw, size, item.url);
             x = (ci === 0 ? x : start) + cw;
           });
           return;
         }
         doc.text(item.text, x, y);
-        addLink(x, y, w, size, item.url);
+        if (item.url) addLink(x, y, w, size, item.url); // display-only items get no link annotation
         x += w;
       });
       y += gap;

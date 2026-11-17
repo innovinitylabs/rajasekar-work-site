@@ -30,7 +30,7 @@ const DEFAULT_JSON_PATH = path.join(ROOT, "resume-default.json");
 const INDEX_PATH = path.join(ROOT, "index.html");
 const SOURCE_PATH = path.join(ROOT, "resume-source.html");
 
-const { normalizeMaster, resolveProfile, visibleLinks, contactLinks } = require("./resume-resolve");
+const { normalizeMaster, resolveProfile, visibleLinks, contactLinks, publicContact } = require("./resume-resolve");
 
 // Assigned in main() before any renderer runs.
 let data; // normalised master (public portfolio view)
@@ -154,6 +154,15 @@ const webEducation = () =>
 const webContact = () => {
   const c = data.contact;
   const card = (item, external) => {
+    if (!item.url) {
+      // display-only item (masked phone)
+      return [
+        `<div class="contact-card">`,
+        `  <span class="contact-label">${escapeHtml(item.labelText)}</span>`,
+        `  <span class="contact-value">${escapeHtml(item.label)}</span>`,
+        `</div>`,
+      ].join("\n");
+    }
     const attrs = external ? ` target="_blank" rel="noreferrer"` : "";
     return [
       `<a class="contact-card" href="${escapeHtml(item.url)}"${attrs}>`,
@@ -220,7 +229,7 @@ const webProjects = () =>
 const printContact = () => {
   const items = resume.contactLinks && resume.contactLinks.length ? resume.contactLinks : contactLinks(data.contact);
   return `<span class="contact-line">${items
-    .map((i) => `<a href="${escapeHtml(i.url)}">${escapeHtml(i.text)}</a>`)
+    .map((i) => (i.url ? `<a href="${escapeHtml(i.url)}">${escapeHtml(i.text)}</a>` : escapeHtml(i.text)))
     .join(" | ")}</span>`;
 };
 
@@ -398,8 +407,9 @@ console.log(`Built index.html, resume-source.html and resume-default.json (profi
 
 loadData()
   .then(({ master, profile }) => {
-    data = master;
-    resume = resolveProfile(profile, master);
+    // Public outputs only: the phone number is masked and not linked. The admin and the database keep the full number.
+    data = { ...master, contact: publicContact(master.contact) };
+    resume = resolveProfile(profile, data);
     assemble();
   })
   .catch((err) => {
