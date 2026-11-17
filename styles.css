@@ -832,56 +832,57 @@ img {
   -webkit-overflow-scrolling: touch;
 }
 
-.contributions-graph-inner {
-  display: flex;
-  flex-direction: column;
-  min-width: 680px;
-}
-
-.contributions-months-row {
-  display: flex;
-  padding-left: 28px;
+.contributions-grid {
+  --cell: 11px;
+  --gap: 3px;
+  display: grid;
+  grid-template-columns: 28px repeat(var(--weeks), var(--cell));
+  grid-template-rows: 16px repeat(7, var(--cell));
+  gap: var(--gap);
+  width: max-content;
   font-size: 0.72rem;
   color: var(--muted);
-  height: 16px;
-  margin-bottom: 4px;
 }
 
 .contributions-month-label {
-  flex: 1;
-  text-align: left;
+  grid-row: 1;
+  white-space: nowrap;
+  line-height: 16px;
+  align-self: end;
 }
 
-.contributions-body-row {
-  display: flex;
-  gap: 6px;
+.contributions-weekday-label {
+  grid-column: 1;
+  line-height: var(--cell);
 }
 
-.contributions-weekdays-col {
+.contributions-tabs {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 22px;
-  height: 88px;
-  font-size: 0.68rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.contributions-tab {
+  border: 1px solid var(--line);
+  background: transparent;
   color: var(--muted);
-  padding: 2px 0;
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
 }
 
-.contributions-calendar-grid {
-  display: flex;
-  gap: 3px;
-}
-
-.contributions-week-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.contributions-tab.is-active {
+  color: var(--text);
+  border-color: var(--text);
+  font-weight: 600;
 }
 
 .contributions-day-cell {
-  width: 10px;
-  height: 10px;
+  width: var(--cell, 10px);
+  height: var(--cell, 10px);
   border-radius: 2px;
   background-color: var(--line);
   transition: transform 0.15s ease, outline 0.15s ease;
@@ -999,4 +1000,26 @@ img {
 .project-card .project-links {
   margin-top: 0.75rem;
   font-size: 0.9rem;
+}
+
+.project-card .project-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.9rem;
+}
+
+.project-primary-link {
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.project-secondary-links {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.project-secondary-link {
+  color: var(--muted);
+  text-decoration: underline;
 }

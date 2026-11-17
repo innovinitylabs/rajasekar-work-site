@@ -40,6 +40,8 @@
     masterSavedJson: "",
     profiles: [], // working copies, each with the server `version`
     savedJson: {}, // id -> JSON of last server-confirmed state
+    savedProfiles: {}, // id -> deep copy of the last server-confirmed profile
+    previewMode: "draft", // "draft" = working copy, "saved" = last saved version
     applications: [],
     storage: null,
     activeProfileId: null,
@@ -289,7 +291,8 @@
       state.masterDraft = null;
       state.profiles = data.profiles.map(clone);
       state.savedJson = {};
-      state.profiles.forEach((p) => (state.savedJson[p.id] = profileSnapshot(p)));
+      state.savedProfiles = {};
+      state.profiles.forEach((p) => { state.savedJson[p.id] = profileSnapshot(p); state.savedProfiles[p.id] = clone(p); });
       state.applications = data.applications;
       state.storage = data.storage;
       if (!state.profiles.some((p) => p.id === state.activeProfileId)) {
@@ -443,55 +446,90 @@
     $("projects-checkboxes").innerHTML = sel.map((id, i) => row(id, true, i)).join("") + rest.map((id) => row(id, false, -1)).join("");
   };
 
+  /** Profile shown in the preview/PDF: the working copy, or the last server-saved version. */
+  const previewProfile = () => {
+    const p = getActiveProfile();
+    if (!p) return null;
+    return state.previewMode === "saved" && state.savedProfiles[p.id] ? state.savedProfiles[p.id] : p;
+  };
+
   const resolved = () => {
-    const profile = getActiveProfile();
+    const profile = previewProfile();
     if (!profile || !state.master || !window.ResumeResolve) return null;
     return window.ResumeResolve.resolveProfile(profile, state.master);
+  };
+
+  const CONTACT_ORDER = [["phone", ""], ["email", ""], ["linkedin", "LinkedIn: "], ["github", "GitHub: "], ["portfolio", "Portfolio: "]];
+
+  const resumePageHtml = (r, unsaved) => {
+    const c = /^#[0-9a-fA-F]{6}$/.test(r.accentColor) ? r.accentColor : "#2457c5";
+    const compact = r.projectDetail === "compact";
+    const contact = r.contact
+      ? CONTACT_ORDER.filter(([k]) => r.contact[k]).map(([k, pre]) => esc(pre + r.contact[k].label)).join(" &nbsp;|&nbsp; ")
+      : "";
+    const heading = (t) => `<div class="rp-h" style="color:${c};">${t}</div>`;
+    let html = `<div class="resume-page layout-${esc(r.layout)}${unsaved ? " is-unsaved" : ""}" style="--accent-c:${c};">
+      <h1>${esc(r.name)}</h1>
+      <div class="rp-title" style="color:${c};">${esc(r.title)}</div>
+      ${contact ? `<div class="rp-contact">${contact}</div>` : ""}`;
+    if (r.proof.length) {
+      html += `<div class="rp-proof">${r.proof.map((p) => `<div style="border-color:${c};"><strong>${esc(p.value)}</strong>${esc(p.text)}</div>`).join("")}</div>`;
+    }
+    if (r.summary) html += `${heading("Summary")}<div class="rp-summary">${esc(r.summary)}</div>`;
+    if (r.skills.length) {
+      html += heading("Skills") + r.skills.map((g) => `<div class="rp-skill"><b>${esc(g.group)}:</b> ${esc(g.items.join(", "))}</div>`).join("");
+    }
+    if (r.experience.length) {
+      html += heading("Experience") + r.experience.map((e) => `
+        <div class="rp-role"><div class="rp-role-top"><span>${esc(e.org)}</span><span>${esc(e.period)}</span></div>
+          <div class="rp-sub">${esc(e.role)}</div>
+          <ul>${e.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></div>`).join("");
+    }
+    if (r.projects.length) {
+      html += heading("Projects") + r.projects.map((p) => `
+        <div class="rp-role"><div class="rp-role-top"><span>${esc(p.title)}</span><span>${esc(p.status)}</span></div>
+          <div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>
+          ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
+          ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}</div>`).join("");
+    }
+    if (r.education.length) {
+      html += heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("");
+    }
+    return html + "</div>";
+  };
+
+  /** Scales the fixed-width A4 page to the available width: whole page visible, no horizontal scroll. */
+  const fitPreview = () => {
+    const stage = $("preview-stage");
+    const scaler = $("preview-scaler");
+    if (!stage || !scaler) return;
+    const avail = stage.clientWidth - 32;
+    const scale = Math.min(1, avail / 794);
+    scaler.style.transform = scale < 1 ? `scale(${scale})` : "";
+    const page = scaler.firstElementChild && scaler.firstElementChild.firstElementChild;
+    scaler.style.marginLeft = scale < 1 ? "0" : "auto";
+    stage.style.height = page ? `${page.offsetHeight * scale + 32}px` : "auto";
   };
 
   const renderLivePreview = () => {
     const pane = $("profile-live-preview");
     const r = resolved();
-    if (!pane || !r) return;
     const profile = getActiveProfile();
-    const note = $("preview-note");
-    if (note) {
-      note.textContent = isProfileDirty(profile)
-        ? "Preview and PDF reflect your unsaved edits."
-        : "Preview matches the saved version of this profile.";
-    }
-    const c = r.accentColor;
-    let html = `<div class="preview-paper">
-      <h1 class="preview-name">${esc(r.name)}</h1>
-      <div class="preview-title" style="color:${esc(c)};">${esc(r.title)}</div>
-      ${r.summary ? `<div class="preview-summary">${esc(r.summary)}</div>` : ""}`;
-    if (r.skills.length) {
-      html += `<div class="preview-section-title" style="color:${esc(c)};">Skills</div>
-        <ul style="padding-left:14px; margin:0 0 0.8rem; font-size:0.8rem;">${r.skills.map((g) => `<li><strong>${esc(g.group)}:</strong> ${esc(g.items.join(", "))}</li>`).join("")}</ul>`;
-    }
-    if (r.experience.length) {
-      html += `<div class="preview-section-title" style="color:${esc(c)};">Experience</div>` + r.experience.map((e) => `
-        <div style="margin-bottom:0.75rem;">
-          <div style="display:flex; justify-content:space-between; font-weight:600; font-size:0.85rem;">
-            <span>${esc(e.org)} - <span style="font-weight:400;">${esc(e.role)}</span></span>
-            <span style="font-size:0.75rem; color:var(--muted);">${esc(e.period)}</span></div>
-          <ul style="padding-left:14px; margin:0.3rem 0; font-size:0.8rem; color:var(--muted);">${e.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
-        </div>`).join("");
-    }
-    if (r.projects.length) {
-      const compact = r.projectDetail === "compact";
-      html += `<div class="preview-section-title" style="color:${esc(c)};">Projects</div>` + r.projects.map((p) => `
-        <div style="margin-bottom:0.6rem; font-size:0.8rem;">
-          <div style="font-weight:600;">${esc(p.title)} <span style="font-weight:400; color:var(--muted);">${esc([p.role, p.status].filter(Boolean).join(" | "))}</span></div>
-          ${compact ? "" : `<div style="color:var(--muted);">${esc(p.description)}</div><ul style="padding-left:14px; margin:0.2rem 0; color:var(--muted);">${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>`}
-          <div style="color:var(--muted); font-size:0.75rem;">Technologies: ${esc(p.technologies.join(", "))}</div>
-        </div>`).join("");
-    }
-    if (r.education.length) {
-      html += `<div class="preview-section-title" style="color:${esc(c)};">Education</div>
-        <div style="font-size:0.8rem; color:var(--muted);">${r.education.map((ed) => `${esc(ed.level)} - ${esc(ed.place)} (${esc(ed.meta)})`).join(" | ")}</div>`;
-    }
-    pane.innerHTML = html + "</div>";
+    if (!pane || !r || !profile) return;
+    const dirty = isProfileDirty(profile);
+    const showingDraft = state.previewMode === "draft";
+    const unsavedShown = dirty && showingDraft;
+    const badge = $("preview-state");
+    badge.textContent = unsavedShown ? "Unsaved edits" : "Saved";
+    badge.classList.toggle("is-unsaved", unsavedShown);
+    $("preview-note").textContent = unsavedShown
+      ? "This preview (and the PDF) shows your unsaved edits. Switch to \u201cSaved version\u201d to see what is stored in the database."
+      : dirty
+        ? "Showing the last saved version; you have newer unsaved edits in the editor."
+        : "Matches the version saved in the database.";
+    document.querySelectorAll("[data-preview-mode]").forEach((b) => b.classList.toggle("is-active", b.dataset.previewMode === state.previewMode));
+    pane.innerHTML = resumePageHtml(r, unsavedShown);
+    fitPreview();
   };
 
   /* --------------------------- profile editing --------------------------- */
@@ -567,6 +605,11 @@
       onProfileInput();
     });
 
+    document.querySelectorAll("[data-preview-mode]").forEach((b) =>
+      b.addEventListener("click", () => { state.previewMode = b.dataset.previewMode; renderLivePreview(); })
+    );
+    window.addEventListener("resize", fitPreview);
+    if (window.ResizeObserver) new ResizeObserver(fitPreview).observe($("preview-stage"));
     $("btn-save-profiles").addEventListener("click", saveActiveProfile);
     $("btn-duplicate-profile").addEventListener("click", duplicateProfile);
     $("btn-delete-profile").addEventListener("click", deleteProfile);
@@ -597,6 +640,7 @@
     const copy = clone(saved);
     if (i >= 0) state.profiles[i] = copy; else state.profiles.push(copy);
     state.savedJson[saved.id] = profileSnapshot(copy);
+    state.savedProfiles[saved.id] = clone(copy);
   };
 
   const saveActiveProfile = async () => {
@@ -661,6 +705,7 @@
     if (!out) return;
     state.profiles = state.profiles.filter((p) => p.id !== cur.id);
     delete state.savedJson[cur.id];
+    delete state.savedProfiles[cur.id];
     state.activeProfileId = (state.profiles.find((p) => p.isDefault) || state.profiles[0]).id;
     renderProfileList(); renderActiveProfile();
     showToast(`Deleted "${cur.name}"`);
@@ -725,6 +770,57 @@
     return `<div class="form-group"><label class="form-label" for="${id}">${esc(label)}${hint}</label>${input}</div>`;
   };
 
+  const LINK_TYPES = ["website", "app", "generator", "github", "documentation", "demo", "other"];
+
+  const isHttpUrl = (u) => {
+    try {
+      const x = new URL(u);
+      return (x.protocol === "https:" || x.protocol === "http:") && x.hostname.includes(".");
+    } catch (_) { return false; }
+  };
+
+  const linksEditor = (p, i) => {
+    const links = p.links || [];
+    const rows = links.map((l, j) => {
+      const base = `projects.${i}.links.${j}`;
+      const bad = l.url && !isHttpUrl(l.url);
+      return `<div class="link-row" data-project="${i}" data-link="${j}">
+        <input class="form-input" aria-label="Link label" placeholder="Label (e.g. Official Website)" data-path="${base}.label" data-kind="text" value="${esc(l.label)}" maxlength="120" />
+        <input class="form-input ${bad ? "is-invalid" : ""}" aria-label="Link URL" placeholder="https://example.com" data-path="${base}.url" data-kind="text" data-url="1" value="${esc(l.url)}" maxlength="500" />
+        <select class="form-select" aria-label="Link type" data-path="${base}.type" data-kind="text">
+          ${LINK_TYPES.map((t) => `<option ${t === (l.type || "website") ? "selected" : ""}>${t}</option>`).join("")}</select>
+        <div class="link-actions">
+          <button type="button" class="button button-secondary mini-btn" data-link-move="up" ${j === 0 ? "disabled" : ""} aria-label="Move link up">↑</button>
+          <button type="button" class="button button-secondary mini-btn" data-link-move="down" ${j === links.length - 1 ? "disabled" : ""} aria-label="Move link down">↓</button>
+          <button type="button" class="button btn-danger mini-btn" data-link-remove="1" aria-label="Remove link">✕</button>
+        </div>
+        <div class="link-flags">
+          <label><input type="radio" name="primary-${i}" data-link-primary="1" ${l.primary ? "checked" : ""} /> Primary</label>
+          <label><input type="checkbox" data-path="${base}.visible" data-kind="bool" ${l.visible !== false ? "checked" : ""} /> Visible on public site</label>
+        </div>
+        ${bad ? `<div class="link-error">Enter a full URL starting with https://</div>` : ""}
+      </div>`;
+    }).join("");
+    return `<div class="form-group"><label class="form-label">Project links</label>
+      ${rows || `<p class="proof-text" style="font-size:0.78rem; margin:0 0 0.4rem;">No links yet.</p>`}
+      <button type="button" class="button button-secondary mini-btn" data-link-add="${i}">+ Add link</button></div>`;
+  };
+
+  /** Returns a list of problems with project links, checked before anything is sent to the server. */
+  const linkProblems = () => {
+    const out = [];
+    (state.masterDraft.projects || []).forEach((p) => {
+      const links = p.links || [];
+      links.forEach((l, j) => {
+        if (!String(l.label || "").trim()) out.push(`${p.title}: link ${j + 1} needs a label`);
+        if (!isHttpUrl(l.url || "")) out.push(`${p.title}: "${l.label || "link " + (j + 1)}" has an invalid URL`);
+      });
+      if (links.filter((l) => l.primary).length > 1) out.push(`${p.title}: only one primary link is allowed`);
+      if (links.some((l) => l.primary && l.visible === false)) out.push(`${p.title}: the primary link must be visible`);
+    });
+    return out;
+  };
+
   const renderMasterEditor = () => {
     const host = $("master-editor");
     const d = state.masterDraft;
@@ -746,6 +842,7 @@
         ${field("Description", `projects.${i}.description`, p.description, { kind: "area", rows: 2 })}
         ${field("Technologies", `projects.${i}.technologies`, p.technologies, { kind: "csv", rows: 2 })}
         ${field("Highlights", `projects.${i}.bullets`, p.bullets, { kind: "lines", rows: 3 })}
+        ${linksEditor(p, i)}
         <div style="display:flex; gap:1.2rem; align-items:center; flex-wrap:wrap;">
           <label class="checkbox-item" style="margin:0;"><input type="checkbox" data-path="projects.${i}.isPublic" data-kind="bool" ${p.isPublic !== false ? "checked" : ""} /><span>Show on public portfolio</span></label>
           <label class="checkbox-item" style="margin:0;"><input type="checkbox" data-path="projects.${i}.needsReview" data-kind="bool" ${p.needsReview ? "checked" : ""} /><span>Needs my review</span></label>
@@ -778,6 +875,14 @@
   const onMasterInput = (e) => {
     const t = e.target;
     const path = t.dataset && t.dataset.path;
+    if (t.dataset && t.dataset.linkPrimary && state.masterDraft) {
+      const row = t.closest(".link-row");
+      const links = state.masterDraft.projects[Number(row.dataset.project)].links;
+      links.forEach((l, k) => (l.primary = k === Number(row.dataset.link)));
+      links[Number(row.dataset.link)].visible = true; // a primary link is always public
+      renderMasterEditor(); refreshStatus();
+      return;
+    }
     if (!path || !state.masterDraft) return;
     state.lastError = null;
     const kind = t.dataset.kind;
@@ -787,11 +892,22 @@
     else if (kind === "csv") value = t.value.split(",").map((s) => s.trim()).filter(Boolean);
     else value = t.value;
     setPath(state.masterDraft, path, value);
+    if (t.dataset.url) t.classList.toggle("is-invalid", Boolean(value) && !isHttpUrl(value));
+    // hiding the primary link would orphan it: hand "primary" to nothing and let the server rule apply
+    if (/\.visible$/.test(path) && !value) {
+      const m = /^projects\.(\d+)\.links\.(\d+)\.visible$/.exec(path);
+      if (m) { const l = state.masterDraft.projects[+m[1]].links[+m[2]]; if (l.primary) { l.primary = false; renderMasterEditor(); } }
+    }
     refreshStatus();
   };
 
   const saveMaster = async () => {
     if (!isMasterDirty()) return showToast("Master resume has no unsaved changes.");
+    const problems = linkProblems();
+    if (problems.length) {
+      showBanner(`<strong>Not saved: fix the project links first.</strong><ul>${problems.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`);
+      return showToast("Not saved: invalid project links", true);
+    }
     const out = await guarded(() => api("PUT", "/api/master", { version: state.masterVersion, data: state.masterDraft }));
     if (!out) return;
     state.master = out.master;
@@ -929,6 +1045,28 @@
           state.masterDraft.projects.splice(i, 1);
           renderMasterEditor(); refreshStatus();
         }
+      }
+      const addLink = e.target.closest("[data-link-add]");
+      if (addLink) {
+        const proj = state.masterDraft.projects[Number(addLink.dataset.linkAdd)];
+        proj.links = proj.links || [];
+        proj.links.push({ label: "", url: "", type: "website", primary: proj.links.length === 0, visible: true });
+        renderMasterEditor(); refreshStatus();
+        return;
+      }
+      const row = e.target.closest(".link-row");
+      if (row && (e.target.closest("[data-link-remove]") || e.target.closest("[data-link-move]"))) {
+        const links = state.masterDraft.projects[Number(row.dataset.project)].links;
+        const j = Number(row.dataset.link);
+        if (e.target.closest("[data-link-remove]")) {
+          const [gone] = links.splice(j, 1);
+          if (gone.primary && links.length) links[0].primary = true;
+        } else {
+          const k = e.target.closest("[data-link-move]").dataset.linkMove === "up" ? j - 1 : j + 1;
+          if (k >= 0 && k < links.length) [links[j], links[k]] = [links[k], links[j]];
+        }
+        renderMasterEditor(); refreshStatus();
+        return;
       }
       if (e.target.id === "btn-add-project") {
         const title = prompt("Project title?");

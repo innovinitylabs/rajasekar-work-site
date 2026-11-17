@@ -30,7 +30,7 @@ const DEFAULT_JSON_PATH = path.join(ROOT, "resume-default.json");
 const INDEX_PATH = path.join(ROOT, "index.html");
 const SOURCE_PATH = path.join(ROOT, "resume-source.html");
 
-const { normalizeMaster, resolveProfile } = require("./resume-resolve");
+const { normalizeMaster, resolveProfile, visibleLinks } = require("./resume-resolve");
 
 // Assigned in main() before any renderer runs.
 let data; // normalised master (public portfolio view)
@@ -182,12 +182,17 @@ const webProjects = () =>
     .map((p) => {
       const tech = p.technologies.map((t) => `    <li>${escapeHtml(t)}</li>`).join("\n");
       const bullets = p.bullets.map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
-      const links = p.links
-        .map(
-          (l) =>
-            `<a href="${escapeHtml(l.url)}" target="_blank" rel="noreferrer">${escapeHtml(l.label)}</a>`
-        )
-        .join(" · ");
+      // Primary link is the main destination; the rest are a compact secondary list.
+      const [primary, ...secondary] = visibleLinks(p.links);
+      const anchor = (l, cls) =>
+        `<a class="${cls}" href="${escapeHtml(l.url)}" target="_blank" rel="noreferrer" data-link-type="${escapeHtml(l.type)}">${escapeHtml(l.label)}</a>`;
+      const links = primary
+        ? `${anchor(primary, "project-primary-link")}${
+            secondary.length
+              ? ` <span class="project-secondary-links">${secondary.map((l) => anchor(l, "project-secondary-link")).join(" · ")}</span>`
+              : ""
+          }`
+        : "";
       return [
         `<article class="experience-card project-card">`,
         `  <div class="experience-header">`,

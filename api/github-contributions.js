@@ -2,15 +2,12 @@
 
 const https = require("https");
 
-// In-memory cache for serverless container lifecycle
-let cache = {
-  timestamp: 0,
-  data: null,
-};
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+const FIRST_DATE = "2025-01-01";
+const CACHE_TTL_MS = 60 * 60 * 1000;
+const cache = new Map(); // key: `${username}|${today}`
 
-const fetchHttps = (url, options = {}, postData = null) => {
-  return new Promise((resolve, reject) => {
+const fetchHttps = (url, options = {}, postData = null) =>
+  new Promise((resolve, reject) => {
     const req = https.request(url, options, (res) => {
       let body = "";
       res.on("data", (chunk) => (body += chunk));
@@ -24,156 +21,136 @@ const fetchHttps = (url, options = {}, postData = null) => {
     if (postData) req.write(postData);
     req.end();
   });
+
+// Tests replace deps.fetchHttps / deps.now so no network or real clock is needed.
+const deps = { fetchHttps, now: () => new Date() };
+
+const LEVELS = { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
+const isoDay = (d) => d.toISOString().slice(0, 10);
+
+/** Merge per-year results into one sorted, de-duplicated list limited to [from, to]. */
+const mergeDays = (lists, from, to) => {
+  const byDate = new Map();
+  for (const day of lists.flat()) {
+    if (day.date >= from && day.date <= to) byDate.set(day.date, day);
+  }
+  return [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : 1));
 };
 
-/**
- * Normalizes contribution level to 0-4 scale.
- */
-const levelMap = {
-  NONE: 0,
-  FIRST_QUARTILE: 1,
-  SECOND_QUARTILE: 2,
-  THIRD_QUARTILE: 3,
-  FOURTH_QUARTILE: 4,
+/** GitHub's contributionsCollection spans at most one year, so query one calendar year at a time. */
+const fromGraphql = async (username, token, from, to) => {
+  const years = [];
+  for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) years.push(y);
+  const fields = `contributionCalendar { weeks { contributionDays { contributionCount date contributionLevel } } }`;
+  const aliases = years
+    .map((y) => {
+      const yFrom = `${y}-01-01T00:00:00Z`;
+      const yTo = y === Number(to.slice(0, 4)) ? `${to}T23:59:59Z` : `${y}-12-31T23:59:59Z`;
+      return `y${y}: contributionsCollection(from: "${yFrom}", to: "${yTo}") { ${fields} }`;
+    })
+    .join("\n");
+  const query = `query($login: String!) { user(login: $login) { ${aliases} } }`;
+  const res = await deps.fetchHttps(
+    "https://api.github.com/graphql",
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "User-Agent": "rajasekar-work-contributions", "Content-Type": "application/json" },
+    },
+    JSON.stringify({ query, variables: { login: username } })
+  );
+  const user = JSON.parse(res.body).data && JSON.parse(res.body).data.user;
+  if (!user) return null;
+  const lists = years.map((y) =>
+    ((user[`y${y}`] && user[`y${y}`].contributionCalendar.weeks) || []).flatMap((w) =>
+      w.contributionDays.map((d) => ({
+        date: d.date,
+        count: d.contributionCount,
+        level: LEVELS[d.contributionLevel] ?? (d.contributionCount > 0 ? 1 : 0),
+      }))
+    )
+  );
+  return mergeDays(lists, from, to);
 };
 
-module.exports = async function handler(req, res) {
+/** Public no-token fallback, one request per year. */
+const fromPublicProxy = async (username, from, to) => {
+  const years = [];
+  for (let y = Number(from.slice(0, 4)); y <= Number(to.slice(0, 4)); y++) years.push(y);
+  const lists = await Promise.all(
+    years.map(async (y) => {
+      const res = await deps.fetchHttps(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}?y=${y}`, {
+        headers: { "User-Agent": "rajasekar-work-contributions" },
+      });
+      if (res.statusCode !== 200) throw new Error(`proxy ${res.statusCode}`);
+      const parsed = JSON.parse(res.body);
+      if (!Array.isArray(parsed.contributions)) throw new Error("proxy shape");
+      return parsed.contributions.map((d) => ({ date: d.date, count: d.count, level: d.level }));
+    })
+  );
+  return mergeDays(lists, from, to);
+};
+
+const summarise = (username, source, from, to, days) => {
+  const years = {};
+  for (const d of days) years[d.date.slice(0, 4)] = (years[d.date.slice(0, 4)] || 0) + d.count;
+  return {
+    username,
+    source,
+    from,
+    to,
+    totalContributions: days.reduce((n, d) => n + d.count, 0),
+    years,
+    days,
+  };
+};
+
+async function handler(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
 
-  const username = (req.query && req.query.username) || "innovinitylabs";
+  const raw = (req.query && req.query.username) || "innovinitylabs";
+  const username = /^[A-Za-z0-9-]{1,39}$/.test(raw) ? raw : "innovinitylabs";
+  const to = isoDay(deps.now()); // real current date, never a hard-coded end
+  const from = FIRST_DATE;
 
-  // Check in-memory cache
-  if (cache.data && Date.now() - cache.timestamp < CACHE_TTL_MS) {
-    return res.status(200).json(cache.data);
-  }
+  const key = `${username}|${to}`;
+  const hit = cache.get(key);
+  if (hit && Date.now() - hit.at < CACHE_TTL_MS) return res.status(200).json(hit.data);
 
   const token = process.env.GITHUB_TOKEN || process.env.GITHUB_GRAPHQL_TOKEN || "";
+  const attempts = [];
+  if (token) attempts.push(["github-graphql", () => fromGraphql(username, token, from, to)]);
+  attempts.push(["public-sync", () => fromPublicProxy(username, from, to)]);
 
-  // 1. If GitHub Token is available, use official GraphQL API
-  if (token) {
+  for (const [source, load] of attempts) {
     try {
-      const query = `
-        query($login: String!) {
-          user(login: $login) {
-            contributionsCollection {
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                    weekday
-                    contributionLevel
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
-
-      const response = await fetchHttps(
-        "https://api.github.com/graphql",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "User-Agent": "rajasekar-work-contributions",
-            "Content-Type": "application/json",
-          },
-        },
-        JSON.stringify({ query, variables: { login: username } })
-      );
-
-      const parsed = JSON.parse(response.body);
-      const calendar =
-        parsed.data &&
-        parsed.data.user &&
-        parsed.data.user.contributionsCollection &&
-        parsed.data.user.contributionsCollection.contributionCalendar;
-
-      if (calendar) {
-        const weeks = calendar.weeks.map((week) => ({
-          contributionDays: week.contributionDays.map((day) => ({
-            date: day.date,
-            count: day.contributionCount,
-            level: levelMap[day.contributionLevel] ?? (day.contributionCount > 0 ? 1 : 0),
-            weekday: day.weekday,
-          })),
-        }));
-
-        const result = {
-          username,
-          source: "github-graphql",
-          totalContributions: calendar.totalContributions,
-          weeks,
-        };
-
-        cache = { timestamp: Date.now(), data: result };
-        return res.status(200).json(result);
+      const days = await load();
+      if (days && days.length > 0) {
+        const data = summarise(username, source, from, to, days);
+        cache.set(key, { at: Date.now(), data });
+        return res.status(200).json(data);
       }
     } catch {
-      // Fall through to fallback
+      /* try the next source */
     }
   }
 
-  // 2. Fallback: Query public contribution data proxy or return clean graceful structure
-  try {
-    const fallbackRes = await fetchHttps(
-      `https://github-contributions-api.jogruber.de/v4/${username}?y=last`,
-      {
-        headers: { "User-Agent": "rajasekar-work-contributions" },
-      }
-    );
-
-    if (fallbackRes.statusCode === 200) {
-      const parsed = JSON.parse(fallbackRes.body);
-      if (parsed.contributions && Array.isArray(parsed.contributions)) {
-        // Group into 7-day weeks
-        const weeks = [];
-        let currentWeek = [];
-
-        parsed.contributions.forEach((day, index) => {
-          const dateObj = new Date(day.date);
-          const weekday = dateObj.getDay();
-
-          currentWeek.push({
-            date: day.date,
-            count: day.count,
-            level: day.level,
-            weekday,
-          });
-
-          if (currentWeek.length === 7 || index === parsed.contributions.length - 1) {
-            weeks.push({ contributionDays: currentWeek });
-            currentWeek = [];
-          }
-        });
-
-        const total = typeof parsed.total === "object" ? parsed.total.lastYear || 0 : parsed.total || 0;
-
-        const result = {
-          username,
-          source: "public-sync",
-          totalContributions: total,
-          weeks,
-        };
-
-        cache = { timestamp: Date.now(), data: result };
-        return res.status(200).json(result);
-      }
-    }
-  } catch {
-    // Fallback failure
-  }
-
-  // 3. Graceful offline fallback: Do not fabricate false counts
+  // Never fabricate counts when no source works.
   return res.status(200).json({
     username,
     source: "offline-placeholder",
+    from,
+    to,
     totalContributions: 0,
-    weeks: [],
-    message: "GitHub contribution data is temporarily syncing or unavailable without network/token.",
+    years: {},
+    days: [],
+    message: "GitHub contribution data is temporarily unavailable.",
   });
-};
+}
+
+module.exports = handler;
+module.exports.deps = deps;
+module.exports.mergeDays = mergeDays;
+module.exports.fromGraphql = fromGraphql;
+module.exports.fromPublicProxy = fromPublicProxy;
+module.exports.clearCache = () => cache.clear();
