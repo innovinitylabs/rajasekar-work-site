@@ -63,7 +63,7 @@ test("first request migrates the schema and seeds master, 4 profiles and the leg
   const out = await getBootstrap();
   assert.equal(out.status, 200);
   assert.equal(out.body.storage.backend, "postgres");
-  assert.deepEqual(out.body.profiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency"]);
+  assert.deepEqual(out.body.profiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency", "anthropic-product-ai-engineering"]);
   assert.equal(out.body.profiles.filter((p) => p.isDefault).length, 1);
   assert.equal(out.body.applications.length, 1);
   assert.equal(out.body.master.projects.length, 8);
@@ -71,7 +71,7 @@ test("first request migrates the schema and seeds master, 4 profiles and the leg
 
   // Seeding is recorded, so it never repeats.
   const again = await getBootstrap();
-  assert.equal(again.body.profiles.length, 4);
+  assert.equal(again.body.profiles.length, 5);
 });
 
 test("PERSISTENCE: created profile survives a closed pool + brand-new store (simulated cold start)", { skip }, async () => {

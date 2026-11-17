@@ -462,6 +462,20 @@
       ]
     },
     {
+      "id": "skill-ai-engineering",
+      "group": "AI Engineering",
+      "items": [
+        "LLM integration",
+        "Tool calling",
+        "Answer validation",
+        "Local inference",
+        "llama.cpp",
+        "Apple Foundation Models",
+        "Qwen",
+        "Golden-fixture parity testing"
+      ]
+    },
+    {
       "id": "skill-currently-learning",
       "group": "Currently Learning",
       "items": [

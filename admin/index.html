@@ -208,6 +208,10 @@
               <div class="admin-card-header preview-header">
                 <h3>Resume Preview <span id="preview-state" class="admin-badge">Saved</span></h3>
                 <div class="preview-controls">
+                  <div class="seg" role="group" aria-label="Preview type">
+                    <button type="button" class="seg-btn is-active" data-preview-view="pdf">PDF (exact)</button>
+                    <button type="button" class="seg-btn" data-preview-view="quick">Text view (approximate)</button>
+                  </div>
                   <div class="seg" role="group" aria-label="Preview source">
                     <button type="button" class="seg-btn is-active" data-preview-mode="draft">Working copy</button>
                     <button type="button" class="seg-btn" data-preview-mode="saved">Saved version</button>
@@ -216,9 +220,19 @@
                 </div>
               </div>
               <p class="proof-text" id="preview-note" style="margin:0 0 0.75rem; font-size:0.78rem;"></p>
+              <div id="pdf-view">
+                <div class="pdf-info" id="pdf-info" aria-live="polite">Generating PDF…</div>
+                <iframe id="pdf-frame" class="pdf-frame" title="Exact PDF preview of the selected profile"></iframe>
+                <p class="proof-text" style="font-size:0.75rem; margin:0.4rem 0 0;">
+                  This is the real exported PDF, rendered by your browser's PDF viewer.
+                  <a id="pdf-open" href="#" target="_blank" rel="noreferrer">Open in a new tab</a> if it does not display on this device.
+                </p>
+              </div>
+              <div id="quick-view" style="display:none;">
               <div class="preview-stage" id="preview-stage">
-                <div class="preview-scaler" id="preview-scaler">
-                  <div id="profile-live-preview"></div>
+                  <div class="preview-scaler" id="preview-scaler">
+                    <div id="profile-live-preview"></div>
+                  </div>
                 </div>
               </div>
             </div>
