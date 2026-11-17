@@ -34,7 +34,8 @@ const { normalizeMaster, resolveProfile, visibleLinks, contactLinks, publicConta
 
 // Assigned in main() before any renderer runs.
 let data; // normalised master (public portfolio view)
-let resume; // resolved default profile (ATS resume view)
+let resume; // resolved default profile (full, used for the PDF JSON)
+let resumeWeb; // same, with the phone removed (web views)
 
 const escapeHtml = (value) =>
   String(value)
@@ -172,7 +173,6 @@ const webContact = () => {
     ].join("\n");
   };
   return [
-    card({ ...c.phone, labelText: "Phone" }, false),
     card({ ...c.email, labelText: "Email" }, false),
     card({ ...c.linkedin, labelText: "LinkedIn" }, true),
     card({ ...c.github, labelText: "GitHub" }, true),
@@ -227,7 +227,7 @@ const webProjects = () =>
 /* ------------------------------ print markup ------------------------------ */
 
 const printContact = () => {
-  const items = resume.contactLinks && resume.contactLinks.length ? resume.contactLinks : contactLinks(data.contact);
+  const items = resumeWeb.contactLinks.filter((i) => i.key !== "phone");
   return `<span class="contact-line">${items
     .map((i) => (i.url ? `<a href="${escapeHtml(i.url)}">${escapeHtml(i.text)}</a>` : escapeHtml(i.text)))
     .join(" | ")}</span>`;
@@ -407,9 +407,11 @@ console.log(`Built index.html, resume-source.html and resume-default.json (profi
 
 loadData()
   .then(({ master, profile }) => {
-    // Public outputs only: the phone number is masked and not linked. The admin and the database keep the full number.
-    data = { ...master, contact: publicContact(master.contact) };
-    resume = resolveProfile(profile, data);
+    // The admin and database keep the full contact; the web views omit the phone (below).
+    data = master;
+    resume = resolveProfile(profile, master); // full contact: feeds the downloadable PDF
+    // Web pages (site and printable HTML) omit the phone number; it is only in the PDF.
+    resumeWeb = resolveProfile(profile, { ...master, contact: publicContact(master.contact) });
     assemble();
   })
   .catch((err) => {

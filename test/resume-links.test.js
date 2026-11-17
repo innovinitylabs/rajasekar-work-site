@@ -46,13 +46,12 @@ test("portfolio href is fixed even if the stored contact says otherwise", () => 
   assert.equal(contactLinks(c)[3].url, "https://linkedin.com/in/x");
 });
 
-test("public resume HTML: same order; the phone is masked and is not a link", () => {
+test("public resume HTML: same order; the phone is omitted from web views", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "resume-source.html"), "utf8");
   const header = html.slice(html.indexOf("<!-- build:contact -->"), html.indexOf("<!-- /build:contact -->"));
   const anchors = [...header.matchAll(/<a href="([^"]+)">([^<]+)<\/a>/g)].map((m) => [m[2], m[1]]);
   assert.deepEqual(anchors, EXPECTED.filter((x) => !x[1].startsWith("tel:")));
-  assert.ok(header.includes("+91 xxx xxx 8791"));
-  assert.ok(header.indexOf("Portfolio") < header.indexOf("+91 xxx xxx 8791") && header.indexOf("+91 xxx xxx 8791") < header.indexOf("LinkedIn"));
+  assert.ok(!header.includes("7904348791"), "web header omits the phone number");
 });
 
 test("PDF: header link annotations exist in the same order and text is extractable in order", async () => {
