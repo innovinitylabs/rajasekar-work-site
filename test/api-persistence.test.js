@@ -494,6 +494,52 @@ test("PROFILE PREVIEW data: a profile that selects the multi-link project still 
   assert.equal(resolved.projects[0].id, "project-links-demo");
 });
 
+test("MIGRATION 004 upgrades a pre-two-page database in place and is idempotent", { skip }, async () => {
+  const { Pool } = require("pg");
+  const pool = new Pool({ connectionString: TEST_URL });
+  const { rows } = await pool.query("SELECT data, version FROM master_resume WHERE id = 1");
+  const legacy = rows[0].data;
+  legacy.experience.find((e) => e.id === "exp-independent").bullets = ["Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications"];
+  delete legacy.experience.find((e) => e.id === "exp-appzwork").context;
+  const i = legacy.skills.findIndex((x) => x.id === "skill-devops");
+  legacy.skills.splice(i, 2, { id: "skill-devops-developer-tools", group: "DevOps and Developer Tools", items: ["Docker", "Git", "Cursor"] });
+  legacy.projects.find((p) => p.id === "project-madras-checks").links.splice(1, 0, { label: "Art Page", url: "https://madraschecks.com/art/", type: "website", primary: false, visible: true });
+  legacy.projects.reverse();
+  await pool.query("UPDATE master_resume SET data = $1::jsonb WHERE id = 1", [JSON.stringify(legacy)]);
+  await pool.query(
+    "UPDATE profiles SET selected_projects='[\"project-onchainrugs\",\"project-uravu\"]', project_detail='compact', selected_skills='[\"skill-programming-languages\",\"skill-devops-developer-tools\",\"skill-currently-learning\"]' WHERE id='data-engineer'"
+  );
+  await pool.query("UPDATE profiles SET selected_skills='[\"skill-databases\",\"skill-devops-developer-tools\",\"skill-currently-learning\"]' WHERE id='ai-product-engineer'");
+  await pool.query("DELETE FROM schema_migrations WHERE id = '004_two_page_resume'");
+  const tables = (await pool.query("SELECT count(*)::int n FROM information_schema.tables WHERE table_schema='public'")).rows[0].n;
+
+  await m.db.migrate(pool);
+
+  const after = (await pool.query("SELECT data, version, updated_by FROM master_resume WHERE id = 1")).rows[0];
+  const d = after.data;
+  assert.equal(d.experience.find((e) => e.id === "exp-independent").bullets.length, 4);
+  assert.deepEqual(d.experience.find((e) => e.id === "exp-appzwork").context.map((c) => c.split(":")[0]), ["BMO Capital Accounts", "EvoBrix-X"]);
+  assert.ok(d.skills.some((x) => x.id === "skill-devops") && d.skills.some((x) => x.id === "skill-developer-tools"));
+  assert.ok(!d.skills.some((x) => x.id === "skill-devops-developer-tools"));
+  assert.deepEqual(d.projects.find((p) => p.id === "project-madras-checks").links.filter((l) => l.visible).map((l) => l.url), ["https://madraschecks.com", "https://art.madraschecks.com"]);
+  assert.equal(d.projects[0].id, "project-links-demo", "order is left alone when you have added your own projects");
+  assert.equal(after.updated_by, "migration-004");
+
+  const de = (await pool.query("SELECT selected_projects, project_detail, selected_skills, version FROM profiles WHERE id='data-engineer'")).rows[0];
+  assert.equal(de.project_detail, "showcase");
+  assert.equal(de.selected_projects.length, 8);
+  assert.ok(!de.selected_skills.includes("skill-currently-learning") && !de.selected_skills.includes("skill-developer-tools"));
+  const ai = (await pool.query("SELECT selected_skills FROM profiles WHERE id='ai-product-engineer'")).rows[0];
+  assert.deepEqual(ai.selected_skills, ["skill-databases", "skill-devops", "skill-developer-tools"]);
+  assert.equal((await pool.query("SELECT count(*)::int n FROM information_schema.tables WHERE table_schema='public'")).rows[0].n, tables, "no table dropped or added");
+  await assert.rejects(pool.query("UPDATE profiles SET project_detail='huge' WHERE id='data-engineer'"));
+
+  const v = after.version;
+  await m.db.migrate(pool);
+  assert.equal((await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version, v);
+  await pool.end();
+});
+
 test("teardown", { skip }, async () => {
   await m.db.closePool();
 });

@@ -32,7 +32,7 @@ test("build generates website and ATS resume from source data", () => {
 
   assert.ok(!website.includes('id="awards"'));
   assert.ok(!resume.includes("<h2>Awards</h2>"));
-  assert.ok(!resume.includes("valipokkann.in"));
+  assert.ok(!resume.includes("Creative:"), "no separate creative-domain contact item (the Valipokkann project link is a project URL)");
   assert.ok(resume.includes("rajasekar.work"));
   assert.equal((resume.match(/class="contact-line"/g) || []).length, 1);
   assert.ok(resume.includes("<strong>Programming Languages:</strong>"));
@@ -43,9 +43,9 @@ test("build generates website and ATS resume from source data", () => {
   });
   assert.ok(website.includes('id="projects"'));
   assert.equal(defaultResume.profileId, "data-engineer");
-  assert.ok(resume.includes("<h2>Projects</h2>"));
-  assert.ok(resume.includes("<h3>OnchainRugs</h3>") && resume.includes("<h3>Uravu</h3>"));
-  assert.ok(!resume.includes("<h3>Hard COpy</h3>"), "ATS resume must not force all eight projects");
+  assert.ok(resume.includes("<h2>Independent Development | Selected Work</h2>"));
+  data.projects.forEach((p) => assert.ok(resume.includes(`<h3>${p.title}</h3>`), `resume page 2 missing ${p.title}`));
+  assert.ok(resume.includes("Client projects: BMO Capital Accounts"), "Appzwork client context");
 });
 
 test("ATS resume uses conventional sections in parser-friendly order", () => {
@@ -65,7 +65,7 @@ test("ATS resume uses conventional sections in parser-friendly order", () => {
     "Appzwork",
     "Software Engineer",
     "Jan 2020 - Nov 2023",
-    "<h2>Projects</h2>",
+    "<h2>Independent Development | Selected Work</h2>",
     "<h2>Education</h2>",
   ];
 

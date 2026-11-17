@@ -60,7 +60,7 @@ test("resolveProfile is pure: it does not mutate the master and honours bullet s
   const de = resolveProfile(seedProfiles[0], master);
   assert.equal(JSON.stringify(master), before);
   const ind = de.experience.find((e) => e.org === "Independent");
-  assert.equal(ind.bullets.length, 1);
+  assert.equal(ind.bullets.length, 4);
   assert.equal(de.experience.find((e) => e.org === "Digit Insurance").bullets.length, 7);
 });
 

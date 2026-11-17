@@ -39,6 +39,7 @@
         role: role.role,
         period: role.period,
         track: role.track || (id === "exp-independent" ? "independent" : "enterprise"),
+        context: [...(role.context || [])],
         bullets,
         bulletDetails: bullets.map((text, i) => ({ id: `${id}-b${i + 1}`, text })),
       };
@@ -132,6 +133,12 @@
     return out;
   };
 
+  const SHOWCASE = {
+    heading: "Independent Development | Selected Work",
+    intro:
+      "Since June 2025, independently building software products spanning data-driven applications, generative systems, creative technology and AI-assisted products.",
+  };
+
   const DEFAULT_VISIBILITY = {
     proof: true,
     summary: true,
@@ -168,7 +175,7 @@
           Array.isArray(picked) && picked.length > 0
             ? role.bulletDetails.filter((b) => picked.includes(b.id)).map((b) => b.text)
             : [...role.bullets];
-        return { org: role.org, role: role.role, period: role.period, bullets };
+        return { org: role.org, role: role.role, period: role.period, context: [...(role.context || [])], bullets };
       });
 
     const skillIds = new Set(
@@ -201,7 +208,10 @@
       profileId: profile.id,
       profileName: profile.name,
       layout: profile.layout || "ats-classic",
-      projectDetail: profile.projectDetail === "compact" ? "compact" : "detailed",
+      projectDetail: ["compact", "showcase"].includes(profile.projectDetail) ? profile.projectDetail : "detailed",
+      // "showcase" = deliberate two-page A4: experience on page 1, all selected projects on page 2
+      pageMode: profile.projectDetail === "showcase" ? "two-page" : "flow",
+      showcase: profile.projectDetail === "showcase" ? SHOWCASE : null,
       accentColor: profile.accentColor || "#2457c5",
       sectionVisibility: visibility,
       name: master.name,
@@ -219,5 +229,5 @@
     };
   };
 
-  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, resolveProfile, LINK_TYPES, DEFAULT_VISIBILITY };
+  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, resolveProfile, SHOWCASE, LINK_TYPES, DEFAULT_VISIBILITY };
 });

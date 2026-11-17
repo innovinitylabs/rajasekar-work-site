@@ -185,7 +185,7 @@ const webProjects = () =>
       // Primary link is the main destination; the rest are a compact secondary list.
       const [primary, ...secondary] = visibleLinks(p.links);
       const anchor = (l, cls) =>
-        `<a class="${cls}" href="${escapeHtml(l.url)}" target="_blank" rel="noreferrer" data-link-type="${escapeHtml(l.type)}">${escapeHtml(l.label)}</a>`;
+        `<a class="${cls}" href="${escapeHtml(l.url)}" target="_blank" rel="noreferrer" data-link-type="${escapeHtml(l.type)}" title="${escapeHtml(l.label)}">${escapeHtml(l.url)}</a>`;
       const links = primary
         ? `${anchor(primary, "project-primary-link")}${
             secondary.length
@@ -237,13 +237,25 @@ const printExperience = () =>
         `    </div>`,
         `    <div class="role-time">${escapeHtml(role.period)}</div>`,
         `  </div>`,
+        role.context && role.context.length
+          ? `  <p class="role-context">Client projects: ${escapeHtml(role.context.join("; "))}</p>`
+          : "",
         `  <ul class="bullets">`,
         bullets,
         `  </ul>`,
         `</div>`,
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
     })
     .join("\n\n");
+
+const printProof = () =>
+  resume.proof.length
+    ? `<section class="proof">\n${resume.proof
+        .map((p) => `  <p><strong>${escapeHtml(p.value)}</strong> ${escapeHtml(p.text)}</p>`)
+        .join("\n")}\n</section>`
+    : "";
 
 const printSkills = () =>
   resume.skills
@@ -268,6 +280,7 @@ const printEducation = () =>
 const printProjects = () => {
   if (!resume.projects.length) return "";
   const compact = resume.projectDetail === "compact";
+  const showcase = resume.pageMode === "two-page";
   const items = resume.projects
     .map((p) => {
       const bullets = p.bullets.map((b) => `    <li>${escapeHtml(b)}</li>`).join("\n");
@@ -281,7 +294,7 @@ const printProjects = () => {
         `    </div>`,
         `  </div>`,
         p.description && !compact ? `  <p class="project-description">${escapeHtml(p.description)}</p>` : "",
-        p.bullets.length && !compact ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
+        p.bullets.length && !compact && !showcase ? `  <ul class="bullets">\n${bullets}\n  </ul>` : "",
         p.technologies.length ? `  <p class="project-tech"><strong>Technologies:</strong> ${escapeHtml(p.technologies.join(", "))}</p>` : "",
         p.links.length
           ? `  <p class="project-tech"><strong>Links:</strong> ${p.links
@@ -294,6 +307,9 @@ const printProjects = () => {
         .join("\n");
     })
     .join("\n\n");
+  if (resume.pageMode === "two-page" && resume.showcase) {
+    return `<section class="page-break">\n  <h2>${escapeHtml(resume.showcase.heading)}</h2>\n  <p class="showcase-intro">${escapeHtml(resume.showcase.intro)}</p>\n${indent(items, 2)}\n</section>`;
+  }
   return `<section>\n  <h2>Projects</h2>\n${indent(items, 2)}\n</section>`;
 };
 
@@ -359,6 +375,7 @@ sourceHtml = replaceRegion(
 );
 sourceHtml = replaceRegion(sourceHtml, "name", escapeHtml(data.name), 0);
 sourceHtml = replaceRegion(sourceHtml, "title", escapeHtml(resume.title), 0);
+sourceHtml = replaceRegion(sourceHtml, "proof", printProof(), 8);
 sourceHtml = replaceRegion(sourceHtml, "summary", escapeHtml(resume.summary), 10);
 sourceHtml = replaceRegion(sourceHtml, "contact", printContact(), 10);
 sourceHtml = replaceRegion(sourceHtml, "experience", printExperience(), 8);

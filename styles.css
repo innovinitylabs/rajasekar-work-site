@@ -1023,3 +1023,11 @@ img {
   color: var(--muted);
   text-decoration: underline;
 }
+
+.project-card .project-links a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.project-card .project-links {
+  min-width: 0;
+}

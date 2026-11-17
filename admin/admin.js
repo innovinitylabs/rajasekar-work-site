@@ -462,39 +462,50 @@
   const resumePageHtml = (r, unsaved) => {
     const c = /^#[0-9a-fA-F]{6}$/.test(r.accentColor) ? r.accentColor : "#2457c5";
     const compact = r.projectDetail === "compact";
+    const twoPage = r.pageMode === "two-page";
     const contact = (r.contactLinks || [])
       .map((i) => `<a href="${esc(i.url)}" target="_blank" rel="noreferrer">${esc(i.text)}</a>`)
       .join(" &nbsp;|&nbsp; ");
     const heading = (t) => `<div class="rp-h" style="color:${c};">${t}</div>`;
-    let html = `<div class="resume-page layout-${esc(r.layout)}${unsaved ? " is-unsaved" : ""}" style="--accent-c:${c};">
-      <h1>${esc(r.name)}</h1>
+    const page = (inner, n) => `<div class="resume-page layout-${esc(r.layout)}${unsaved ? " is-unsaved" : ""}" style="--accent-c:${c};" data-page="${n}">${inner}</div>`;
+    const links = (p) => (p.links.length ? `<div class="rp-tech"><b>Links:</b> ${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.url)}</a>`).join(" | ")}</div>` : "");
+
+    let first = `<h1>${esc(r.name)}</h1>
       <div class="rp-title" style="color:${c};">${esc(r.title)}</div>
       ${contact ? `<div class="rp-contact">${contact}</div>` : ""}`;
     if (r.proof.length) {
-      html += `<div class="rp-proof">${r.proof.map((p) => `<div style="border-color:${c};"><strong>${esc(p.value)}</strong>${esc(p.text)}</div>`).join("")}</div>`;
+      first += `<div class="rp-metrics">${r.proof.map((p) => `<div><b style="color:${c};">${esc(p.value)}</b> ${esc(p.text)}</div>`).join("")}</div>`;
     }
-    if (r.summary) html += `${heading("Summary")}<div class="rp-summary">${esc(r.summary)}</div>`;
+    if (r.summary) first += `${heading("Summary")}<div class="rp-summary">${esc(r.summary)}</div>`;
     if (r.skills.length) {
-      html += heading("Skills") + r.skills.map((g) => `<div class="rp-skill"><b>${esc(g.group)}:</b> ${esc(g.items.join(", "))}</div>`).join("");
+      first += heading("Skills") + r.skills.map((g) => `<div class="rp-skill"><b>${esc(g.group)}:</b> ${esc(g.items.join(", "))}</div>`).join("");
     }
     if (r.experience.length) {
-      html += heading("Experience") + r.experience.map((e) => `
+      first += heading("Experience") + r.experience.map((e) => `
         <div class="rp-role"><div class="rp-role-top"><span>${esc(e.org)}</span><span>${esc(e.period)}</span></div>
           <div class="rp-sub">${esc(e.role)}</div>
+          ${e.context && e.context.length ? `<div class="rp-sub">Client projects: ${esc(e.context.join("; "))}</div>` : ""}
           <ul>${e.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></div>`).join("");
     }
+    const education = r.education.length
+      ? heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("")
+      : "";
+
+    let projects = "";
     if (r.projects.length) {
-      html += heading("Projects") + r.projects.map((p) => `
-        <div class="rp-role"><div class="rp-role-top"><span>${esc(p.title)}</span><span>${esc(p.status)}</span></div>
-          <div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>
-          ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
+      projects = r.projects.map((p) => `
+        <div class="rp-role"><div class="rp-role-top"><span>${esc(p.title)}${twoPage || compact ? ` <i class="rp-meta">${esc([p.role, p.period, p.status].filter(Boolean).join(" | "))}</i>` : ""}</span>${twoPage || compact ? "" : `<span>${esc(p.status)}</span>`}</div>
+          ${twoPage || compact ? "" : `<div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>`}
+          ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${!twoPage && p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
           ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}
-          ${p.links.length ? `<div class="rp-tech">Links: ${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.url)}</a>`).join(" | ")}</div>` : ""}</div>`).join("");
+          ${links(p)}</div>`).join("");
     }
-    if (r.education.length) {
-      html += heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("");
+
+    if (twoPage && r.showcase) {
+      // Mirrors the PDF: experience on page 1, selected work (and education) on page 2.
+      return page(first, 1) + page(`${heading(esc(r.showcase.heading))}<div class="rp-summary" style="margin-bottom:8px;">${esc(r.showcase.intro)}</div>${projects}${education}`, 2);
     }
-    return html + "</div>";
+    return page(first + (projects ? heading("Projects") + projects : "") + education, 1);
   };
 
   /** Scales the fixed-width A4 page to the available width: whole page visible, no horizontal scroll. */
@@ -505,9 +516,8 @@
     const avail = stage.clientWidth - 32;
     const scale = Math.min(1, avail / 794);
     scaler.style.transform = scale < 1 ? `scale(${scale})` : "";
-    const page = scaler.firstElementChild && scaler.firstElementChild.firstElementChild;
     scaler.style.marginLeft = scale < 1 ? "0" : "auto";
-    stage.style.height = page ? `${page.offsetHeight * scale + 32}px` : "auto";
+    stage.style.height = scaler.offsetHeight ? `${scaler.offsetHeight * scale + 32}px` : "auto";
   };
 
   const renderLivePreview = () => {

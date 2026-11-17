@@ -49,10 +49,10 @@
       "role": "Independent Software Developer",
       "period": "Jun 2025 - Present",
       "bullets": [
-        "Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications",
-        "Built OnchainRugs, a Next.js and Solidity application for generative on-chain NFTs with multi-chain wallet integration, Redis caching, and a deterministic server and browser renderer",
-        "Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS backed by a native Swift calculation kit, with a Python oracle used to check numerical parity",
-        "Use AI-assisted development tools (Cursor, Claude, ChatGPT, GitHub Copilot) across design, implementation, and testing"
+        "Design and build complete software products independently, from architecture to deployment, across web (Next.js, React, TypeScript), native iOS and macOS (Swift, SwiftUI) and generative-art applications; the web products run on Vercel under their own domains",
+        "Built OnchainRugs end to end: Solidity ERC721A contracts (Foundry), multi-chain wallet integration (wagmi, viem, RainbowKit), a deterministic p5-compatible renderer shared by browser, server and Puppeteer-generated previews, and a webhook that keeps an Upstash Redis cache in sync with chain events",
+        "Implemented backend and data workflows: Next.js server actions with Zod validation, Neon PostgreSQL persistence with SQL migrations and transactional email via Resend (Uravu), and GitHub OAuth on Vercel serverless functions for a Decap CMS content workflow (Valipokkann)",
+        "Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS on a native C and Swift calculation layer, checked against a Python oracle with golden fixtures and numerical parity tests; use Cursor, Claude, ChatGPT and GitHub Copilot across design, implementation and testing"
       ]
     },
     {
@@ -80,10 +80,57 @@
         "Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments",
         "Optimized SQL queries and stored procedures to improve database performance under high-usage production workloads",
         "Managed production database deployments, maintenance, and recovery across client environments"
+      ],
+      "context": [
+        "BMO Capital Accounts: banking and capital accounts project",
+        "EvoBrix-X: insurance-sector project by CNSI"
       ]
     }
   ],
   "projects": [
+    {
+      "id": "project-madras-checks",
+      "title": "Madras Checks",
+      "category": "Web / brand site",
+      "status": "Deployed",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "CSS"
+      ],
+      "bullets": [
+        "Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository"
+      ],
+      "links": [
+        {
+          "label": "Official Website",
+          "url": "https://madraschecks.com",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Art Platform",
+          "url": "https://art.madraschecks.com",
+          "type": "generator",
+          "primary": false,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://madraschecks-site.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
+        }
+      ],
+      "isPublic": true,
+      "needsReview": false
+    },
     {
       "id": "project-onchainrugs",
       "title": "OnchainRugs",
@@ -119,73 +166,6 @@
         {
           "label": "Vercel deployment",
           "url": "https://onchain-rugs.vercel.app",
-          "type": "demo",
-          "primary": false,
-          "visible": false
-        }
-      ],
-      "isPublic": true,
-      "needsReview": false
-    },
-    {
-      "id": "project-pocket-astro",
-      "title": "Pocket Astro",
-      "category": "Native app / astronomical computation",
-      "status": "In development",
-      "role": "Sole developer",
-      "period": "",
-      "description": "Offline-first native SwiftUI app for iOS and macOS that renders chart reports and dasha timelines from a Swift calculation kit.",
-      "technologies": [
-        "Swift",
-        "SwiftUI",
-        "Swift Package Manager",
-        "C",
-        "Swiss Ephemeris",
-        "Python",
-        "XcodeGen",
-        "WidgetKit"
-      ],
-      "bullets": [
-        "Building a native calculation layer (C and Swift) and checking it against a Python oracle (wrapping the open-source PyJHora library) with golden fixtures and parity tests",
-        "Bundles a JPL DE440 ephemeris and a GeoNames place list with checksummed lock files; includes Lock Screen widgets and an optional on-device language model for a chart assistant"
-      ],
-      "links": [],
-      "isPublic": true,
-      "needsReview": false
-    },
-    {
-      "id": "project-uravu",
-      "title": "Uravu",
-      "category": "Web / pre-launch product site",
-      "status": "Deployed",
-      "role": "Sole developer",
-      "period": "",
-      "description": "Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.",
-      "technologies": [
-        "Next.js",
-        "React",
-        "TypeScript",
-        "Tailwind CSS",
-        "Three.js",
-        "Neon Postgres",
-        "Zod",
-        "Resend"
-      ],
-      "bullets": [
-        "Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend",
-        "Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)"
-      ],
-      "links": [
-        {
-          "label": "Official Website",
-          "url": "https://www.uravu.social",
-          "type": "website",
-          "primary": true,
-          "visible": true
-        },
-        {
-          "label": "Vercel deployment",
-          "url": "https://uravu-site.vercel.app",
           "type": "demo",
           "primary": false,
           "visible": false
@@ -234,52 +214,111 @@
       "needsReview": false
     },
     {
-      "id": "project-madras-checks",
-      "title": "Madras Checks",
-      "category": "Web / brand site",
+      "id": "project-uravu",
+      "title": "Uravu",
+      "category": "Web / pre-launch product site",
       "status": "Deployed",
       "role": "Sole developer",
       "period": "",
-      "description": "Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.",
+      "description": "Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.",
       "technologies": [
         "Next.js",
         "React",
         "TypeScript",
-        "CSS"
+        "Tailwind CSS",
+        "Three.js",
+        "Neon Postgres",
+        "Zod",
+        "Resend"
       ],
       "bullets": [
-        "Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository"
+        "Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend",
+        "Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)"
       ],
       "links": [
         {
           "label": "Official Website",
-          "url": "https://madraschecks.com",
+          "url": "https://www.uravu.social",
           "type": "website",
           "primary": true,
           "visible": true
         },
         {
-          "label": "Art Page",
-          "url": "https://madraschecks.com/art/",
-          "type": "website",
-          "primary": false,
-          "visible": true
-        },
-        {
-          "label": "Art Platform & Generator",
-          "url": "https://art.madraschecks.com",
-          "type": "generator",
-          "primary": false,
-          "visible": true
-        },
-        {
           "label": "Vercel deployment",
-          "url": "https://madraschecks-site.vercel.app",
+          "url": "https://uravu-site.vercel.app",
           "type": "demo",
           "primary": false,
           "visible": false
         }
       ],
+      "isPublic": true,
+      "needsReview": false
+    },
+    {
+      "id": "project-hard-copy",
+      "title": "Hard COpy",
+      "category": "Native app / iPadOS and macOS",
+      "status": "In development",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Native handwritten notebook for iPadOS and macOS, tagline \"Beyond Paper\", built in Swift and SwiftUI.",
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "Swift Package Manager",
+        "XcodeGen"
+      ],
+      "bullets": [
+        "Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo"
+      ],
+      "links": [],
+      "isPublic": true,
+      "needsReview": true
+    },
+    {
+      "id": "project-rotate-the-cow",
+      "title": "Rotate the Cow",
+      "category": "Native app / iOS",
+      "status": "In development",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.",
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "RealityKit",
+        "XcodeGen"
+      ],
+      "bullets": [
+        "Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)"
+      ],
+      "links": [],
+      "isPublic": true,
+      "needsReview": false
+    },
+    {
+      "id": "project-pocket-astro",
+      "title": "Pocket Astro",
+      "category": "Native app / astronomical computation",
+      "status": "In development",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Offline-first native SwiftUI app for iOS and macOS that renders chart reports and dasha timelines from a Swift calculation kit.",
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "Swift Package Manager",
+        "C",
+        "Swiss Ephemeris",
+        "Python",
+        "XcodeGen",
+        "WidgetKit"
+      ],
+      "bullets": [
+        "Building a native calculation layer (C and Swift) and checking it against a Python oracle (wrapping the open-source PyJHora library) with golden fixtures and parity tests",
+        "Bundles a JPL DE440 ephemeris and a GeoNames place list with checksummed lock files; includes Lock Screen widgets and an optional on-device language model for a chart assistant"
+      ],
+      "links": [],
       "isPublic": true,
       "needsReview": false
     },
@@ -315,48 +354,6 @@
       ],
       "isPublic": true,
       "needsReview": false
-    },
-    {
-      "id": "project-rotate-the-cow",
-      "title": "Rotate the Cow",
-      "category": "Native app / iOS",
-      "status": "In development",
-      "role": "Sole developer",
-      "period": "",
-      "description": "Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.",
-      "technologies": [
-        "Swift",
-        "SwiftUI",
-        "RealityKit",
-        "XcodeGen"
-      ],
-      "bullets": [
-        "Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)"
-      ],
-      "links": [],
-      "isPublic": true,
-      "needsReview": false
-    },
-    {
-      "id": "project-hard-copy",
-      "title": "Hard COpy",
-      "category": "Native app / iPadOS and macOS",
-      "status": "In development",
-      "role": "Sole developer",
-      "period": "",
-      "description": "Native handwritten notebook for iPadOS and macOS, tagline \"Beyond Paper\", built in Swift and SwiftUI.",
-      "technologies": [
-        "Swift",
-        "SwiftUI",
-        "Swift Package Manager",
-        "XcodeGen"
-      ],
-      "bullets": [
-        "Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo"
-      ],
-      "links": [],
-      "isPublic": true,
-      "needsReview": true
     }
   ],
   "skills": [
@@ -415,13 +412,19 @@
       ]
     },
     {
-      "id": "skill-devops-developer-tools",
-      "group": "DevOps and Developer Tools",
+      "id": "skill-devops",
+      "group": "DevOps",
       "items": [
         "Docker",
         "Git",
         "Linux",
-        "GitHub Workflows",
+        "GitHub Workflows"
+      ]
+    },
+    {
+      "id": "skill-developer-tools",
+      "group": "Developer Tools",
+      "items": [
         "Cursor",
         "Claude",
         "ChatGPT",

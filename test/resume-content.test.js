@@ -92,7 +92,7 @@ test("required skills are present, grouped meaningfully", () => {
   const groups = data.skills.map((g) => g.group);
   [
     "Programming Languages", "Data Engineering", "Databases", "Backend Development",
-    "Cloud and Data Platforms", "DevOps and Developer Tools", "Currently Learning",
+    "Cloud and Data Platforms", "DevOps", "Developer Tools", "Currently Learning",
   ].forEach((g) => assert.ok(groups.includes(g), `missing group ${g}`));
 
   const all = data.skills.flatMap((g) => g.items);

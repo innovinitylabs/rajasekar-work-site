@@ -80,7 +80,7 @@ const proj = (links) => ({ ...resolved("ai-product-engineer"), projects: [{ id: 
 
 test("resolved projects carry only visible links, primary first, with existing labels", () => {
   const madras = resolveProfile({ ...profile("ai-product-engineer"), selectedProjects: ["project-madras-checks"] }, master).projects[0];
-  assert.deepEqual(madras.links.map((l) => l.label), ["Official Website", "Art Page", "Art Platform & Generator"]);
+  assert.deepEqual(madras.links.map((l) => [l.label, l.url]), [["Official Website", "https://madraschecks.com"], ["Art Platform", "https://art.madraschecks.com"]]);
   assert.ok(!madras.links.some((l) => /vercel\.app/.test(l.url)), "no raw deployment URLs");
   const anek = resolveProfile({ ...profile("ai-product-engineer"), selectedProjects: ["project-anekaroopam"] }, master).projects[0];
   assert.ok(anek.links.some((l) => l.label === "GitHub" && l.url.startsWith("https://github.com/")));
@@ -149,7 +149,7 @@ test("profile-specific PDFs: every selected project's visible links are clickabl
 
 test("public resume HTML lists project links as full URLs with matching hrefs, no vercel URLs", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "resume-source.html"), "utf8");
-  const block = html.slice(html.indexOf("<h2>Projects</h2>"), html.indexOf("<h2>Education</h2>"));
+  const block = html.slice(html.indexOf("<h2>Independent Development | Selected Work</h2>"), html.indexOf("<h2>Education</h2>"));
   assert.match(block, /<strong>Links:<\/strong> <a href="https:\/\/onchainrugs\.art">https:\/\/onchainrugs\.art<\/a>/);
   assert.match(block, /<a href="https:\/\/www\.uravu\.social">https:\/\/www\.uravu\.social<\/a>/);
   assert.ok(!/vercel\.app/.test(block));
