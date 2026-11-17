@@ -37,8 +37,10 @@
     const doc = new JsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = options.margin || 40;
+    const margin = options.margin || 36;
     const contentWidth = pageWidth - margin * 2;
+    // Wrap a little early: viewers substitute their own Helvetica, whose widths differ slightly.
+    const wrapSafety = 4;
     let y = margin;
 
     const accentColor =
@@ -69,7 +71,7 @@
       doc.setFont("helvetica", style);
       doc.setFontSize(size);
       setColor(color);
-      const lines = doc.splitTextToSize(text, contentWidth - indent);
+      const lines = doc.splitTextToSize(text, contentWidth - indent - wrapSafety);
       const lineHeight = size * 1.3;
 
       lines.forEach((line) => {
@@ -95,26 +97,6 @@
       y += 10;
     };
 
-    const writeContactLine = (items) => {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8.8);
-      setColor(MUTE);
-      let x = margin;
-      const separator = "  |  ";
-
-      items.forEach((item, index) => {
-        if (index > 0) {
-          doc.text(separator, x, y);
-          x += doc.getTextWidth(separator);
-        }
-
-        doc.textWithLink(item.text, x, y, { url: item.url });
-        x += doc.getTextWidth(item.text);
-      });
-
-      y += 11;
-    };
-
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     setColor(INK);
@@ -126,6 +108,14 @@
       color: accentColor,
       gap: 2,
     });
+
+    // Explicit URI link annotation with a normalised rectangle (lower-left to upper-right) that
+    // covers the visible text: a negative height makes jsPDF emit [llx lly urx ury]. We never
+    // rely on a viewer auto-detecting URLs.
+    const addLink = (x, baselineY, width, size, url) => {
+      const height = size * 1.15;
+      doc.link(x, baselineY + size * 0.28, width, -height, { url });
+    };
 
     // Linked items on one or more lines, wrapping between items (never mid-URL).
     const writeLinkLine = (items, { size = 8.8, prefix = "", gap = 11, indent = 0 } = {}) => {
@@ -141,10 +131,11 @@
         doc.setFont("helvetica", "normal");
       }
       const start = x;
+      const right = pageWidth - margin - wrapSafety;
       items.forEach((item, index) => {
         const w = doc.getTextWidth(item.text);
         const sepW = index > 0 ? doc.getTextWidth(sep) : 0;
-        if (index > 0 && x + sepW + w > pageWidth - margin) {
+        if (index > 0 && x + sepW + w > right) {
           y += gap;
           ensureSpace(gap);
           x = start;
@@ -152,7 +143,23 @@
           doc.text(sep, x, y);
           x += sepW;
         }
-        doc.textWithLink(item.text, x, y, { url: item.url });
+        if (x + w > right) {
+          // A single destination longer than a line: wrap it, each segment keeps the link.
+          const chunks = doc.splitTextToSize(item.text, right - start);
+          chunks.forEach((chunk, ci) => {
+            if (ci > 0) {
+              y += gap;
+              ensureSpace(gap);
+            }
+            const cw = doc.getTextWidth(chunk);
+            doc.text(chunk, ci === 0 ? x : start, y);
+            addLink(ci === 0 ? x : start, y, cw, size, item.url);
+            x = (ci === 0 ? x : start) + cw;
+          });
+          return;
+        }
+        doc.text(item.text, x, y);
+        addLink(x, y, w, size, item.url);
         x += w;
       });
       y += gap;
@@ -178,11 +185,11 @@
         const label = `${group.group}: `;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
-        const labelWidth = doc.getTextWidth(label);
+        const labelWidth = doc.getTextWidth(label) + 2;
         doc.setFont("helvetica", "normal");
         const valueLines = doc.splitTextToSize(
           group.items.join(", "),
-          contentWidth - labelWidth
+          contentWidth - labelWidth - wrapSafety
         );
         const lineHeight = 12;
 
@@ -224,8 +231,9 @@
           doc.setFont("helvetica", "normal");
           doc.setFontSize(9.5);
           setColor(INK);
-          const lines = doc.splitTextToSize(bullet, contentWidth - 12);
-          const lineHeight = 12.2;
+          const lines = doc.splitTextToSize(bullet, contentWidth - 12 - wrapSafety);
+          const lineHeight = 11.9;
+          ensureSpace(lines.length * lineHeight); // never split one bullet across pages
 
           lines.forEach((line, index) => {
             ensureSpace(lineHeight);
@@ -243,10 +251,10 @@
     }
 
     if (data.projects && data.projects.length > 0) {
-      sectionHeading("Projects");
+      sectionHeading("Projects", data.projectDetail === "compact" ? 60 : 110);
       const compact = data.projectDetail === "compact";
       data.projects.forEach((proj) => {
-        ensureSpace(28);
+        ensureSpace(compact ? 40 : 90);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10.5);
         setColor(INK);
@@ -274,8 +282,9 @@
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9.5);
             setColor(INK);
-            const lines = doc.splitTextToSize(bullet, contentWidth - 12);
-            const lineHeight = 12.2;
+            const lines = doc.splitTextToSize(bullet, contentWidth - 12 - wrapSafety);
+            const lineHeight = 11.9;
+          ensureSpace(lines.length * lineHeight); // never split one bullet across pages
             lines.forEach((line, index) => {
               ensureSpace(lineHeight);
               if (index === 0) doc.text("\u2022", margin + 1, y);
@@ -295,7 +304,7 @@
         if (proj.links && proj.links.length > 0) {
           ensureSpace(12);
           writeLinkLine(
-            proj.links.map((l) => ({ text: l.label, url: l.url })),
+            proj.links.map((l) => ({ text: l.url, url: l.url })),
             { size: 9, prefix: "Links: ", gap: 11.5 }
           );
         }

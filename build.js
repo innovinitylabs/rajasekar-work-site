@@ -285,7 +285,7 @@ const printProjects = () => {
         p.technologies.length ? `  <p class="project-tech"><strong>Technologies:</strong> ${escapeHtml(p.technologies.join(", "))}</p>` : "",
         p.links.length
           ? `  <p class="project-tech"><strong>Links:</strong> ${p.links
-              .map((l) => `<a href="${escapeHtml(l.url)}">${escapeHtml(l.label)}</a>`)
+              .map((l) => `<a href="${escapeHtml(l.url)}">${escapeHtml(l.url)}</a>`)
               .join(" | ")}</p>`
           : "",
         `</div>`,
