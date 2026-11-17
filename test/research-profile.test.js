@@ -56,7 +56,7 @@ test("PDF: two A4 pages; page 1 = summary, skills, three jobs; page 2 = projects
     assert.ok(i > at, `page 2 order: ${k}`);
     at = i;
   }
-  assert.ok(p2.includes("B.E. in Civil Engineering") && p2.includes("DataCamp: Introduction to Deep Learning with Python"));
+  assert.ok(p2.includes("B.E. (Anna University)") && p2.includes("DataCamp: Introduction to Deep Learning with Python"));
   assert.ok(!p1.includes("Vahan and Health business domains") === false, "Digit achievements retained");
 });
 
@@ -67,7 +67,7 @@ test("preview/PDF/HTML all use the same resolved data (extra sections, overrides
   assert.equal(r.showcase.bulletsPerProject, 4);
   assert.deepEqual(r.projects.map((p) => p.title), ["Uravu", "Pocket Astro", "OnchainRugs", "Madras Checks"]);
   assert.equal(r.extraSections[0].heading, "Research Interests");
-  assert.equal(r.education.length, 2);
+  assert.equal(r.education.length, 4);
   const js = fs.readFileSync(path.join(__dirname, "..", "admin", "admin.js"), "utf8");
   assert.ok(js.includes("r.extraSections") && js.includes("bulletsPerProject"), "admin preview renders the same fields");
   assert.ok(!/anthropic/i.test(fs.readFileSync(path.join(__dirname, "..", "resume-pdf.js"), "utf8")), "nothing profile-specific in the PDF generator");
@@ -117,7 +117,7 @@ test("existing profiles are unchanged in output: no coursework, AI Systems group
 test("master facts: coursework is introductory and the degree is stated", () => {
   const dc = RAW.education.find((e) => e.id === "edu-datacamp-deep-learning");
   assert.equal(dc.meta, "Introductory course");
-  assert.equal(RAW.education[0].level, "B.E. in Civil Engineering");
+  assert.equal(RAW.education[0].level, "B.E. (Anna University)");
   const ai = RAW.skills.find((g) => g.id === "skill-ai-systems");
   assert.deepEqual(ai.items, ["Local LLM integration", "On-device AI assistants", "AI-assisted development"]);
 });
