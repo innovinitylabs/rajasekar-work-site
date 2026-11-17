@@ -14,7 +14,7 @@ const profile = (id) => seed.find((p) => p.id === id);
 const resolved = (id) => resolveProfile(profile(id), master);
 
 const EXPECTED = [
-  ["Portfolio: rajasekar.work", "https://rajasekar.work"],
+  ["Portfolio: https://rajasekar.work", "https://rajasekar.work"],
   ["rajasekarc1142@gmail.com", "mailto:rajasekarc1142@gmail.com"],
   ["+91 7904348791", "tel:+917904348791"],
   ["LinkedIn: linkedin.com/in/rajasekar-c", "https://linkedin.com/in/rajasekar-c"],
@@ -97,7 +97,7 @@ test("hidden links never reach the resume; a project with only hidden links has 
   assert.deepEqual(r.links, []);
 });
 
-test("PDF: project with several links shows 'Links:' with clickable labels", async () => {
+test("PDF: project with several links shows 'Links:' with the full URLs, each clickable", async () => {
   const data = proj([
     { label: "Official Website", url: "https://madraschecks.com" },
     { label: "Art Platform", url: "https://art.madraschecks.com" },
@@ -106,30 +106,35 @@ test("PDF: project with several links shows 'Links:' with clickable labels", asy
   ]);
   const doc = pdf(data);
   const t = await text(doc);
-  assert.match(t, /Links: Official Website \| Art Platform \| Generator \| GitHub/);
+  assert.match(t, /Links: https:\/\/madraschecks\.com \| https:\/\/art\.madraschecks\.com \| https:\/\/art\.madraschecks\.com\/generator(?: \|)?\s+https:\/\/github\.com\/innovinitylabs\/x/);
   const found = uris(doc);
   ["https://madraschecks.com", "https://art.madraschecks.com", "https://art.madraschecks.com/generator", "https://github.com/innovinitylabs/x"].forEach((u) =>
     assert.ok(found.includes(u), `missing annotation ${u}`)
   );
-  assert.ok(!/madraschecks\.com\//.test(t.replace(/Links:.*/s, "")) || true);
-  assert.ok(!t.includes("https://art.madraschecks.com/generator"), "the label is shown, not the raw URL");
+  assert.ok(!/Official Website|Art Platform/.test(t), "full URLs are shown, not labels");
 });
 
 test("PDF: single link, and no links, render compactly without a Links line", async () => {
   let t = await text(pdf(proj([{ label: "Official Website", url: "https://uravu.example.org" }])));
-  assert.match(t, /Links: Official Website/);
-  assert.ok(!/Links: Official Website \|/.test(t));
+  assert.match(t, /Links: https:\/\/uravu\.example\.org/);
+  assert.ok(!/Links: https:\/\/uravu\.example\.org \|/.test(t));
   t = await text(pdf(proj([])));
   assert.ok(!/Links:/.test(t));
 });
 
-test("PDF: a very long link list wraps between items instead of overflowing the page", async () => {
-  const many = Array.from({ length: 9 }, (_, i) => ({ label: `Destination Number ${i + 1}`, url: `https://example.com/${"x".repeat(180)}/${i}` }));
-  const doc = pdf(proj(many));
-  const t = await text(doc);
-  for (let i = 1; i <= 9; i++) assert.ok(t.includes(`Destination Number ${i}`));
-  assert.ok(!t.includes("xxxxxxxxxx"), "long URLs are never printed as text");
-  assert.equal(uris(doc).filter((u) => u.includes("xxxx")).length, 9);
+test("PDF: long link lists and a single over-long URL wrap inside the margins and stay clickable", async () => {
+  const many = Array.from({ length: 6 }, (_, i) => ({ label: `Destination ${i + 1}`, url: `https://example.com/section-${i + 1}/path` }));
+  let doc = pdf(proj(many));
+  let t = await text(doc);
+  for (let i = 1; i <= 6; i++) assert.ok(t.includes(`https://example.com/section-${i}/path`));
+  assert.equal(uris(doc).filter((u) => u.startsWith("https://example.com/section-")).length, 6);
+
+  const longUrl = `https://example.com/${"segment/".repeat(40)}end`;
+  doc = pdf(proj([{ label: "Long", url: longUrl }]));
+  assert.ok(uris(doc).includes(longUrl), "annotation carries the complete URL");
+  const rects = [...doc.output().matchAll(/\/Rect \[([^\]]+)\][^>]*\/URI \(https:\/\/example\.com\/segment/g)].map((m) => m[1].trim().split(/\s+/).map(Number));
+  assert.ok(rects.length >= 2, "wrapped URL has one link rectangle per line");
+  assert.ok(rects.every((r) => r[0] >= 35.5 && r[2] <= 595.28 - 36 + 0.5));
 });
 
 test("profile-specific PDFs: every selected project's visible links are clickable", () => {
@@ -142,10 +147,10 @@ test("profile-specific PDFs: every selected project's visible links are clickabl
   }
 });
 
-test("public resume HTML lists project links by label with real hrefs, no vercel URLs", () => {
+test("public resume HTML lists project links as full URLs with matching hrefs, no vercel URLs", () => {
   const html = fs.readFileSync(path.join(__dirname, "..", "resume-source.html"), "utf8");
   const block = html.slice(html.indexOf("<h2>Projects</h2>"), html.indexOf("<h2>Education</h2>"));
-  assert.match(block, /<strong>Links:<\/strong> <a href="https:\/\/onchainrugs\.art">Official Website<\/a>/);
-  assert.match(block, /<a href="https:\/\/www\.uravu\.social">Official Website<\/a>/);
+  assert.match(block, /<strong>Links:<\/strong> <a href="https:\/\/onchainrugs\.art">https:\/\/onchainrugs\.art<\/a>/);
+  assert.match(block, /<a href="https:\/\/www\.uravu\.social">https:\/\/www\.uravu\.social<\/a>/);
   assert.ok(!/vercel\.app/.test(block));
 });

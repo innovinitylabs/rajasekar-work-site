@@ -124,7 +124,7 @@
     if (!contact) return [];
     const out = [];
     // The portfolio destination is fixed on purpose.
-    out.push({ key: "portfolio", text: "Portfolio: rajasekar.work", url: "https://rajasekar.work" });
+    out.push({ key: "portfolio", text: "Portfolio: https://rajasekar.work", url: "https://rajasekar.work" });
     if (contact.email) out.push({ key: "email", text: String(contact.email.url).replace(/^mailto:/i, ""), url: `mailto:${String(contact.email.url).replace(/^mailto:/i, "")}` });
     if (contact.phone) out.push({ key: "phone", text: contact.phone.label, url: `tel:${String(contact.phone.url).replace(/^tel:/i, "")}` });
     if (contact.linkedin) out.push({ key: "linkedin", text: `LinkedIn: ${bare(contact.linkedin.label)}`, url: toHttps(contact.linkedin.url) });

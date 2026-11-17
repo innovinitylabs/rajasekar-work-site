@@ -489,7 +489,7 @@
           <div class="rp-sub">${esc([p.role, p.period].filter(Boolean).join(" | "))}</div>
           ${compact ? "" : `<div class="rp-summary">${esc(p.description)}</div>${p.bullets.length ? `<ul>${p.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}`}
           ${p.technologies.length ? `<div class="rp-tech">Technologies: ${esc(p.technologies.join(", "))}</div>` : ""}
-          ${p.links.length ? `<div class="rp-tech">Links: ${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.label)}</a>`).join(" | ")}</div>` : ""}</div>`).join("");
+          ${p.links.length ? `<div class="rp-tech">Links: ${p.links.map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noreferrer">${esc(l.url)}</a>`).join(" | ")}</div>` : ""}</div>`).join("");
     }
     if (r.education.length) {
       html += heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("");
