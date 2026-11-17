@@ -47,7 +47,7 @@ test("every seed profile validates against the master and references only real i
     assert.deepEqual(errors, [], `${p.id}: ${JSON.stringify(errors)}`);
   }
   assert.equal(seedProfiles.filter((p) => p.isDefault).length, 1);
-  assert.deepEqual(seedProfiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency"]);
+  assert.deepEqual(seedProfiles.map((p) => p.id), ["data-engineer", "ai-product-engineer", "database-developer", "anthropic-research-residency", "anthropic-product-ai-engineering"]);
 });
 
 test("every master project is selected by at least one profile or remains available in the master", () => {
