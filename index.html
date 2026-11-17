@@ -42,6 +42,7 @@ Rajasekar C
             <nav class="site-nav" aria-label="Primary">
               <a href="#proof">Proof</a>
               <a href="#experience">Experience</a>
+              <a href="#projects">Projects</a>
               <a href="#skills">Skills</a>
               <a href="#education">Education</a>
               <a href="#contact">Contact</a>
@@ -139,16 +140,33 @@ Rajasekar C
               <article class="experience-card">
                 <div class="experience-header">
                   <div>
+                    <h3>Independent</h3>
+                    <p>Independent Software Developer</p>
+                  </div>
+                  <span class="timeline">Jun 2025 - Present</span>
+                </div>
+                <ul>
+                <li>Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications</li>
+                <li>Built OnchainRugs, a Next.js and Solidity application for generative on-chain NFTs with multi-chain wallet integration, Redis caching, and a deterministic server and browser renderer</li>
+                <li>Developing Pocket Astro, an offline-first SwiftUI app for iOS and macOS backed by a native Swift calculation kit, with a Python oracle used to check numerical parity</li>
+                <li>Use AI-assisted development tools (Cursor, Claude, ChatGPT, GitHub Copilot) across design, implementation, and testing</li>
+                </ul>
+              </article>
+
+              <article class="experience-card">
+                <div class="experience-header">
+                  <div>
                     <h3>Digit Insurance</h3>
                     <p>Data Engineer</p>
                   </div>
                   <span class="timeline">Nov 2023 - Jun 2025</span>
                 </div>
                 <ul>
+                <li>Owned the Vahan and Health business domains</li>
                 <li>Designed and operated ETL data pipelines processing approximately 50M records per day for high-volume batch data processing and downstream reporting</li>
                 <li>Built a Flask and Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under 1 minute, earning the Tech Titan Award</li>
                 <li>Resolved 4000+ production data issues and reduced the open backlog from approximately 600 to under 70</li>
-                <li>Owned PostgreSQL schema design and DDL versioning in Git; implemented PII classification and secure credential storage for data quality and compliant handling</li>
+                <li>Owned PostgreSQL schema design and Git-versioned DDL; implemented PII classification and secure credential handling for data quality and compliant data handling</li>
                 <li>Automated MoEngage customer notification workflows with SQL stored procedures for policy-renewal detection, eliminating redundant alerts</li>
                 <li>Delivered ETL, data-ingestion, and schema work for Bima Satrak regulatory reporting; automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas</li>
                 </ul>
@@ -174,6 +192,208 @@ Rajasekar C
           </div>
         </section>
 
+        <section class="section reveal" id="projects">
+          <div class="container">
+            <div class="section-heading">
+              <p class="section-label">Independent work</p>
+              <h2>Projects</h2>
+            </div>
+
+            <div class="experience-list">
+              <!-- build:projects -->
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>OnchainRugs</h3>
+                    <p>Web3 / generative art · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Next.js application for minting, previewing, maintaining, and exploring generative on-chain rug NFTs tied to EVM smart contracts.</p>
+                <ul>
+                  <li>Developed the Solidity contracts (Foundry-based, with ERC721A and OpenZeppelin) and the Next.js front end with multi-chain wallet support (Base, Shape, Ethereum testnets)</li>
+                  <li>Kept rug output deterministic across browser, export, and server-side flows with a minimal p5-compatible runtime; added a webhook that updates a Redis cache on chain events</li>
+                  <li>Generated dynamic social-preview images by rendering rugs in headless Puppeteer</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>TypeScript</li>
+                  <li>Solidity</li>
+                  <li>Foundry</li>
+                  <li>wagmi</li>
+                  <li>viem</li>
+                  <li>RainbowKit</li>
+                  <li>Upstash Redis</li>
+                  <li>Puppeteer</li>
+                </ul>
+                <p class="project-links"><a href="https://onchain-rugs.vercel.app" target="_blank" rel="noreferrer">onchain-rugs.vercel.app</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Pocket Astro</h3>
+                    <p>Native app / astronomical computation · Sole developer</p>
+                  </div>
+                  <span class="timeline">In development</span>
+                </div>
+                <p class="project-description">Offline-first native SwiftUI app for iOS and macOS that renders chart reports and dasha timelines from a Swift calculation kit.</p>
+                <ul>
+                  <li>Building a native calculation layer (C and Swift) and checking it against a Python oracle (wrapping the open-source PyJHora library) with golden fixtures and parity tests</li>
+                  <li>Bundles a JPL DE440 ephemeris and a GeoNames place list with checksummed lock files; includes Lock Screen widgets and an optional on-device language model for a chart assistant</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Swift</li>
+                  <li>SwiftUI</li>
+                  <li>Swift Package Manager</li>
+                  <li>C</li>
+                  <li>Swiss Ephemeris</li>
+                  <li>Python</li>
+                  <li>XcodeGen</li>
+                  <li>WidgetKit</li>
+                </ul>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Uravu</h3>
+                    <p>Web / pre-launch product site · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.</p>
+                <ul>
+                  <li>Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend</li>
+                  <li>Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Tailwind CSS</li>
+                  <li>Three.js</li>
+                  <li>Neon Postgres</li>
+                  <li>Zod</li>
+                  <li>Resend</li>
+                </ul>
+                <p class="project-links"><a href="https://uravu-site.vercel.app" target="_blank" rel="noreferrer">uravu-site.vercel.app</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Anekaroopam</h3>
+                    <p>Web / digital art platform · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Digital art platform for multistable figurative emergence, including a browser-based Perception Engine for building rotational artworks.</p>
+                <ul>
+                  <li>Built the Perception Engine: import artwork, define perceptual states, rotate or snap between them, and export a standalone offline HTML file or a JSON configuration</li>
+                  <li>Built an image-preparation tool that converts to AVIF, WebP, PNG, and JPEG in the browser using a Web Worker, with side-by-side comparison and size metrics</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Tailwind CSS</li>
+                  <li>Framer Motion</li>
+                  <li>Web Workers</li>
+                </ul>
+                <p class="project-links"><a href="https://anekaroopam.art" target="_blank" rel="noreferrer">anekaroopam.art</a> · <a href="https://github.com/innovinitylabs/anekaroopam-site" target="_blank" rel="noreferrer">github.com/innovinitylabs/anekaroopam-site</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Madras Checks</h3>
+                    <p>Web / brand site · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.</p>
+                <ul>
+                  <li>Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Next.js</li>
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>CSS</li>
+                </ul>
+                <p class="project-links"><a href="https://madraschecks-site.vercel.app" target="_blank" rel="noreferrer">madraschecks-site.vercel.app</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Valipokkann</h3>
+                    <p>Web / artist portfolio · Sole developer</p>
+                  </div>
+                  <span class="timeline">Deployed</span>
+                </div>
+                <p class="project-description">Personal artist website with an art gallery, photography, articles, music, and a Thirukkural section with an image studio for social posts.</p>
+                <ul>
+                  <li>Built the site with content in YAML and Markdown managed through Decap CMS, with GitHub OAuth handled by Vercel serverless functions</li>
+                  <li>Added lazy-loaded image galleries, Vercel Analytics and Speed Insights, and SEO metadata</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>React</li>
+                  <li>TypeScript</li>
+                  <li>Vite</li>
+                  <li>Tailwind CSS</li>
+                  <li>Framer Motion</li>
+                  <li>Decap CMS</li>
+                  <li>Vercel Functions</li>
+                </ul>
+                <p class="project-links"><a href="https://valipokkann.in" target="_blank" rel="noreferrer">valipokkann.in</a></p>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Rotate the Cow</h3>
+                    <p>Native app / iOS · Sole developer</p>
+                  </div>
+                  <span class="timeline">In development</span>
+                </div>
+                <p class="project-description">Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.</p>
+                <ul>
+                  <li>Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Swift</li>
+                  <li>SwiftUI</li>
+                  <li>RealityKit</li>
+                  <li>XcodeGen</li>
+                </ul>
+              </article>
+
+              <article class="experience-card project-card">
+                <div class="experience-header">
+                  <div>
+                    <h3>Hard COpy</h3>
+                    <p>Native app / iPadOS and macOS · Sole developer</p>
+                  </div>
+                  <span class="timeline">In development</span>
+                </div>
+                <p class="project-description">Native handwritten notebook for iPadOS and macOS, tagline &quot;Beyond Paper&quot;, built in Swift and SwiftUI.</p>
+                <ul>
+                  <li>Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo</li>
+                </ul>
+                <ul class="tag-list">
+                  <li>Swift</li>
+                  <li>SwiftUI</li>
+                  <li>Swift Package Manager</li>
+                  <li>XcodeGen</li>
+                </ul>
+              </article>
+            <!-- /build:projects -->
+            </div>
+          </div>
+        </section>
+
         <section class="section reveal" id="skills">
           <div class="container">
             <div class="section-heading">
@@ -183,7 +403,7 @@ Rajasekar C
             <div class="skills-grid">
               <!-- build:skills -->
               <article class="skill-group">
-                <h3>Languages</h3>
+                <h3>Programming Languages</h3>
                 <ul class="tag-list">
                 <li>Python</li>
                 <li>SQL</li>
@@ -199,11 +419,10 @@ Rajasekar C
                 <li>ELT</li>
                 <li>Data Pipelines</li>
                 <li>Data Ingestion</li>
-                <li>Data Modelling</li>
                 <li>Data Warehousing</li>
+                <li>Data Modelling</li>
                 <li>Batch Processing</li>
                 <li>Pandas</li>
-                <li>PySpark</li>
                 </ul>
               </article>
 
@@ -214,11 +433,12 @@ Rajasekar C
                 <li>Oracle</li>
                 <li>DB2</li>
                 <li>Redis</li>
+                <li>ClickHouse</li>
                 </ul>
               </article>
 
               <article class="skill-group">
-                <h3>Backend</h3>
+                <h3>Backend Development</h3>
                 <ul class="tag-list">
                 <li>Flask</li>
                 <li>REST APIs</li>
@@ -229,30 +449,46 @@ Rajasekar C
               </article>
 
               <article class="skill-group">
-                <h3>Data Platforms</h3>
+                <h3>Cloud and Data Platforms</h3>
                 <ul class="tag-list">
-                <li>Databricks</li>
-                <li>ClickHouse</li>
+                <li>Neon</li>
+                <li>Vercel</li>
                 </ul>
               </article>
 
               <article class="skill-group">
-                <h3>DevOps</h3>
+                <h3>DevOps and Developer Tools</h3>
                 <ul class="tag-list">
                 <li>Docker</li>
                 <li>Git</li>
                 <li>Linux</li>
                 <li>GitHub Workflows</li>
+                <li>Cursor</li>
+                <li>Claude</li>
+                <li>ChatGPT</li>
+                <li>GPT Codex</li>
+                <li>GitHub Copilot</li>
                 </ul>
               </article>
 
               <article class="skill-group">
-                <h3>Developer Tools</h3>
+                <h3>Application Development</h3>
                 <ul class="tag-list">
-                <li>Cursor</li>
-                <li>Claude</li>
-                <li>GPT Codex</li>
-                <li>GitHub Copilot</li>
+                <li>TypeScript</li>
+                <li>Next.js</li>
+                <li>React</li>
+                <li>Swift</li>
+                <li>SwiftUI</li>
+                <li>Solidity</li>
+                </ul>
+              </article>
+
+              <article class="skill-group">
+                <h3>Currently Learning</h3>
+                <ul class="tag-list">
+                <li>Databricks</li>
+                <li>Apache Spark</li>
+                <li>PySpark</li>
                 </ul>
               </article>
 
@@ -323,6 +559,7 @@ Rajasekar C
           <nav class="footer-nav" aria-label="Footer">
             <a href="#proof">Proof</a>
             <a href="#experience">Experience</a>
+            <a href="#projects">Projects</a>
             <a href="#skills">Skills</a>
             <a href="#education">Education</a>
             <a href="#contact">Contact</a>

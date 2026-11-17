@@ -1,65 +1,57 @@
 "use strict";
 
-const {
-  getMasterResume,
-  getProfiles,
-  saveProfiles,
-  getApplications,
-  saveApplications,
-} = require("../lib/resume-system");
-const { validateAdminSession } = require("../lib/auth");
+const { adminEndpoint, sendJson, triggerRebuild } = require("../lib/http");
+const { defaultStore: store } = require("../lib/store");
+const { StoreError } = require("../lib/db");
 
-module.exports = async function handler(req, res) {
-  const method = req.method;
+const versionOf = (body) => (Number.isInteger(body.version) ? body.version : undefined);
 
-  // Strict independent server-side session authorization check
-  const auth = validateAdminSession(req.headers ? req.headers.cookie : "");
-
-  if (auth.status !== 200) {
-    res.setHeader("Content-Type", "application/json");
-    return res.status(auth.status).json({
-      error: auth.error,
-      authenticated: false,
-      status: auth.status,
-    });
-  }
-
-  if (method === "GET") {
-    const master = getMasterResume();
-    const profiles = getProfiles();
-    const applications = getApplications();
-
-    return res.status(200).json({
-      master,
+/**
+ * GET    /api/profiles           bootstrap: master + profiles + applications + storage status
+ * POST   /api/profiles           create a profile
+ * PUT    /api/profiles           update a profile (body.id + body.version required)
+ * DELETE /api/profiles?id=&version=
+ *
+ * Every write returns the row as stored in PostgreSQL (re-read inside the same
+ * transaction), so a success response means the data is durably committed.
+ */
+module.exports = adminEndpoint(["GET", "POST", "PUT", "DELETE"], async ({ res, session, body, query, req }) => {
+  if (req.method === "GET") {
+    const [masterState, profiles, applications, storage] = await Promise.all([
+      store.getMaster(),
+      store.listProfiles(),
+      store.listApplications(),
+      store.status(),
+    ]);
+    return sendJson(res, 200, {
+      master: masterState.master,
+      masterVersion: masterState.version,
+      masterUpdatedAt: masterState.updatedAt,
       profiles,
       applications,
-      adminUsername: auth.config.adminUsername,
-      user: auth.session.user,
+      storage,
+      adminUsername: session.user,
+      user: { login: session.user, name: session.name, avatar: session.avatar },
     });
   }
 
-  if (method === "POST") {
-    try {
-      const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
-
-      if (body.profiles && Array.isArray(body.profiles)) {
-        saveProfiles(body.profiles);
-      }
-
-      if (body.applications && Array.isArray(body.applications)) {
-        saveApplications(body.applications);
-      }
-
-      return res.status(200).json({
-        ok: true,
-        profiles: getProfiles(),
-        applications: getApplications(),
-      });
-    } catch (err) {
-      return res.status(400).json({ error: "Failed to save data", message: err.message });
-    }
+  if (req.method === "POST") {
+    const profile = await store.createProfile(body);
+    const rebuild = profile.isDefault ? await triggerRebuild() : undefined;
+    return sendJson(res, 201, { ok: true, profile, rebuild });
   }
 
-  res.setHeader("Allow", "GET, POST");
-  return res.status(405).json({ error: "Method not allowed" });
-};
+  if (req.method === "PUT") {
+    if (typeof body.id !== "string") {
+      throw new StoreError("VALIDATION", 400, "Profile id is required.", [{ field: "id", message: "is required" }]);
+    }
+    const profile = await store.updateProfile(body.id, versionOf(body), body);
+    const rebuild = profile.isDefault ? await triggerRebuild() : undefined;
+    return sendJson(res, 200, { ok: true, profile, rebuild });
+  }
+
+  // DELETE
+  const version = Number.parseInt(query.version, 10);
+  const result = await store.deleteProfile(String(query.id || ""), Number.isNaN(version) ? undefined : version);
+  return sendJson(res, 200, { ok: true, ...result });
+});

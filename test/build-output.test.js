@@ -12,6 +12,9 @@ test("build generates website and ATS resume from source data", () => {
   const data = JSON.parse(
     fs.readFileSync(path.join(ROOT, "resume-data.json"), "utf8")
   );
+  const defaultResume = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "resume-default.json"), "utf8")
+  );
   const website = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   const resume = fs.readFileSync(path.join(ROOT, "resume-source.html"), "utf8");
 
@@ -32,7 +35,17 @@ test("build generates website and ATS resume from source data", () => {
   assert.ok(!resume.includes("valipokkann.in"));
   assert.ok(resume.includes("rajasekar.work"));
   assert.equal((resume.match(/class="contact-line"/g) || []).length, 2);
-  assert.ok(resume.includes("<strong>Languages:</strong>"));
+  assert.ok(resume.includes("<strong>Programming Languages:</strong>"));
+
+  // Public portfolio shows every public master project; the ATS resume shows the default profile's selection.
+  data.projects.filter((p) => p.isPublic !== false).forEach((p) => {
+    assert.ok(website.includes(`<h3>${p.title}</h3>`), `portfolio missing project ${p.title}`);
+  });
+  assert.ok(website.includes('id="projects"'));
+  assert.equal(defaultResume.profileId, "data-engineer");
+  assert.ok(resume.includes("<h2>Projects</h2>"));
+  assert.ok(resume.includes("<h3>OnchainRugs</h3>") && resume.includes("<h3>Uravu</h3>"));
+  assert.ok(!resume.includes("<h3>Hard COpy</h3>"), "ATS resume must not force all eight projects");
 });
 
 test("ATS resume uses conventional sections in parser-friendly order", () => {
@@ -44,12 +57,15 @@ test("ATS resume uses conventional sections in parser-friendly order", () => {
     "<h2>Summary</h2>",
     "<h2>Skills</h2>",
     "<h2>Experience</h2>",
+    "Independent Software Developer",
+    "Jun 2025 - Present",
     "Digit Insurance",
     "Data Engineer",
     "Nov 2023 - Jun 2025",
     "Appzwork",
     "Software Engineer",
     "Jan 2020 - Nov 2023",
+    "<h2>Projects</h2>",
     "<h2>Education</h2>",
   ];
 

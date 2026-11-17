@@ -1,0 +1,244 @@
+{
+  "profileId": "data-engineer",
+  "profileName": "Data Engineer",
+  "layout": "ats-classic",
+  "projectDetail": "compact",
+  "accentColor": "#2457c5",
+  "sectionVisibility": {
+    "proof": true,
+    "summary": true,
+    "skills": true,
+    "experience": true,
+    "projects": true,
+    "education": true,
+    "contact": true
+  },
+  "name": "Rajasekar C",
+  "title": "Data Engineer",
+  "summary": "Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day.",
+  "contact": {
+    "phone": {
+      "label": "+91 7904348791",
+      "url": "tel:+917904348791"
+    },
+    "email": {
+      "label": "rajasekarc1142@gmail.com",
+      "url": "mailto:rajasekarc1142@gmail.com"
+    },
+    "linkedin": {
+      "label": "linkedin.com/in/rajasekar-c",
+      "url": "https://linkedin.com/in/rajasekar-c"
+    },
+    "github": {
+      "label": "github.com/innovinitylabs",
+      "url": "https://github.com/innovinitylabs/"
+    },
+    "portfolio": {
+      "label": "rajasekar.work",
+      "url": "https://rajasekar.work"
+    },
+    "creative": {
+      "label": "valipokkann.in",
+      "url": "https://valipokkann.in"
+    }
+  },
+  "proof": [
+    {
+      "id": "proof-1",
+      "value": "50M records/day",
+      "text": "Designed and operated production ETL pipelines at scale."
+    },
+    {
+      "id": "proof-2",
+      "value": "30 min to under 1 min",
+      "text": "Built Flask and Pandas automation recognized with the Tech Titan Award."
+    },
+    {
+      "id": "proof-3",
+      "value": "4000+ issues resolved",
+      "text": "Reduced the open production-data backlog from approximately 600 to under 70."
+    }
+  ],
+  "experience": [
+    {
+      "org": "Independent",
+      "role": "Independent Software Developer",
+      "period": "Jun 2025 - Present",
+      "bullets": [
+        "Independently build software products, creative technology, web applications, generative art systems, and AI-assisted applications"
+      ]
+    },
+    {
+      "org": "Digit Insurance",
+      "role": "Data Engineer",
+      "period": "Nov 2023 - Jun 2025",
+      "bullets": [
+        "Owned the Vahan and Health business domains",
+        "Designed and operated ETL data pipelines processing approximately 50M records per day for high-volume batch data processing and downstream reporting",
+        "Built a Flask and Pandas automation tool that reduced Vahan issue resolution from approximately 30 minutes to under 1 minute, earning the Tech Titan Award",
+        "Resolved 4000+ production data issues and reduced the open backlog from approximately 600 to under 70",
+        "Owned PostgreSQL schema design and Git-versioned DDL; implemented PII classification and secure credential handling for data quality and compliant data handling",
+        "Automated MoEngage customer notification workflows with SQL stored procedures for policy-renewal detection, eliminating redundant alerts",
+        "Delivered ETL, data-ingestion, and schema work for Bima Satrak regulatory reporting; automated recurring credit-update and Excel-to-database ingestion with SQL and Pandas"
+      ]
+    },
+    {
+      "org": "Appzwork",
+      "role": "Software Engineer",
+      "period": "Jan 2020 - Nov 2023",
+      "bullets": [
+        "Built and maintained Oracle SQL and PL/SQL solutions, stored procedures, and production reports for banking and insurance data systems",
+        "Owned production support and database incident response, diagnosed root causes, and deployed fixes across client environments",
+        "Optimized SQL queries and stored procedures to improve database performance under high-usage production workloads",
+        "Managed production database deployments, maintenance, and recovery across client environments"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "group": "Programming Languages",
+      "items": [
+        "Python",
+        "SQL",
+        "PL/SQL",
+        "Shell"
+      ]
+    },
+    {
+      "group": "Data Engineering",
+      "items": [
+        "ETL",
+        "ELT",
+        "Data Pipelines",
+        "Data Ingestion",
+        "Data Warehousing",
+        "Data Modelling",
+        "Batch Processing",
+        "Pandas"
+      ]
+    },
+    {
+      "group": "Databases",
+      "items": [
+        "PostgreSQL",
+        "Oracle",
+        "DB2",
+        "Redis",
+        "ClickHouse"
+      ]
+    },
+    {
+      "group": "Backend Development",
+      "items": [
+        "Flask",
+        "REST APIs",
+        "Stored Procedures",
+        "Database Design",
+        "Query Optimization"
+      ]
+    },
+    {
+      "group": "Cloud and Data Platforms",
+      "items": [
+        "Neon",
+        "Vercel"
+      ]
+    },
+    {
+      "group": "DevOps and Developer Tools",
+      "items": [
+        "Docker",
+        "Git",
+        "Linux",
+        "GitHub Workflows",
+        "Cursor",
+        "Claude",
+        "ChatGPT",
+        "GPT Codex",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "group": "Currently Learning",
+      "items": [
+        "Databricks",
+        "Apache Spark",
+        "PySpark"
+      ]
+    },
+    {
+      "group": "Other",
+      "items": [
+        "Selenium",
+        "MoEngage"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-onchainrugs",
+      "title": "OnchainRugs",
+      "status": "Deployed",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Next.js application for minting, previewing, maintaining, and exploring generative on-chain rug NFTs tied to EVM smart contracts.",
+      "technologies": [
+        "Next.js",
+        "TypeScript",
+        "Solidity",
+        "Foundry",
+        "wagmi",
+        "viem",
+        "RainbowKit",
+        "Upstash Redis",
+        "Puppeteer"
+      ],
+      "bullets": [
+        "Developed the Solidity contracts (Foundry-based, with ERC721A and OpenZeppelin) and the Next.js front end with multi-chain wallet support (Base, Shape, Ethereum testnets)",
+        "Kept rug output deterministic across browser, export, and server-side flows with a minimal p5-compatible runtime; added a webhook that updates a Redis cache on chain events",
+        "Generated dynamic social-preview images by rendering rugs in headless Puppeteer"
+      ],
+      "links": [
+        {
+          "label": "onchain-rugs.vercel.app",
+          "url": "https://onchain-rugs.vercel.app"
+        }
+      ]
+    },
+    {
+      "id": "project-uravu",
+      "title": "Uravu",
+      "status": "Deployed",
+      "role": "Sole developer",
+      "period": "",
+      "description": "Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Three.js",
+        "Neon Postgres",
+        "Zod",
+        "Resend"
+      ],
+      "bullets": [
+        "Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend",
+        "Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)"
+      ],
+      "links": [
+        {
+          "label": "uravu-site.vercel.app",
+          "url": "https://uravu-site.vercel.app"
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "level": "B.E.",
+      "place": "RMK Engineering College",
+      "meta": "CGPA: 7.17"
+    }
+  ]
+}

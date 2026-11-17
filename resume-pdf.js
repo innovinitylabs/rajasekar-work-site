@@ -50,7 +50,7 @@
       title: `${data.name} - ${data.title}`,
       subject: `${data.title} resume`,
       author: data.name,
-      keywords: "Data Engineer, ETL, SQL, Python, PostgreSQL, Oracle",
+      keywords: [data.title, "ETL", "SQL", "Python", "PostgreSQL", "Oracle"].filter(Boolean).join(", "),
     });
 
     const ensureSpace = (needed) => {
@@ -83,16 +83,16 @@
 
     const sectionHeading = (label, reserve = 36) => {
       ensureSpace(reserve);
-      y += 7;
+      y += 5;
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
       setColor(accentColor);
       doc.text(label.toUpperCase(), margin, y);
-      y += 5;
+      y += 4;
       doc.setDrawColor(208, 213, 221);
       doc.setLineWidth(0.5);
       doc.line(margin, y, pageWidth - margin, y);
-      y += 12;
+      y += 10;
     };
 
     const writeContactLine = (items) => {
@@ -214,46 +214,64 @@
             doc.text(line, margin + 12, y);
             y += lineHeight;
           });
-          y += 2;
+          y += 1.5;
         });
 
-        y += 8;
+        y += 6;
       });
     }
 
     if (data.projects && data.projects.length > 0) {
       sectionHeading("Projects");
+      const compact = data.projectDetail === "compact";
       data.projects.forEach((proj) => {
         ensureSpace(28);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10.5);
         setColor(INK);
         doc.text(proj.title, margin, y);
-        y += 11;
-        writeLines(`${proj.role} | ${proj.period}`, {
-          size: 9.2,
-          style: "italic",
-          color: MUTE,
-          gap: 2,
-        });
-        if (proj.description) {
+        const projectMeta = [proj.role, proj.period, proj.status].filter(Boolean).join(" | ");
+        if (compact) {
+          // One line: "Title  Sole developer | Deployed"
+          const titleWidth = doc.getTextWidth(proj.title);
+          doc.setFont("helvetica", "italic");
+          doc.setFontSize(9.2);
+          setColor(MUTE);
+          if (projectMeta) doc.text(`   ${projectMeta}`, margin + titleWidth, y);
+          y += 12;
+        } else {
+          y += 11;
+          if (projectMeta) {
+            writeLines(projectMeta, { size: 9.2, style: "italic", color: MUTE, gap: 2 });
+          }
+        }
+        if (proj.description && !compact) {
           writeLines(proj.description, { size: 9.5, color: MUTE, gap: 2 });
         }
-        (proj.bullets || []).forEach((bullet) => {
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(9.5);
-          setColor(INK);
-          const lines = doc.splitTextToSize(bullet, contentWidth - 12);
-          const lineHeight = 12.2;
-          lines.forEach((line, index) => {
-            ensureSpace(lineHeight);
-            if (index === 0) doc.text("\u2022", margin + 1, y);
-            doc.text(line, margin + 12, y);
-            y += lineHeight;
+        if (!compact) {
+          (proj.bullets || []).forEach((bullet) => {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9.5);
+            setColor(INK);
+            const lines = doc.splitTextToSize(bullet, contentWidth - 12);
+            const lineHeight = 12.2;
+            lines.forEach((line, index) => {
+              ensureSpace(lineHeight);
+              if (index === 0) doc.text("\u2022", margin + 1, y);
+              doc.text(line, margin + 12, y);
+              y += lineHeight;
+            });
+            y += 2;
           });
-          y += 2;
-        });
-        y += 6;
+        }
+        if (proj.technologies && proj.technologies.length > 0) {
+          writeLines(`Technologies: ${proj.technologies.join(", ")}`, {
+            size: 9,
+            color: MUTE,
+            gap: 2,
+          });
+        }
+        y += compact ? 2 : 6;
       });
     }
 

@@ -1,36 +1,73 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "ResumeSystemSchema",
-  "description": "Schema for the multi-profile resume management system of rajasekar.work",
+  "description": "Shape of the master resume document and the profile/application rows. PostgreSQL is the source of truth; lib/validate.js enforces this server-side.",
   "type": "object",
   "properties": {
     "masterResume": {
       "type": "object",
-      "required": ["name", "title", "summary", "contact", "proof", "experience", "skills", "education"],
+      "required": [
+        "name",
+        "title",
+        "summary",
+        "contact",
+        "proof",
+        "experience",
+        "projects",
+        "skills",
+        "education"
+      ],
       "properties": {
-        "name": { "type": "string" },
-        "title": { "type": "string" },
-        "summary": { "type": "string" },
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
         "contact": {
           "type": "object",
           "properties": {
-            "phone": { "$ref": "#/$defs/contactItem" },
-            "email": { "$ref": "#/$defs/contactItem" },
-            "linkedin": { "$ref": "#/$defs/contactItem" },
-            "github": { "$ref": "#/$defs/contactItem" },
-            "portfolio": { "$ref": "#/$defs/contactItem" },
-            "creative": { "$ref": "#/$defs/contactItem" }
+            "phone": {
+              "$ref": "#/$defs/contactItem"
+            },
+            "email": {
+              "$ref": "#/$defs/contactItem"
+            },
+            "linkedin": {
+              "$ref": "#/$defs/contactItem"
+            },
+            "github": {
+              "$ref": "#/$defs/contactItem"
+            },
+            "portfolio": {
+              "$ref": "#/$defs/contactItem"
+            },
+            "creative": {
+              "$ref": "#/$defs/contactItem"
+            }
           }
         },
         "proof": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["value", "text"],
+            "required": [
+              "value",
+              "text"
+            ],
             "properties": {
-              "id": { "type": "string" },
-              "value": { "type": "string" },
-              "text": { "type": "string" }
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
             }
           }
         },
@@ -38,55 +75,59 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["org", "role", "period", "bullets"],
+            "required": [
+              "org",
+              "role",
+              "period",
+              "bullets"
+            ],
             "properties": {
-              "id": { "type": "string" },
-              "org": { "type": "string" },
-              "role": { "type": "string" },
-              "period": { "type": "string" },
+              "id": {
+                "type": "string"
+              },
+              "org": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
               "bullets": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               },
               "bulletDetails": {
                 "type": "array",
                 "items": {
                   "type": "object",
                   "properties": {
-                    "id": { "type": "string" },
-                    "text": { "type": "string" },
-                    "tags": { "type": "array", "items": { "type": "string" } }
+                    "id": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
                   }
                 }
               },
-              "track": { "type": "string", "enum": ["enterprise", "independent", "contract"] }
-            }
-          }
-        },
-        "independentWork": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "required": ["id", "title", "role", "period", "description", "technologies"],
-            "properties": {
-              "id": { "type": "string" },
-              "title": { "type": "string" },
-              "role": { "type": "string" },
-              "period": { "type": "string" },
-              "description": { "type": "string" },
-              "technologies": { "type": "array", "items": { "type": "string" } },
-              "links": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "label": { "type": "string" },
-                    "url": { "type": "string" }
-                  }
-                }
-              },
-              "bullets": { "type": "array", "items": { "type": "string" } },
-              "track": { "type": "string", "enum": ["independent"] }
+              "track": {
+                "type": "string",
+                "enum": [
+                  "enterprise",
+                  "independent",
+                  "contract"
+                ]
+              }
             }
           }
         },
@@ -94,11 +135,23 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["group", "items"],
+            "required": [
+              "group",
+              "items"
+            ],
             "properties": {
-              "id": { "type": "string" },
-              "group": { "type": "string" },
-              "items": { "type": "array", "items": { "type": "string" } }
+              "id": {
+                "type": "string"
+              },
+              "group": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
             }
           }
         },
@@ -106,12 +159,105 @@
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["level", "place", "meta"],
+            "required": [
+              "level",
+              "place",
+              "meta"
+            ],
             "properties": {
-              "id": { "type": "string" },
-              "level": { "type": "string" },
-              "place": { "type": "string" },
-              "meta": { "type": "string" }
+              "id": {
+                "type": "string"
+              },
+              "level": {
+                "type": "string"
+              },
+              "place": {
+                "type": "string"
+              },
+              "meta": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "status",
+              "role",
+              "description",
+              "technologies"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+              },
+              "title": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Deployed",
+                  "In development",
+                  "Prototype",
+                  "Experimental",
+                  "Needs review"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string",
+                "description": "Left blank unless verified"
+              },
+              "description": {
+                "type": "string"
+              },
+              "technologies": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "bullets": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "isPublic": {
+                "type": "boolean",
+                "default": true,
+                "description": "Show on the public portfolio"
+              },
+              "needsReview": {
+                "type": "boolean",
+                "default": false
+              }
             }
           }
         }
@@ -119,89 +265,231 @@
     },
     "profiles": {
       "type": "array",
-      "items": { "$ref": "#/$defs/profile" }
+      "items": {
+        "$ref": "#/$defs/profile"
+      }
     },
     "applications": {
       "type": "array",
-      "items": { "$ref": "#/$defs/jobApplication" }
+      "items": {
+        "$ref": "#/$defs/jobApplication"
+      }
     }
   },
   "$defs": {
     "contactItem": {
       "type": "object",
-      "required": ["label", "url"],
+      "required": [
+        "label",
+        "url"
+      ],
       "properties": {
-        "label": { "type": "string" },
-        "url": { "type": "string" }
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
       }
     },
     "sectionVisibility": {
       "type": "object",
       "properties": {
-        "proof": { "type": "boolean", "default": true },
-        "summary": { "type": "boolean", "default": true },
-        "skills": { "type": "boolean", "default": true },
-        "experience": { "type": "boolean", "default": true },
-        "projects": { "type": "boolean", "default": false },
-        "education": { "type": "boolean", "default": true },
-        "contact": { "type": "boolean", "default": true }
+        "proof": {
+          "type": "boolean",
+          "default": true
+        },
+        "summary": {
+          "type": "boolean",
+          "default": true
+        },
+        "skills": {
+          "type": "boolean",
+          "default": true
+        },
+        "experience": {
+          "type": "boolean",
+          "default": true
+        },
+        "projects": {
+          "type": "boolean",
+          "default": false
+        },
+        "education": {
+          "type": "boolean",
+          "default": true
+        },
+        "contact": {
+          "type": "boolean",
+          "default": true
+        }
       }
     },
     "profile": {
       "type": "object",
-      "required": ["id", "name", "targetTitle"],
+      "required": [
+        "id",
+        "name",
+        "targetTitle"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "isDefault": { "type": "boolean", "default": false },
-        "targetTitle": { "type": "string" },
-        "summaryOverride": { "type": ["string", "null"] },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isDefault": {
+          "type": "boolean",
+          "default": false
+        },
+        "targetTitle": {
+          "type": "string"
+        },
+        "summaryOverride": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "selectedExperience": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "List of experience IDs to include"
         },
         "selectedSkills": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "description": "List of skill group IDs or skill names"
         },
         "selectedProjects": {
           "type": "array",
-          "items": { "type": "string" },
-          "description": "List of independent work IDs"
+          "items": {
+            "type": "string"
+          },
+          "description": "Project ids; array order is the priority order on the resume"
         },
-        "sectionVisibility": { "$ref": "#/$defs/sectionVisibility" },
+        "sectionVisibility": {
+          "$ref": "#/$defs/sectionVisibility"
+        },
         "layout": {
           "type": "string",
-          "enum": ["ats-classic", "modern-visual", "executive"],
+          "enum": [
+            "ats-classic",
+            "modern-visual",
+            "executive"
+          ],
           "default": "ats-classic"
         },
-        "accentColor": { "type": "string" },
-        "createdAt": { "type": "string" },
-        "updatedAt": { "type": "string" }
+        "accentColor": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "selectedBullets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": "experience id -> bullet ids to include; absent means all bullets"
+        },
+        "projectDetail": {
+          "type": "string",
+          "enum": [
+            "detailed",
+            "compact"
+          ],
+          "default": "detailed"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optimistic-lock version, incremented by the server on every write"
+        }
       }
     },
     "jobApplication": {
       "type": "object",
-      "required": ["id", "company", "jobTitle", "applicationDate", "profileId", "status"],
+      "required": [
+        "id",
+        "company",
+        "jobTitle",
+        "applicationDate",
+        "status"
+      ],
       "properties": {
-        "id": { "type": "string" },
-        "company": { "type": "string" },
-        "jobTitle": { "type": "string" },
-        "jobDescription": { "type": "string" },
-        "applicationDate": { "type": "string" },
-        "profileId": { "type": "string" },
-        "selectedSkills": { "type": "array", "items": { "type": "string" } },
-        "selectedExperience": { "type": "array", "items": { "type": "string" } },
-        "generatedResumeVersion": { "type": "string" },
+        "id": {
+          "type": "string"
+        },
+        "company": {
+          "type": "string"
+        },
+        "jobTitle": {
+          "type": "string"
+        },
+        "jobDescription": {
+          "type": "string"
+        },
+        "applicationDate": {
+          "type": "string"
+        },
+        "profileId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selectedSkills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selectedExperience": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "generatedResumeVersion": {
+          "type": "string"
+        },
         "status": {
           "type": "string",
-          "enum": ["Draft", "Applied", "Screening", "Interviewing", "Offered", "Rejected", "Archived"]
+          "enum": [
+            "Draft",
+            "Applied",
+            "Screening",
+            "Interviewing",
+            "Offered",
+            "Rejected",
+            "Archived"
+          ]
         },
-        "notes": { "type": "string" },
-        "createdAt": { "type": "string" },
-        "updatedAt": { "type": "string" }
+        "notes": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     }
   }

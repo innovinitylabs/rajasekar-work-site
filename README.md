@@ -1,71 +1,112 @@
 # rajasekar-work-site
 
-`resume-data.json` is the single source of truth for the website and ATS resume.
+Portfolio site (`rajasekar.work`) plus a private resume-management console (`/admin/`).
 
-After editing it, regenerate the checked-in HTML:
+## Where data lives (read this first)
+
+| Data | Authoritative store | Notes |
+| --- | --- | --- |
+| Master resume (experience, projects, skills, education) | **PostgreSQL** table `master_resume` (+ `master_resume_history`) | One row, versioned. |
+| Resume profiles | **PostgreSQL** table `profiles` | Reference master data by id. |
+| Job applications | **PostgreSQL** table `applications` | |
+| Revoked sessions (logout) | **PostgreSQL** table `revoked_sessions` | |
+| Colour theme | browser `localStorage` | Convenience only. Nothing else is cached in the browser. |
+
+`resume-data.json`, `lib/seed-profiles.js` and `lib/seed-applications.js` are **only the one-time seed** for a
+brand-new empty database. After the first initialisation they are never read at runtime and never written.
+Edit content through the admin console (or restore from a backup), not by editing the seed files.
+
+Why not JSON files? A Vercel function's filesystem is read-only (apart from an ephemeral, per-instance `/tmp`), and every
+deploy replaces the repo. A JSON file written by a function disappears on the next cold start or deploy, and two
+instances would never see each other's writes. PostgreSQL is shared by all instances, durable, transactional and backed up.
+
+### Concurrency model
+
+Every mutable row has an integer `version`. A write must say which version it was based on
+(`UPDATE … WHERE id=$1 AND version=$2`, inside a transaction with `FOR UPDATE`). If someone else saved first the API answers
+`409 VERSION_CONFLICT` with the current row, and the admin console tells you to reload instead of overwriting.
+Constraints (single default profile, status/layout enums, hex colours, FK from applications to profiles) are enforced by the
+database, not just by the API.
+
+## Setup
+
+### 1. Create a PostgreSQL database
+Recommended: **Neon** (free tier, serverless-friendly pooled connections, point-in-time restore) via the Vercel Marketplace
+integration. Vercel Postgres is Neon underneath; Supabase Postgres also works. Any PostgreSQL ≥ 13 works.
+
+Use the **pooled** connection string in production (Neon: the host containing `-pooler`).
+
+### 2. Environment variables (Vercel → Project → Settings → Environment Variables)
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | yes | PostgreSQL connection string (`POSTGRES_URL` is also accepted). |
+| `SESSION_SECRET` | yes | ≥ 32 random characters (`openssl rand -base64 48`). **No default exists: without it the admin API refuses every request (503).** |
+| `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | yes | GitHub OAuth app. Callback URL: `https://<your-domain>/api/auth/callback`. |
+| `ADMIN_GITHUB_USERNAME` | no | Defaults to `innovinitylabs`. |
+| `ADMIN_GITHUB_ID` | recommended | Numeric GitHub account id (`gh api user --jq .id`). Pins admin access to the immutable id, not just the renameable username. |
+| `SITE_URL` | recommended | e.g. `https://www.rajasekar.work`. Used to build the OAuth redirect URI instead of trusting the Host header. |
+| `VERCEL_DEPLOY_HOOK_URL` | optional | When set, saving the master resume or the default profile triggers a rebuild so the public site follows. |
+| `GITHUB_TOKEN` | optional | GraphQL contribution calendar. |
+
+### 3. Create the tables
+Tables are created automatically on the first admin request and on every build (idempotent, advisory-locked). To do it explicitly:
 
 ```bash
-npm run build
+DATABASE_URL=postgres://… npm run db:migrate
 ```
 
-Run the full acceptance suite before publishing:
+On first run the database is seeded once from `resume-data.json` and the seed profiles.
+The one pre-existing application record (`ScaleData Systems`, from the old `data/applications.json`) is seeded too, so
+nothing is dropped; it looks like sample data, so delete it in the admin console if it is not real.
+
+### 4. Backups
+* In the admin console: **Backup & Storage → Download backup (JSON)** (`GET /api/export`, a consistent snapshot).
+* From a terminal: `DATABASE_URL=… npm run db:backup -- backups/resume.json`.
+* The provider's own point-in-time restore (Neon) covers the database; keep an off-provider copy of the JSON export too.
+* Every master-resume save is also kept in `master_resume_history`.
+
+## Local development
 
 ```bash
-npm run verify
+createdb resume_dev
+export DATABASE_URL=postgres://localhost/resume_dev
+export SESSION_SECRET="$(openssl rand -base64 48)"
+export GITHUB_CLIENT_ID=… GITHUB_CLIENT_SECRET=…     # GitHub OAuth app with callback http://localhost:3000/api/auth/callback
+npm run dev                                          # static site + /api on http://127.0.0.1:3000
 ```
+There is intentionally no authentication bypass; sign in with GitHub as the configured admin.
 
-The verification suite checks:
+## Build & test
 
-- generated website and printable HTML content
-- conventional ATS section order
-- required Data Engineer keywords
-- one-page jsPDF output
-- selectable PDF text and extraction order
-
-Rendering paths:
-
-- `build.js` generates `index.html` and `resume-source.html`
-- `resume-pdf.js` generates the downloadable PDF
-- `script.js` handles browser interactions, theme toggle, and GitHub activity calendar
-- `admin/` provides the private Multi-Profile Resume Management Console
-
-Vercel runs `npm run build` during deployment.
-
----
-
-## Phase 2: Multi-Profile Resume System Architecture
-
-### 1. Master Data & Profile Schema
-- `resume-data.json` remains the master source of truth for all baseline resume content.
-- `lib/resume-system.js` normalizes master data with deterministic stable IDs (`exp-*`, `skill-*`, `edu-*`).
-- `data/profiles.json` manages custom profiles (e.g. Data Engineer, AI / Product Engineer, Database Developer, Custom Profiles) referencing master data without duplication.
-- `data/applications.json` tracks targeted job applications linked to specific resume profiles.
-- `schema/resume-system.schema.json` formalizes the JSON Schema specification.
-
-### 2. Private Administrative Console (`/admin/`)
-- Accessible at `/admin/` for profile drafting, previewing, and PDF generation.
-- Supports creating, renaming, duplicating, and deleting profiles.
-- Allows configuring section visibility, customizing professional summaries, and filtering experience or skills by stable ID.
-- Provides a live preview and direct profile PDF export.
-
-### 3. GitHub OAuth Authentication
-Serverless GitHub OAuth endpoints are implemented under `/api/auth/`:
-- `GET /api/auth/login`: Initiates OAuth authorization with signed CSRF state.
-- `GET /api/auth/callback`: Exchanges authorization code, verifies identity against `ADMIN_GITHUB_USERNAME`, and sets an `HttpOnly` secure session cookie.
-- `GET /api/auth/session`: Validates current session token.
-- `GET /api/auth/logout`: Clears session cookie.
-
-#### Required Environment Variables for Production
-Configure these in Vercel or your `.env` file:
 ```bash
-GITHUB_CLIENT_ID="your_github_oauth_app_client_id"
-GITHUB_CLIENT_SECRET="your_github_oauth_app_client_secret"
-ADMIN_GITHUB_USERNAME="innovinitylabs"
-SESSION_SECRET="at_least_32_bytes_random_secret_string"
-GITHUB_TOKEN="optional_pat_for_graphql_contribution_calendar"
+npm run build     # reads the master + default profile from PostgreSQL when DATABASE_URL is set (fails loudly if unreachable),
+                  # otherwise from resume-data.json + seed profiles
+npm test          # unit + auth tests; persistence tests are skipped unless TEST_DATABASE_URL is set
+TEST_DATABASE_URL=postgres://localhost/resume_test npm test   # also runs the real-PostgreSQL persistence suite
 ```
+The database name must contain `test`: the persistence suite wipes the schema.
 
-### 4. GitHub Contribution Calendar
-- `/api/github-contributions?username=innovinitylabs`: Fetches activity data via GitHub GraphQL (or public sync fallback) with 1-hour serverless caching.
-- Statically embedded and client-hydrated on the portfolio with interactive tooltips, month/weekday labels, and light/dark theme support.
+Build outputs (committed, regenerated on every deploy):
+`index.html` (public portfolio: whole master, public projects), `resume-source.html` (printable ATS resume of the default profile),
+`resume-default.json` (resolved default profile used by the "Download Resume" button).
 
+## Architecture
+
+* `resume-resolve.js` pure master+profile → resume logic, shared by build, API and the browser admin preview (one code path).
+* `resume-pdf.js` jsPDF renderer (single column, standard headings, selectable text, linked contact details).
+* `lib/store.js` the only persistence layer. `lib/db.js` pool, migrations runner, error mapping. `lib/migrations.js` schema.
+* `lib/validate.js` server-side validation for master, profiles and applications.
+* `lib/auth.js` + `api/auth/*` GitHub OAuth, signed sessions. `lib/http.js` shared admin-endpoint guard (auth, CSRF, JSON, errors).
+* `api/profiles.js`, `api/applications.js`, `api/master.js`, `api/export.js` admin API. `api/github-contributions.js` public activity graph.
+* `admin/` console. `tools/` migrate/backup/dev server.
+
+## Security model
+
+* GitHub OAuth with a signed, expiring, one-time `state` that must also match an HttpOnly cookie (CSRF on login).
+* Session = HMAC-SHA256-signed token (12 h) with a unique id; cookie is `HttpOnly; Secure; SameSite=Lax`.
+* Every protected endpoint re-validates the session server-side: 401 invalid/expired/revoked, 403 non-admin, 503 if auth is not configured (fails closed).
+* Logout (`POST /api/auth/logout`) clears the cookie **and** revokes the session id in PostgreSQL.
+* Writes require `Content-Type: application/json` and a same-origin `Origin` (if sent) on top of SameSite cookies.
+* Secrets live only in environment variables; the browser never receives them.
+* Static hosting note: Vercel serves the repository root, so nothing sensitive may be committed. `.vercelignore` drops `test/`, `schema/`, `tools/`.

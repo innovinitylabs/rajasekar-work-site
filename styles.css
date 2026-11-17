@@ -975,3 +975,28 @@ img {
 .contributions-tooltip.is-active {
   opacity: 1;
 }
+
+/* Independent projects */
+.project-card .project-description {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--muted);
+}
+
+.project-card ul.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.project-card ul.tag-list li {
+  min-height: 28px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.project-card .project-links {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
