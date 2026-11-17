@@ -60,11 +60,23 @@ On first run the database is seeded once from `resume-data.json` and the seed pr
 The one pre-existing application record (`ScaleData Systems`, from the old `data/applications.json`) is seeded too, so
 nothing is dropped; it looks like sample data, so delete it in the admin console if it is not real.
 
-### 4. Backups
+### 4. Backups and restore
 * In the admin console: **Backup & Storage → Download backup (JSON)** (`GET /api/export`, a consistent snapshot).
 * From a terminal: `DATABASE_URL=… npm run db:backup -- backups/resume.json`.
 * The provider's own point-in-time restore (Neon) covers the database; keep an off-provider copy of the JSON export too.
 * Every master-resume save is also kept in `master_resume_history`.
+* **Restore:** `DATABASE_URL=… npm run db:restore -- backups/resume.json --yes` replaces the master, profiles and applications
+  from a backup in one transaction (validated first: an invalid file changes nothing; the master gets a new version, the old one stays in history).
+
+### Project links
+Each project has a `links` array: `{ label, url, type, primary, visible }` (`type`: website, app, generator, github, documentation, demo, other).
+At most one link is primary and it must be visible. Edit them in **Master Resume → Projects → Project links**. The public portfolio shows the primary
+link prominently and the other visible links in a compact list, using labels. Schema change 003 (`lib/migrations.js`) upgrades existing records in place
+and replaces bare `*.vercel.app` URLs only with verified custom domains (the deployment URL is kept as a hidden link).
+
+### GitHub activity graph
+`/api/github-contributions` returns daily data from 2025-01-01 through today (queried one calendar year at a time with a token, or via the public proxy without one).
+The browser builds the calendar from real dates (`contrib-calendar.js`); month labels are placed on the week column that contains the month's first day.
 
 ## Local development
 

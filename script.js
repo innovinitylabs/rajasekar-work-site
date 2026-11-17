@@ -182,119 +182,106 @@ if ("IntersectionObserver" in window) {
 /* -------------------------------------------------------------------------- */
 
 const renderContributionCalendar = (container, data, username) => {
-  const months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  const C = window.ContribCalendar;
+  const today = data.to || C.todayIso();
+  const years = C.availableYears(today);
+  const views = [
+    { id: "last", label: "Last 12 months", range: C.lastYearRange(today), caption: "in the last 12 months" },
+    ...years.map((y) => ({ id: String(y), label: String(y), range: C.yearRange(y, today), caption: `in ${y}` })),
   ];
-  const weekdays = ["", "Mon", "", "Wed", "", "Fri", ""];
+  const weekdayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
+  const esc = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
-  const weeks = data.weeks || [];
-  let monthLabelsHtml = "";
-  let lastMonth = -1;
+  const draw = (viewId) => {
+    const view = views.find((v) => v.id === viewId) || views[0];
+    const cal = C.buildCalendar(data.days, view.range.start, view.range.end);
 
-  weeks.forEach((week) => {
-    const firstDay = week.contributionDays && week.contributionDays[0];
-    if (firstDay && firstDay.date) {
-      const monthIndex = new Date(firstDay.date).getMonth();
-      if (monthIndex !== lastMonth) {
-        monthLabelsHtml += `<span class="contributions-month-label">${months[monthIndex]}</span>`;
-        lastMonth = monthIndex;
-      }
-    }
-  });
+    // One CSS grid: row 1 = month labels, rows 2-8 = Sun..Sat, col 1 = weekday labels.
+    // Every item is placed by its computed column, so labels cannot drift from the tiles.
+    const monthsHtml = cal.monthLabels
+      .map((m) => `<span class="contributions-month-label" style="grid-column:${m.col + 2} / span 3">${m.label}</span>`)
+      .join("");
+    const weekdaysHtml = weekdayLabels
+      .map((d, r) => (d ? `<span class="contributions-weekday-label" style="grid-row:${r + 2}">${d}</span>` : ""))
+      .join("");
+    const cellsHtml = cal.weeks
+      .map((week, c) =>
+        week
+          .map((d, r) =>
+            d
+              ? `<div class="contributions-day-cell level-${d.level}" style="grid-column:${c + 2};grid-row:${r + 2}" data-date="${d.date}" data-count="${d.count}" tabindex="0" role="gridcell" aria-label="${d.count} contributions on ${d.date}"></div>`
+              : ""
+          )
+          .join("")
+      )
+      .join("");
 
-  const weekdaysHtml = weekdays
-    .map((d) => `<span>${d}</span>`)
-    .join("");
+    const tabs = views
+      .map(
+        (v) =>
+          `<button type="button" class="contributions-tab${v.id === view.id ? " is-active" : ""}" data-view="${esc(v.id)}" aria-pressed="${v.id === view.id}">${esc(v.label)}</button>`
+      )
+      .join("");
 
-  const weeksHtml = weeks
-    .map((week) => {
-      const days = week.contributionDays || [];
-      const daysHtml = days
-        .map(
-          (d) =>
-            `<div class="contributions-day-cell level-${d.level || 0}" data-date="${d.date}" data-count="${d.count || 0}" tabindex="0" role="gridcell" aria-label="${d.count || 0} contributions on ${d.date}"></div>`
-        )
-        .join("");
-      return `<div class="contributions-week-col">${daysHtml}</div>`;
-    })
-    .join("");
-
-  container.innerHTML = `
-    <div class="contributions-header">
-      <div class="contributions-meta">
-        <span class="contributions-count">${data.totalContributions.toLocaleString()} contributions</span>
-        <span class="contributions-subtext">in the last year on GitHub</span>
+    container.innerHTML = `
+      <div class="contributions-header">
+        <div class="contributions-meta">
+          <span class="contributions-count">${cal.total.toLocaleString()} contributions</span>
+          <span class="contributions-subtext">${view.caption} on GitHub</span>
+        </div>
+        <a href="https://github.com/${username}" target="_blank" rel="noreferrer" class="button button-secondary" style="min-height:32px; padding:0.35rem 0.85rem; font-size:0.8rem;">
+          @${username} on GitHub
+        </a>
       </div>
-      <a href="https://github.com/${username}" target="_blank" rel="noreferrer" class="button button-secondary" style="min-height:32px; padding:0.35rem 0.85rem; font-size:0.8rem;">
-        @${username} on GitHub
-      </a>
-    </div>
-
-    <div class="contributions-scroll">
-      <div class="contributions-graph-inner">
-        <div class="contributions-months-row">${monthLabelsHtml}</div>
-        <div class="contributions-body-row">
-          <div class="contributions-weekdays-col">${weekdaysHtml}</div>
-          <div class="contributions-calendar-grid">${weeksHtml}</div>
+      <div class="contributions-tabs" role="group" aria-label="Contribution period">${tabs}</div>
+      <div class="contributions-scroll">
+        <div class="contributions-grid" style="--weeks:${cal.weeks.length}" role="grid" aria-label="Contribution calendar">
+          ${monthsHtml}${weekdaysHtml}${cellsHtml}
         </div>
       </div>
-    </div>
-
-    <div class="contributions-footer">
-      <span>Contributions activity calendar</span>
-      <div class="contributions-legend">
-        <span>Less</span>
-        <span class="contributions-day-cell level-0"></span>
-        <span class="contributions-day-cell level-1"></span>
-        <span class="contributions-day-cell level-2"></span>
-        <span class="contributions-day-cell level-3"></span>
-        <span class="contributions-day-cell level-4"></span>
-        <span>More</span>
+      <div class="contributions-footer">
+        <span>${view.range.start} to ${view.range.end}</span>
+        <div class="contributions-legend">
+          <span>Less</span>
+          <span class="contributions-day-cell level-0"></span>
+          <span class="contributions-day-cell level-1"></span>
+          <span class="contributions-day-cell level-2"></span>
+          <span class="contributions-day-cell level-3"></span>
+          <span class="contributions-day-cell level-4"></span>
+          <span>More</span>
+        </div>
       </div>
-    </div>
-    <div class="contributions-tooltip" role="tooltip" aria-hidden="true"></div>
-  `;
+      <div class="contributions-tooltip" role="tooltip" aria-hidden="true"></div>
+    `;
 
-  // Interactive tooltip
-  const tooltip = container.querySelector(".contributions-tooltip");
-  const cells = container.querySelectorAll(".contributions-day-cell[data-date]");
+    container.querySelectorAll(".contributions-tab").forEach((btn) =>
+      btn.addEventListener("click", () => draw(btn.dataset.view))
+    );
 
-  const showTooltip = (cell) => {
-    const date = cell.dataset.date;
-    const count = parseInt(cell.dataset.count, 10);
-    if (!date) return;
-
-    const dateFormatted = new Date(date).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
+    const tooltip = container.querySelector(".contributions-tooltip");
+    const showTooltip = (cell) => {
+      const date = cell.dataset.date;
+      const count = parseInt(cell.dataset.count, 10);
+      const dateFormatted = new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric", timeZone: "UTC",
+      });
+      tooltip.textContent = `${count === 1 ? "1 contribution" : `${count} contributions`} on ${dateFormatted}`;
+      tooltip.classList.add("is-active");
+      const cellRect = cell.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      tooltip.style.left = `${cellRect.left - containerRect.left + cellRect.width / 2}px`;
+      tooltip.style.top = `${cellRect.top - containerRect.top}px`;
+    };
+    const hideTooltip = () => tooltip.classList.remove("is-active");
+    container.querySelectorAll(".contributions-grid .contributions-day-cell").forEach((cell) => {
+      cell.addEventListener("mouseenter", () => showTooltip(cell));
+      cell.addEventListener("mouseleave", hideTooltip);
+      cell.addEventListener("focus", () => showTooltip(cell));
+      cell.addEventListener("blur", hideTooltip);
     });
-
-    const countText = count === 1 ? "1 contribution" : `${count} contributions`;
-    tooltip.textContent = `${countText} on ${dateFormatted}`;
-    tooltip.classList.add("is-active");
-
-    const cellRect = cell.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-
-    const left = cellRect.left - containerRect.left + cellRect.width / 2;
-    const top = cellRect.top - containerRect.top;
-
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
   };
 
-  const hideTooltip = () => {
-    tooltip.classList.remove("is-active");
-  };
-
-  cells.forEach((cell) => {
-    cell.addEventListener("mouseenter", () => showTooltip(cell));
-    cell.addEventListener("mouseleave", hideTooltip);
-    cell.addEventListener("focus", () => showTooltip(cell));
-    cell.addEventListener("blur", hideTooltip);
-  });
+  draw("last");
 };
 
 const initializeContributionGraph = () => {
@@ -306,7 +293,7 @@ const initializeContributionGraph = () => {
   fetch(`/api/github-contributions?username=${encodeURIComponent(username)}`)
     .then((res) => (res.ok ? res.json() : null))
     .then((data) => {
-      if (!data || !data.weeks || data.weeks.length === 0) {
+      if (!data || !Array.isArray(data.days) || data.days.length === 0 || !window.ContribCalendar) {
         container.innerHTML = `
           <div class="contributions-header">
             <div class="contributions-meta">

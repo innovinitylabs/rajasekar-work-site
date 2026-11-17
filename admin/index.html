@@ -120,6 +120,7 @@
             <div class="profile-list" id="admin-profile-list"></div>
           </div>
 
+          <div class="admin-main-col">
           <div class="admin-card">
             <div class="admin-card-header">
               <h3>Editing: <span id="active-profile-name" style="color:var(--accent);">Profile</span></h3>
@@ -197,14 +198,23 @@
             </form>
           </div>
 
-          <div class="admin-preview-col">
-            <div class="admin-card">
-              <div class="admin-card-header">
-                <h3>Live Profile Preview</h3>
-                <button type="button" class="button button-secondary btn-small" id="btn-export-profile-pdf">Export Profile PDF</button>
+            <div class="admin-card" id="preview-card">
+              <div class="admin-card-header preview-header">
+                <h3>Resume Preview <span id="preview-state" class="admin-badge">Saved</span></h3>
+                <div class="preview-controls">
+                  <div class="seg" role="group" aria-label="Preview source">
+                    <button type="button" class="seg-btn is-active" data-preview-mode="draft">Working copy</button>
+                    <button type="button" class="seg-btn" data-preview-mode="saved">Saved version</button>
+                  </div>
+                  <button type="button" class="button button-primary btn-small" id="btn-export-profile-pdf">Export PDF</button>
+                </div>
               </div>
               <p class="proof-text" id="preview-note" style="margin:0 0 0.75rem; font-size:0.78rem;"></p>
-              <div id="profile-live-preview"></div>
+              <div class="preview-stage" id="preview-stage">
+                <div class="preview-scaler" id="preview-scaler">
+                  <div id="profile-live-preview"></div>
+                </div>
+              </div>
             </div>
           </div>
         </section>

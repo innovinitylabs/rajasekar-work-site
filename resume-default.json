@@ -200,8 +200,18 @@
       ],
       "links": [
         {
-          "label": "onchain-rugs.vercel.app",
-          "url": "https://onchain-rugs.vercel.app"
+          "label": "Official Website",
+          "url": "https://onchainrugs.art",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://onchain-rugs.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
         }
       ]
     },
@@ -228,8 +238,18 @@
       ],
       "links": [
         {
-          "label": "uravu-site.vercel.app",
-          "url": "https://uravu-site.vercel.app"
+          "label": "Official Website",
+          "url": "https://www.uravu.social",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://uravu-site.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
         }
       ]
     }

@@ -5,7 +5,8 @@
     "verify": "npm run build && npm test",
     "db:migrate": "node tools/db-migrate.js",
     "db:backup": "node tools/db-backup.js",
-    "dev": "node tools/dev-server.js"
+    "dev": "node tools/dev-server.js",
+    "db:restore": "node tools/db-restore.js"
   },
   "devDependencies": {
     "jspdf": "^4.2.1",

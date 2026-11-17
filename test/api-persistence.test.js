@@ -342,6 +342,158 @@ test("DB constraints hold even when the API is bypassed", { skip }, async () => 
   await pool.end();
 });
 
+const getMasterDoc = async () => {
+  const { req, res } = adminRequest("GET");
+  return (await call(m.master, req, res)).body;
+};
+const putMaster = async (version, data) => {
+  const { req, res } = adminRequest("PUT", { body: { version, data } });
+  return call(m.master, req, res);
+};
+const lnk = (label, url, extra = {}) => ({ label, url, type: "website", primary: false, visible: true, ...extra });
+
+test("PROJECT LINKS: create multi-link project, edit, reorder, change primary, hide, remove - persisted after a cold start", { skip }, async () => {
+  let cur = await getMasterDoc();
+  let data = JSON.parse(JSON.stringify(cur.data));
+  data.projects.push({
+    id: "project-links-demo", title: "Links Demo", category: "", status: "Prototype", role: "Sole developer", period: "",
+    description: "Demo", technologies: ["Node"], bullets: [], isPublic: true, needsReview: false,
+    links: [lnk("Official Website", "https://example.com", { primary: true }), lnk("Generator", "https://gen.example.com", { type: "generator" }), lnk("GitHub", "https://github.com/innovinitylabs/x", { type: "github" })],
+  });
+  let out = await putMaster(cur.version, data);
+  assert.equal(out.status, 200, JSON.stringify(out.body));
+
+  // edit label/url, make Generator primary, hide GitHub, reorder
+  cur = out.body;
+  data = JSON.parse(JSON.stringify(cur.data));
+  const proj = data.projects.find((p) => p.id === "project-links-demo");
+  proj.links[0].primary = false;
+  proj.links[1].primary = true;
+  proj.links[1].label = "Art Platform";
+  proj.links[1].url = "https://art.example.com";
+  proj.links[2].visible = false;
+  proj.links.reverse();
+  out = await putMaster(cur.version, data);
+  assert.equal(out.status, 200, JSON.stringify(out.body));
+
+  await m.db.closePool();
+  const fresh = await m.store.createStore().getMaster();
+  const saved = fresh.doc.projects.find((p) => p.id === "project-links-demo");
+  assert.deepEqual(saved.links.map((l) => l.label), ["GitHub", "Art Platform", "Official Website"]);
+  assert.equal(saved.links.filter((l) => l.primary).length, 1);
+  assert.equal(saved.links.find((l) => l.primary).label, "Art Platform");
+  assert.equal(saved.links.find((l) => l.label === "GitHub").visible, false);
+  // the profile picker / resolver still sees the project
+  assert.ok(fresh.master.projects.some((p) => p.id === "project-links-demo"));
+
+  // remove a link
+  data = JSON.parse(JSON.stringify(fresh.doc));
+  data.projects.find((p) => p.id === "project-links-demo").links.splice(0, 1);
+  out = await putMaster(fresh.version, data);
+  assert.equal(out.status, 200);
+  assert.equal(out.body.data.projects.find((p) => p.id === "project-links-demo").links.length, 2);
+});
+
+test("PROJECT LINKS: invalid URLs, two primaries and a stale version are rejected and nothing changes", { skip }, async () => {
+  const cur = await getMasterDoc();
+  const mutate = (fn) => { const d = JSON.parse(JSON.stringify(cur.data)); fn(d.projects.find((p) => p.id === "project-links-demo")); return d; };
+  for (const [name, fn] of [
+    ["bad url", (p) => (p.links[0].url = "example dot com")],
+    ["javascript url", (p) => (p.links[0].url = "javascript:alert(1)")],
+    ["two primaries", (p) => p.links.forEach((l) => (l.primary = true))],
+    ["bad type", (p) => (p.links[0].type = "portal")],
+  ]) {
+    const out = await putMaster(cur.version, mutate(fn));
+    assert.equal(out.status, 400, `${name}: ${JSON.stringify(out.body)}`);
+  }
+  const unchanged = await getMasterDoc();
+  assert.equal(unchanged.version, cur.version);
+  const stale = await putMaster(cur.version - 1, mutate(() => {}));
+  assert.equal(stale.status, 409);
+});
+
+test("BACKUP + RESTORE: export includes links; restore into a changed database brings everything back", { skip }, async () => {
+  const exp = adminRequest("GET");
+  const snap = (await call(m.exporter, exp.req, exp.res)).body;
+  const demo = snap.master.data.projects.find((p) => p.id === "project-links-demo");
+  assert.equal(demo.links.length, 2, "export carries project links");
+  const madras = snap.master.data.projects.find((p) => p.id === "project-madras-checks");
+  assert.ok(madras.links.some((l) => l.url === "https://art.madraschecks.com" && l.type === "generator"));
+
+  // damage the live data
+  let cur = await getMasterDoc();
+  const broken = JSON.parse(JSON.stringify(cur.data));
+  broken.projects.find((p) => p.id === "project-madras-checks").links = [];
+  assert.equal((await putMaster(cur.version, broken)).status, 200);
+  const del = adminRequest("DELETE", { query: { id: "par-1", version: "1" } });
+  await call(m.applications, del.req, del.res);
+
+  const result = await m.store.defaultStore.restoreAll(JSON.parse(JSON.stringify(snap)));
+  assert.ok(result.masterVersion > cur.version);
+  assert.equal(result.profiles, snap.profiles.length);
+  assert.equal(result.applications, snap.applications.length);
+
+  cur = await getMasterDoc();
+  assert.deepEqual(cur.data.projects.find((p) => p.id === "project-madras-checks").links, madras.links);
+  assert.deepEqual(cur.data.projects.find((p) => p.id === "project-links-demo").links, demo.links);
+  const again = adminRequest("GET");
+  const snap2 = (await call(m.exporter, again.req, again.res)).body;
+  assert.deepEqual(snap2.profiles.map((p) => [p.id, p.selectedProjects, p.version]), snap.profiles.map((p) => [p.id, p.selectedProjects, p.version]));
+  assert.deepEqual(snap2.applications.map((a) => a.id).sort(), snap.applications.map((a) => a.id).sort(), "all applications (incl. the deleted one) are back");
+});
+
+test("RESTORE is all-or-nothing: an invalid snapshot changes nothing", { skip }, async () => {
+  const exp = adminRequest("GET");
+  const snap = (await call(m.exporter, exp.req, exp.res)).body;
+  const before = (await getMasterDoc()).version;
+  const bad = JSON.parse(JSON.stringify(snap));
+  bad.profiles[0].selectedProjects = ["project-nope"];
+  await assert.rejects(m.store.defaultStore.restoreAll(bad), /unknown project id/);
+  const bad2 = JSON.parse(JSON.stringify(snap));
+  bad2.master.data.projects[0].links[0].url = "nope";
+  await assert.rejects(m.store.defaultStore.restoreAll(bad2));
+  await assert.rejects(m.store.defaultStore.restoreAll({ format: "other" }));
+  assert.equal((await getMasterDoc()).version, before);
+  assert.equal((await getBootstrap()).body.profiles.length, snap.profiles.length);
+});
+
+test("MIGRATION 003 upgrades a legacy master in place (no table dropped) and records a history row", { skip }, async () => {
+  const { Pool } = require("pg");
+  const pool = new Pool({ connectionString: TEST_URL });
+  const { rows } = await pool.query("SELECT data, version FROM master_resume WHERE id = 1");
+  const legacy = rows[0].data;
+  legacy.projects.find((p) => p.id === "project-uravu").links = [{ label: "uravu-site.vercel.app", url: "https://uravu-site.vercel.app" }];
+  await pool.query("UPDATE master_resume SET data = $1::jsonb WHERE id = 1", [JSON.stringify(legacy)]);
+  await pool.query("DELETE FROM schema_migrations WHERE id = '003_project_links_v2'");
+  const tablesBefore = (await pool.query("SELECT count(*)::int n FROM information_schema.tables WHERE table_schema='public'")).rows[0].n;
+
+  await m.db.migrate(pool);
+
+  const after = (await pool.query("SELECT data, version, updated_by FROM master_resume WHERE id = 1")).rows[0];
+  const uravu = after.data.projects.find((p) => p.id === "project-uravu");
+  assert.equal(uravu.links[0].url, "https://www.uravu.social");
+  assert.equal(uravu.links[0].primary, true);
+  assert.equal(after.version, rows[0].version + 1);
+  assert.equal(after.updated_by, "migration-003");
+  assert.equal((await pool.query("SELECT count(*)::int n FROM information_schema.tables WHERE table_schema='public'")).rows[0].n, tablesBefore);
+  assert.equal((await pool.query("SELECT count(*)::int n FROM master_resume_history WHERE saved_by='migration-003'")).rows[0].n, 1);
+  assert.equal((await pool.query("SELECT count(*)::int n FROM profiles")).rows[0].n >= 3, true, "profiles untouched");
+  await m.db.migrate(pool); // idempotent
+  assert.equal((await pool.query("SELECT version FROM master_resume WHERE id = 1")).rows[0].version, after.version);
+  await pool.end();
+});
+
+test("PROFILE PREVIEW data: a profile that selects the multi-link project still resolves", { skip }, async () => {
+  const boot = await getBootstrap();
+  const p = boot.body.profiles.find((x) => x.id === "ai-product-engineer");
+  const r = adminRequest("PUT", { body: { ...p, selectedProjects: ["project-links-demo", ...p.selectedProjects] } });
+  assert.equal((await call(m.profiles, r.req, r.res)).status, 200);
+  const after = await getBootstrap();
+  const { resolveProfile } = require("../resume-resolve");
+  const resolved = resolveProfile(after.body.profiles.find((x) => x.id === "ai-product-engineer"), after.body.master);
+  assert.equal(resolved.projects[0].id, "project-links-demo");
+});
+
 test("teardown", { skip }, async () => {
   await m.db.closePool();
 });

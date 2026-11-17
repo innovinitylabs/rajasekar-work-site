@@ -3,12 +3,30 @@
   "title": "Data Engineer",
   "summary": "Production Data Engineer with 5+ years of experience building, operating, automating, and troubleshooting high-volume production data systems. Strong in Python, SQL, PostgreSQL, and Oracle, with hands-on experience in ETL pipelines, data ingestion, data modelling, schema design, and production reliability at approximately 50M records per day.",
   "contact": {
-    "phone": { "label": "+91 7904348791", "url": "tel:+917904348791" },
-    "email": { "label": "rajasekarc1142@gmail.com", "url": "mailto:rajasekarc1142@gmail.com" },
-    "linkedin": { "label": "linkedin.com/in/rajasekar-c", "url": "https://linkedin.com/in/rajasekar-c" },
-    "github": { "label": "github.com/innovinitylabs", "url": "https://github.com/innovinitylabs/" },
-    "portfolio": { "label": "rajasekar.work", "url": "https://rajasekar.work" },
-    "creative": { "label": "valipokkann.in", "url": "https://valipokkann.in" }
+    "phone": {
+      "label": "+91 7904348791",
+      "url": "tel:+917904348791"
+    },
+    "email": {
+      "label": "rajasekarc1142@gmail.com",
+      "url": "mailto:rajasekarc1142@gmail.com"
+    },
+    "linkedin": {
+      "label": "linkedin.com/in/rajasekar-c",
+      "url": "https://linkedin.com/in/rajasekar-c"
+    },
+    "github": {
+      "label": "github.com/innovinitylabs",
+      "url": "https://github.com/innovinitylabs/"
+    },
+    "portfolio": {
+      "label": "rajasekar.work",
+      "url": "https://rajasekar.work"
+    },
+    "creative": {
+      "label": "valipokkann.in",
+      "url": "https://valipokkann.in"
+    }
   },
   "proof": [
     {
@@ -74,13 +92,38 @@
       "role": "Sole developer",
       "period": "",
       "description": "Next.js application for minting, previewing, maintaining, and exploring generative on-chain rug NFTs tied to EVM smart contracts.",
-      "technologies": ["Next.js", "TypeScript", "Solidity", "Foundry", "wagmi", "viem", "RainbowKit", "Upstash Redis", "Puppeteer"],
+      "technologies": [
+        "Next.js",
+        "TypeScript",
+        "Solidity",
+        "Foundry",
+        "wagmi",
+        "viem",
+        "RainbowKit",
+        "Upstash Redis",
+        "Puppeteer"
+      ],
       "bullets": [
         "Developed the Solidity contracts (Foundry-based, with ERC721A and OpenZeppelin) and the Next.js front end with multi-chain wallet support (Base, Shape, Ethereum testnets)",
         "Kept rug output deterministic across browser, export, and server-side flows with a minimal p5-compatible runtime; added a webhook that updates a Redis cache on chain events",
         "Generated dynamic social-preview images by rendering rugs in headless Puppeteer"
       ],
-      "links": [{ "label": "onchain-rugs.vercel.app", "url": "https://onchain-rugs.vercel.app" }],
+      "links": [
+        {
+          "label": "Official Website",
+          "url": "https://onchainrugs.art",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://onchain-rugs.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
+        }
+      ],
       "isPublic": true,
       "needsReview": false
     },
@@ -92,7 +135,16 @@
       "role": "Sole developer",
       "period": "",
       "description": "Offline-first native SwiftUI app for iOS and macOS that renders chart reports and dasha timelines from a Swift calculation kit.",
-      "technologies": ["Swift", "SwiftUI", "Swift Package Manager", "C", "Swiss Ephemeris", "Python", "XcodeGen", "WidgetKit"],
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "Swift Package Manager",
+        "C",
+        "Swiss Ephemeris",
+        "Python",
+        "XcodeGen",
+        "WidgetKit"
+      ],
       "bullets": [
         "Building a native calculation layer (C and Swift) and checking it against a Python oracle (wrapping the open-source PyJHora library) with golden fixtures and parity tests",
         "Bundles a JPL DE440 ephemeris and a GeoNames place list with checksummed lock files; includes Lock Screen widgets and an optional on-device language model for a chart assistant"
@@ -109,12 +161,36 @@
       "role": "Sole developer",
       "period": "",
       "description": "Pre-launch waitlist site for Uravu, a product concept described as relational infrastructure for AI-mediated human connection.",
-      "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Three.js", "Neon Postgres", "Zod", "Resend"],
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Three.js",
+        "Neon Postgres",
+        "Zod",
+        "Resend"
+      ],
       "bullets": [
         "Stores waitlist signups in Neon Postgres (SQL migration, unique lowercase emails) through a Next.js server action with Zod validation and a welcome email via Resend",
         "Built an animated emotional-network background with React Three Fiber and structured SEO data (JSON-LD)"
       ],
-      "links": [{ "label": "uravu-site.vercel.app", "url": "https://uravu-site.vercel.app" }],
+      "links": [
+        {
+          "label": "Official Website",
+          "url": "https://www.uravu.social",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://uravu-site.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
+        }
+      ],
       "isPublic": true,
       "needsReview": false
     },
@@ -126,14 +202,33 @@
       "role": "Sole developer",
       "period": "",
       "description": "Digital art platform for multistable figurative emergence, including a browser-based Perception Engine for building rotational artworks.",
-      "technologies": ["Next.js", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "Web Workers"],
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "Framer Motion",
+        "Web Workers"
+      ],
       "bullets": [
         "Built the Perception Engine: import artwork, define perceptual states, rotate or snap between them, and export a standalone offline HTML file or a JSON configuration",
         "Built an image-preparation tool that converts to AVIF, WebP, PNG, and JPEG in the browser using a Web Worker, with side-by-side comparison and size metrics"
       ],
       "links": [
-        { "label": "anekaroopam.art", "url": "https://anekaroopam.art" },
-        { "label": "github.com/innovinitylabs/anekaroopam-site", "url": "https://github.com/innovinitylabs/anekaroopam-site" }
+        {
+          "label": "Official Website",
+          "url": "https://anekaroopam.art",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "GitHub",
+          "url": "https://github.com/innovinitylabs/anekaroopam-site",
+          "type": "github",
+          "primary": false,
+          "visible": true
+        }
       ],
       "isPublic": true,
       "needsReview": false
@@ -146,11 +241,45 @@
       "role": "Sole developer",
       "period": "",
       "description": "Website for Madras Checks, a contemporary luxury textile house from Madras working with generative pattern, handloom craft, cotton, and natural dyes.",
-      "technologies": ["Next.js", "React", "TypeScript", "CSS"],
+      "technologies": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "CSS"
+      ],
       "bullets": [
         "Built the site as a statically exportable Next.js application with unit tests for its content and data modules; the pattern generator is a separate system and is not part of this repository"
       ],
-      "links": [{ "label": "madraschecks-site.vercel.app", "url": "https://madraschecks-site.vercel.app" }],
+      "links": [
+        {
+          "label": "Official Website",
+          "url": "https://madraschecks.com",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        },
+        {
+          "label": "Art Page",
+          "url": "https://madraschecks.com/art/",
+          "type": "website",
+          "primary": false,
+          "visible": true
+        },
+        {
+          "label": "Art Platform & Generator",
+          "url": "https://art.madraschecks.com",
+          "type": "generator",
+          "primary": false,
+          "visible": true
+        },
+        {
+          "label": "Vercel deployment",
+          "url": "https://madraschecks-site.vercel.app",
+          "type": "demo",
+          "primary": false,
+          "visible": false
+        }
+      ],
       "isPublic": true,
       "needsReview": false
     },
@@ -162,12 +291,28 @@
       "role": "Sole developer",
       "period": "",
       "description": "Personal artist website with an art gallery, photography, articles, music, and a Thirukkural section with an image studio for social posts.",
-      "technologies": ["React", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion", "Decap CMS", "Vercel Functions"],
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Vite",
+        "Tailwind CSS",
+        "Framer Motion",
+        "Decap CMS",
+        "Vercel Functions"
+      ],
       "bullets": [
         "Built the site with content in YAML and Markdown managed through Decap CMS, with GitHub OAuth handled by Vercel serverless functions",
         "Added lazy-loaded image galleries, Vercel Analytics and Speed Insights, and SEO metadata"
       ],
-      "links": [{ "label": "valipokkann.in", "url": "https://valipokkann.in" }],
+      "links": [
+        {
+          "label": "Official Website",
+          "url": "https://valipokkann.in",
+          "type": "website",
+          "primary": true,
+          "visible": true
+        }
+      ],
       "isPublic": true,
       "needsReview": false
     },
@@ -179,7 +324,12 @@
       "role": "Sole developer",
       "period": "",
       "description": "Low-stimulation iOS app where the user rotates a 3D cow with free-form circular finger gestures, designed as a bedtime alternative to scrolling.",
-      "technologies": ["Swift", "SwiftUI", "RealityKit", "XcodeGen"],
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "RealityKit",
+        "XcodeGen"
+      ],
       "bullets": [
         "Implemented gesture-driven 3D rotation in SwiftUI and RealityKit with optional haptics and ambient audio, Swift 6 strict concurrency, and local-only session tracking (no accounts, ads, or network required)"
       ],
@@ -195,7 +345,12 @@
       "role": "Sole developer",
       "period": "",
       "description": "Native handwritten notebook for iPadOS and macOS, tagline \"Beyond Paper\", built in Swift and SwiftUI.",
-      "technologies": ["Swift", "SwiftUI", "Swift Package Manager", "XcodeGen"],
+      "technologies": [
+        "Swift",
+        "SwiftUI",
+        "Swift Package Manager",
+        "XcodeGen"
+      ],
       "bullets": [
         "Structured as an iPadOS and macOS app with a shared HardCopyCore Swift package, guided by written engineering specifications for ink input and filtering, stroke geometry, shape recognition, PDF pages, and undo/redo"
       ],
@@ -205,17 +360,111 @@
     }
   ],
   "skills": [
-    { "id": "skill-programming-languages", "group": "Programming Languages", "items": ["Python", "SQL", "PL/SQL", "Shell"] },
-    { "id": "skill-data-engineering", "group": "Data Engineering", "items": ["ETL", "ELT", "Data Pipelines", "Data Ingestion", "Data Warehousing", "Data Modelling", "Batch Processing", "Pandas"] },
-    { "id": "skill-databases", "group": "Databases", "items": ["PostgreSQL", "Oracle", "DB2", "Redis", "ClickHouse"] },
-    { "id": "skill-backend-development", "group": "Backend Development", "items": ["Flask", "REST APIs", "Stored Procedures", "Database Design", "Query Optimization"] },
-    { "id": "skill-cloud-data-platforms", "group": "Cloud and Data Platforms", "items": ["Neon", "Vercel"] },
-    { "id": "skill-devops-developer-tools", "group": "DevOps and Developer Tools", "items": ["Docker", "Git", "Linux", "GitHub Workflows", "Cursor", "Claude", "ChatGPT", "GPT Codex", "GitHub Copilot"] },
-    { "id": "skill-application-development", "group": "Application Development", "items": ["TypeScript", "Next.js", "React", "Swift", "SwiftUI", "Solidity"] },
-    { "id": "skill-currently-learning", "group": "Currently Learning", "items": ["Databricks", "Apache Spark", "PySpark"] },
-    { "id": "skill-other", "group": "Other", "items": ["Selenium", "MoEngage"] }
+    {
+      "id": "skill-programming-languages",
+      "group": "Programming Languages",
+      "items": [
+        "Python",
+        "SQL",
+        "PL/SQL",
+        "Shell"
+      ]
+    },
+    {
+      "id": "skill-data-engineering",
+      "group": "Data Engineering",
+      "items": [
+        "ETL",
+        "ELT",
+        "Data Pipelines",
+        "Data Ingestion",
+        "Data Warehousing",
+        "Data Modelling",
+        "Batch Processing",
+        "Pandas"
+      ]
+    },
+    {
+      "id": "skill-databases",
+      "group": "Databases",
+      "items": [
+        "PostgreSQL",
+        "Oracle",
+        "DB2",
+        "Redis",
+        "ClickHouse"
+      ]
+    },
+    {
+      "id": "skill-backend-development",
+      "group": "Backend Development",
+      "items": [
+        "Flask",
+        "REST APIs",
+        "Stored Procedures",
+        "Database Design",
+        "Query Optimization"
+      ]
+    },
+    {
+      "id": "skill-cloud-data-platforms",
+      "group": "Cloud and Data Platforms",
+      "items": [
+        "Neon",
+        "Vercel"
+      ]
+    },
+    {
+      "id": "skill-devops-developer-tools",
+      "group": "DevOps and Developer Tools",
+      "items": [
+        "Docker",
+        "Git",
+        "Linux",
+        "GitHub Workflows",
+        "Cursor",
+        "Claude",
+        "ChatGPT",
+        "GPT Codex",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "id": "skill-application-development",
+      "group": "Application Development",
+      "items": [
+        "TypeScript",
+        "Next.js",
+        "React",
+        "Swift",
+        "SwiftUI",
+        "Solidity"
+      ]
+    },
+    {
+      "id": "skill-currently-learning",
+      "group": "Currently Learning",
+      "items": [
+        "Databricks",
+        "Apache Spark",
+        "PySpark"
+      ]
+    },
+    {
+      "id": "skill-other",
+      "group": "Other",
+      "items": [
+        "Selenium",
+        "MoEngage"
+      ]
+    }
   ],
   "education": [
-    { "id": "edu-rmk-engineering-college", "level": "B.E.", "meta": "CGPA: 7.17", "place": "RMK Engineering College" }
+    {
+      "id": "edu-rmk-engineering-college",
+      "level": "B.E.",
+      "meta": "CGPA: 7.17",
+      "place": "RMK Engineering College"
+    }
   ]
 }

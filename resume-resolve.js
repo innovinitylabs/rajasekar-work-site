@@ -73,7 +73,7 @@
       description: p.description || "",
       technologies: [...(p.technologies || [])],
       bullets: [...(p.bullets || [])],
-      links: clone(p.links || []),
+      links: normalizeLinks(p.links),
       isPublic: p.isPublic !== false,
       needsReview: p.needsReview === true,
     }));
@@ -89,6 +89,28 @@
       skills,
       education,
     };
+  };
+
+  const LINK_TYPES = ["website", "app", "generator", "github", "documentation", "demo", "other"];
+
+  /** Legacy links were {label, url}; new ones add type/primary/visible. */
+  const normalizeLinks = (links) => {
+    const list = (links || []).map((l) => ({
+      label: l.label,
+      url: l.url,
+      type: LINK_TYPES.includes(l.type) ? l.type : "website",
+      primary: l.primary === true,
+      visible: l.visible !== false,
+    }));
+    // Old records had no primary flag: the first link is the main destination.
+    if (list.length && !list.some((l) => l.primary)) list[0].primary = true;
+    return list;
+  };
+
+  /** Visible links, primary first, otherwise in stored order. */
+  const visibleLinks = (links) => {
+    const vis = normalizeLinks(links).filter((l) => l.visible);
+    return [...vis.filter((l) => l.primary), ...vis.filter((l) => !l.primary)];
   };
 
   const DEFAULT_VISIBILITY = {
@@ -177,5 +199,5 @@
     };
   };
 
-  return { slugify, normalizeMaster, resolveProfile, DEFAULT_VISIBILITY };
+  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, resolveProfile, LINK_TYPES, DEFAULT_VISIBILITY };
 });
