@@ -171,3 +171,21 @@ test("layout: admin preview carries the same page-2 spacing rules as the PDF", (
   const css = fs.readFileSync(path.join(__dirname, "..", "admin", "admin.css"), "utf8");
   assert.match(css, /\[data-page="2"\] \.rp-role \{ margin-bottom: 12px; \}/);
 });
+
+test("admin preview is the real PDF: preview and Export share one builder, and the approximate text view is labelled as such", () => {
+  const js = fs.readFileSync(path.join(__dirname, "..", "admin", "admin.js"), "utf8");
+  const html = fs.readFileSync(path.join(__dirname, "..", "admin", "index.html"), "utf8");
+  assert.equal((js.match(/window\.ResumePdf\.buildResumePdf\(/g) || []).length, 1, "only one place builds a PDF in the admin");
+  assert.equal((js.match(/await buildProfilePdf\(r\)/g) || []).length, 2, "preview and export both call it");
+  assert.ok(js.includes("URL.createObjectURL(blob)") && html.includes('id="pdf-frame"'));
+  assert.ok(html.includes("PDF (exact)") && html.includes("Text view (approximate)"));
+  assert.match(js, /expected \$\{expected\}/, "warns when a two-page profile no longer fits two pages");
+});
+
+test("admin and tests use the same jsPDF version (pinned), so browser output matches what is tested", () => {
+  const pkg = require("../package.json");
+  const installed = require("jspdf/package.json").version;
+  const cdn = /jspdf@([\d.]+)\//.exec(fs.readFileSync(path.join(__dirname, "..", "admin", "admin.js"), "utf8"))[1];
+  assert.equal(pkg.devDependencies.jspdf, cdn);
+  assert.equal(installed, cdn);
+});

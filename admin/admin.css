@@ -603,3 +603,10 @@
 .resume-page[data-page="2"] .rp-role { margin-bottom: 12px; }
 .resume-page[data-page="2"] li { margin-bottom: 2px; }
 .resume-page .rp-edu-detail { color: #475467; }
+
+.pdf-info { font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted); }
+.pdf-info.is-ok { color: #067647; }
+.pdf-info.is-warn { color: #b54708; }
+[data-theme="dark"] .pdf-info.is-ok { color: #47cd89; }
+[data-theme="dark"] .pdf-info.is-warn { color: #fdb022; }
+.pdf-frame { width: 100%; height: min(1150px, 85vh); border: 1px solid var(--line); border-radius: var(--radius); background: #525659; }

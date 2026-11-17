@@ -9,7 +9,7 @@
     "db:restore": "node tools/db-restore.js"
   },
   "devDependencies": {
-    "jspdf": "^4.2.1",
+    "jspdf": "4.2.1",
     "pdf-parse": "^2.4.5"
   },
   "dependencies": {
