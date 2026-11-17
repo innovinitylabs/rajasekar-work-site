@@ -583,7 +583,7 @@
 
     if (twoPage && r.showcase) {
       // Mirrors the PDF: experience on page 1, selected work (and education) on page 2.
-      return page(first, 1) + page(`${heading(esc(r.showcase.heading))}<div class="rp-summary" style="margin-bottom:8px;">${esc(r.showcase.intro)}</div>${projects}${extras}${education}`, 2);
+      return page(first, 1) + page(`${heading(esc(r.showcase.heading))}<div class="rp-summary" style="margin-bottom:5px;">${esc(r.showcase.intro)}</div>${projects}${extras}${education}`, 2);
     }
     return page(first + (projects ? heading("Projects") + projects : "") + extras + education, 1);
   };
