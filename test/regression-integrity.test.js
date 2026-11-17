@@ -26,8 +26,10 @@ test("contact links, proof metrics and education are preserved exactly", () => {
   assert.equal(RAW.contact.portfolio.url, "https://rajasekar.work");
   assert.deepEqual(RAW.proof.map((p) => p.value), ["50M records/day", "30 min to under 1 min", "4000+ issues resolved"]);
   assert.deepEqual(RAW.education, [
-    { id: "edu-rmk-engineering-college", level: "B.E. in Civil Engineering", meta: "CGPA: 7.17", place: "RMK Engineering College" },
-    { id: "edu-datacamp-deep-learning", level: "Coursework", meta: "Introductory course", place: "DataCamp: Introduction to Deep Learning with Python" },
+    { id: "edu-rmk-engineering-college", level: "B.E. (Anna University)", meta: "CGPA: 7.17", place: "RMK Engineering College" },
+    { id: "edu-higher-secondary", level: "Higher Secondary (12th Standard)", meta: "87.4%", place: "" },
+    { id: "edu-secondary-school", level: "Secondary School (10th Standard)", meta: "86.5%", place: "" },
+    { id: "edu-datacamp-deep-learning", level: "DataCamp: Introduction to Deep Learning with Python", meta: "Introductory course", place: "" },
   ]);
 });
 

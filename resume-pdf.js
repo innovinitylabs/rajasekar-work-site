@@ -282,16 +282,27 @@
     const drawEducation = () => {
     if (data.education && data.education.length > 0) {
       sectionHeading("Education", 26);
-      data.education.forEach((education) => {
-        writeLines(
-          `${education.level} - ${education.place} - ${education.meta}`,
-          { size: 9.5, color: INK, gap: 0 }
-        );
+      data.education.forEach((ed) => {
+        ensureSpace(26);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        setColor(INK);
+        doc.text(ed.title, margin, y);
+        if (ed.inline) {
+          const tw = doc.getTextWidth(`${ed.title} `);
+          doc.setFont("helvetica", "normal");
+          setColor(MUTE);
+          doc.text(`| ${ed.inline}`, margin + tw, y);
+          y += 12;
+        } else {
+          y += 11.5;
+          if (ed.detail) writeLines(ed.detail, { size: 9.5, color: MUTE, gap: 1.5 });
+        }
       });
     }
     };
     let educationDrawn = false;
-    if (twoPage && data.education && data.education.length > 0 && y + 12 + 12 * data.education.length + 24 <= pageHeight - margin) {
+    if (twoPage && data.education && data.education.length > 0 && y + 12 + 24 * data.education.length + 24 <= pageHeight - margin) {
       drawEducation(); // fits naturally at the end of page 1
       educationDrawn = true;
     }

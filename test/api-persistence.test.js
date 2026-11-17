@@ -575,7 +575,7 @@ test("MIGRATION 005 adds profile options, upgrades master, and inserts the resea
   after.forEach((a, i) => {
     assert.deepEqual(a.selected_skills, before[i].selected_skills, "skills untouched");
     assert.deepEqual(a.selected_projects, before[i].selected_projects, "projects untouched");
-    assert.deepEqual(a.options.selectedEducation, ["edu-rmk-engineering-college"], "existing profile keeps only the degree");
+    assert.deepEqual(a.options.selectedEducation, ["edu-rmk-engineering-college"], "college-only profiles stay college-only");
   });
   const v = (await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version;
   await m.db.migrate(pool);
@@ -604,6 +604,37 @@ test("RESEARCH PROFILE via the API: persisted options survive a cold start and a
   await m.store.defaultStore.restoreAll(JSON.parse(JSON.stringify(snap)));
   const again = (await getBootstrap()).body.profiles.find((x) => x.id === "anthropic-research-residency");
   assert.deepEqual(again.options, snap.profiles.find((x) => x.id === "anthropic-research-residency").options);
+});
+
+test("MIGRATION 006 completes the education history and sets profile visibility defaults in an existing database", { skip }, async () => {
+  const { Pool } = require("pg");
+  const pool = new Pool({ connectionString: TEST_URL });
+  const legacy = (await pool.query("SELECT data FROM master_resume WHERE id = 1")).rows[0].data;
+  legacy.education = [
+    { id: "edu-rmk-engineering-college", level: "B.E. in Civil Engineering", place: "RMK Engineering College", meta: "CGPA: 7.17" },
+    { id: "edu-datacamp-deep-learning", level: "Coursework", place: "DataCamp: Introduction to Deep Learning with Python", meta: "Introductory course" },
+  ];
+  await pool.query("UPDATE master_resume SET data=$1::jsonb WHERE id=1", [JSON.stringify(legacy)]);
+  await pool.query("UPDATE profiles SET options = jsonb_set(options, '{selectedEducation}', '[\"edu-rmk-engineering-college\"]') WHERE id IN ('ai-product-engineer','data-engineer')");
+  await pool.query("UPDATE profiles SET options = jsonb_set(options, '{selectedEducation}', '[\"edu-rmk-engineering-college\",\"edu-datacamp-deep-learning\"]') WHERE id='anthropic-research-residency'");
+  await pool.query("DELETE FROM schema_migrations WHERE id = '006_education_history'");
+  const before = (await pool.query("SELECT id, selected_projects, selected_skills FROM profiles ORDER BY id")).rows;
+
+  await m.db.migrate(pool);
+
+  const d = (await pool.query("SELECT data FROM master_resume WHERE id = 1")).rows[0].data;
+  assert.deepEqual(d.education.map((e) => e.id), ["edu-rmk-engineering-college", "edu-higher-secondary", "edu-secondary-school", "edu-datacamp-deep-learning"]);
+  assert.deepEqual(d.education.slice(0, 3).map((e) => e.meta), ["CGPA: 7.17", "87.4%", "86.5%"]);
+  const opts = Object.fromEntries((await pool.query("SELECT id, options FROM profiles")).rows.map((r) => [r.id, r.options.selectedEducation]));
+  assert.deepEqual(opts["data-engineer"], ["edu-rmk-engineering-college"]);
+  assert.deepEqual(opts["ai-product-engineer"], ["edu-rmk-engineering-college", "edu-higher-secondary", "edu-secondary-school"]);
+  assert.equal(opts["anthropic-research-residency"].length, 4);
+  const after = (await pool.query("SELECT id, selected_projects, selected_skills FROM profiles ORDER BY id")).rows;
+  assert.deepEqual(after, before, "projects and skills untouched");
+  const v = (await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version;
+  await m.db.migrate(pool);
+  assert.equal((await pool.query("SELECT version FROM master_resume WHERE id=1")).rows[0].version, v);
+  await pool.end();
 });
 
 test("teardown", { skip }, async () => {

@@ -405,9 +405,12 @@
   ],
   "education": [
     {
-      "level": "B.E. in Civil Engineering",
+      "level": "B.E. (Anna University)",
       "place": "RMK Engineering College",
-      "meta": "CGPA: 7.17"
+      "meta": "CGPA: 7.17",
+      "title": "B.E. (Anna University)",
+      "detail": "RMK Engineering College | CGPA: 7.17",
+      "inline": ""
     }
   ],
   "extraSections": []

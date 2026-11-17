@@ -482,15 +482,27 @@
   "education": [
     {
       "id": "edu-rmk-engineering-college",
-      "level": "B.E. in Civil Engineering",
-      "meta": "CGPA: 7.17",
-      "place": "RMK Engineering College"
+      "level": "B.E. (Anna University)",
+      "place": "RMK Engineering College",
+      "meta": "CGPA: 7.17"
+    },
+    {
+      "id": "edu-higher-secondary",
+      "level": "Higher Secondary (12th Standard)",
+      "place": "",
+      "meta": "87.4%"
+    },
+    {
+      "id": "edu-secondary-school",
+      "level": "Secondary School (10th Standard)",
+      "place": "",
+      "meta": "86.5%"
     },
     {
       "id": "edu-datacamp-deep-learning",
-      "level": "Coursework",
-      "meta": "Introductory course",
-      "place": "DataCamp: Introduction to Deep Learning with Python"
+      "level": "DataCamp: Introduction to Deep Learning with Python",
+      "place": "",
+      "meta": "Introductory course"
     }
   ]
 }

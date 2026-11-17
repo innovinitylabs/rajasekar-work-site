@@ -143,9 +143,11 @@ const webEducation = () =>
         `    <h3>${escapeHtml(edu.level)}</h3>`,
         `    <span class="education-meta">${escapeHtml(edu.meta)}</span>`,
         `  </div>`,
-        `  <p>${escapeHtml(edu.place)}</p>`,
+        edu.place ? `  <p>${escapeHtml(edu.place)}</p>` : "",
         `</article>`,
-      ].join("\n")
+      ]
+        .filter(Boolean)
+        .join("\n")
     )
     .join("\n\n");
 
@@ -274,11 +276,10 @@ const printSkills = () =>
 
 const printEducation = () =>
   resume.education
-    .map(
-      (edu) =>
-        `<li>${escapeHtml(edu.level)} - ${escapeHtml(edu.place)} - ${escapeHtml(
-          edu.meta
-        )}</li>`
+    .map((edu) =>
+      edu.inline
+        ? `<li><strong>${escapeHtml(edu.title)}</strong> | ${escapeHtml(edu.inline)}</li>`
+        : `<li><strong>${escapeHtml(edu.title)}</strong>${edu.detail ? `<br />${escapeHtml(edu.detail)}` : ""}</li>`
     )
     .join("\n");
 

@@ -139,6 +139,19 @@
       "Since June 2025, independently building software products spanning data-driven applications, generative systems, creative technology and AI-assisted products.",
   };
 
+  /**
+   * One compact display shape for every output (PDF, HTML, preview).
+   * With a place: two lines ("level" / "place | meta"). Without: one line ("level | meta").
+   */
+  const educationDisplay = (e) => ({
+    level: e.level,
+    place: e.place || "",
+    meta: e.meta || "",
+    title: e.level,
+    detail: e.place ? [e.place, e.meta].filter(Boolean).join(" | ") : "",
+    inline: e.place ? "" : e.meta || "",
+  });
+
   const DEFAULT_VISIBILITY = {
     proof: true,
     summary: true,
@@ -234,11 +247,11 @@
       education: visibility.education
         ? master.education
             .filter((e) => !(options.selectedEducation || []).length || options.selectedEducation.includes(e.id))
-            .map((e) => ({ level: e.level, place: e.place, meta: e.meta }))
+            .map((e) => educationDisplay(e))
         : [],
       extraSections: (options.extraSections || []).map((x) => ({ heading: x.heading, paragraphs: [...x.paragraphs] })),
     };
   };
 
-  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, resolveProfile, SHOWCASE, LINK_TYPES, DEFAULT_VISIBILITY };
+  return { slugify, normalizeMaster, normalizeLinks, visibleLinks, contactLinks, educationDisplay, resolveProfile, SHOWCASE, LINK_TYPES, DEFAULT_VISIBILITY };
 });

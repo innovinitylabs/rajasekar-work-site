@@ -12,7 +12,7 @@ test("master keeps the Data Engineer positioning", () => {
   assert.match(data.summary, /Production Data Engineer/);
   assert.match(data.summary, /5\+ years/);
   assert.match(data.summary, /50M records per day/);
-  assert.equal(data.education.length, 2);
+  assert.equal(data.education.length, 4);
 });
 
 test("Digit Insurance: dates, ownership of BOTH Vahan and Health, and every verified achievement retained", () => {

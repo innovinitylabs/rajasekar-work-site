@@ -438,7 +438,7 @@
       <div class="form-group"><label class="form-label" for="opt-display-name">Name on resume (blank = master name)</label>
         <input class="form-input" id="opt-display-name" maxlength="120" value="${esc(o.displayName || "")}" /></div>
       <div class="form-group"><label class="form-label">Education entries (none ticked = all)</label>
-        ${state.master.education.map((e) => `<label class="checkbox-item"><input type="checkbox" data-opt-edu="${esc(e.id)}" ${eduSel.has(e.id) ? "checked" : ""} /><span>${esc(e.level)} - ${esc(e.place)}</span></label>`).join("")}</div>
+        ${state.master.education.map((e) => `<label class="checkbox-item"><input type="checkbox" data-opt-edu="${esc(e.id)}" ${eduSel.has(e.id) ? "checked" : ""} /><span>${esc(e.level)}${e.place ? " - " + esc(e.place) : ""}${e.meta ? " | " + esc(e.meta) : ""}</span></label>`).join("")}</div>
       <div class="form-group"><label class="form-label">Two-page layout, page 2 (used when Projects are "Showcase")</label>
         <input class="form-input" id="opt-sc-heading" placeholder="Heading (blank = default)" maxlength="120" value="${esc(sc.heading || "")}" style="margin-bottom:0.4rem;" />
         <textarea class="form-textarea" id="opt-sc-intro" rows="2" maxlength="600" placeholder="Introduction (blank = default)">${esc(sc.intro || "")}</textarea>
@@ -566,7 +566,7 @@
           <ul>${e.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul></div>`).join("");
     }
     const education = r.education.length
-      ? heading("Education") + r.education.map((ed) => `<div>${esc(ed.level)} - ${esc(ed.place)} - ${esc(ed.meta)}</div>`).join("")
+      ? heading("Education") + r.education.map((ed) => (ed.inline ? `<div><b>${esc(ed.title)}</b> | ${esc(ed.inline)}</div>` : `<div><b>${esc(ed.title)}</b></div>${ed.detail ? `<div class="rp-edu-detail">${esc(ed.detail)}</div>` : ""}`)).join("")
       : "";
 
     const bulletCap = twoPage ? (r.showcase && r.showcase.bulletsPerProject) || 0 : Infinity;
@@ -970,6 +970,9 @@
       </div>
       <div class="master-block"><h4>Skills</h4>
         ${d.skills.map((s, i) => `<div class="master-grid-2">${field("Group", `skills.${i}.group`, s.group)}${field("Items", `skills.${i}.items`, s.items, { kind: "csv", rows: 2 })}</div>`).join("")}
+      </div>
+      <div class="master-block"><h4>Education (newest first; which entries each resume shows is set per profile under Profile options)</h4>
+        ${d.education.map((e, i) => `<div class="master-grid-2">${field("Qualification", `education.${i}.level`, e.level)}${field("Institution (optional)", `education.${i}.place`, e.place)}${field("Result", `education.${i}.meta`, e.meta)}</div>`).join("")}
       </div>
       <div class="master-block"><h4>Projects (${d.projects.length})</h4>
         ${projectBlocks}
